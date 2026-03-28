@@ -36,7 +36,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.4.9
-  flutter_slidable: ^3.1.1
+  flutter_slidable: ^4.0.3
   flutter_svg: ^2.0.9
   gap: ^3.0.1
   intl: ^0.19.0
@@ -44,7 +44,7 @@ dependencies:
   isar_flutter_libs: ^3.1.0+1
   path_provider: ^2.1.5
   shared_preferences: ^2.2.2
-  skeletonizer: ^1.0.1
+  skeletonizer: ^2.1.3
   table_calendar: ^3.1.2
   talker_dio_logger: ^2.3.3
   talker_flutter: ^3.5.6
@@ -124,35 +124,35 @@ spider:
   groups:
     - path: assets/svgs/payment_method_icons
       class_name: SvgPaymentMethodIcons
-      types: [.svg]
+      types: [ .svg ]
     - path: assets/svgs/social_logos
       class_name: SvgSocialLogos
-      types: [.svg]
+      types: [ .svg ]
     - path: assets/svgs/iconsax/bold
       class_name: IconsaxBold
-      types: [.svg]
+      types: [ .svg ]
     - path: assets/svgs/iconsax/broken
       class_name: IconsaxBroken
-      types: [.svg]
+      types: [ .svg ]
     - path: assets/svgs/iconsax/bulk
       class_name: IconsaxBulk
-      types: [.svg]
+      types: [ .svg ]
     - path: assets/svgs/iconsax/linear
       class_name: IconsaxLinear
-      types: [.svg]
+      types: [ .svg ]
     - path: assets/svgs/iconsax/outline
       class_name: IconsaxOutline
-      types: [.svg]
+      types: [ .svg ]
     - path: assets/svgs/iconsax/twotone
       class_name: IconsaxTwotone
-      types: [.svg]
+      types: [ .svg ]
     - path: assets/svgs/home_icons
       class_name: HomeIcons
-      types: [.svg]
+      types: [ .svg ]
 
     - path: assets/images
       class_name: ImagesAssets
-      types: [.png, .jpg, .jpeg, .gif]
+      types: [ .png, .jpg, .jpeg, .gif ]
 
 flutter_launcher_icons:
   android: "launcher_icon"
