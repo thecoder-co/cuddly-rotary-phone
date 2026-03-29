@@ -69,92 +69,75 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Resolved colours
+    final resolvedBg = backgroundColor ??
+        (isOutline ? Colors.transparent : AppColors.primary);
+    final resolvedFg = textColor ??
+        (isOutline
+            ? (isDark ? Colors.white : AppColors.primary)
+            : Colors.white);
+    final disabledBg = isOutline ? Colors.transparent : const Color(0xFFE2E2E2);
+    final disabledFg = AppColors.greyQuatinary;
+
+    final buttonChild = child ??
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (preIcon != null) ...[
+              SvgPicture.asset(preIcon!, colorFilter: ColorFilter.mode(iconColor ?? resolvedFg, BlendMode.srcIn)),
+              preIconSpace.spacingW,
+            ],
+            Text(
+              label!,
+              style: CustomTextStyle.textmedium16.w700
+                  .withColor(onPressed == null ? disabledFg : resolvedFg),
+            ),
+            if (postIcon != null) ...[
+              postIconSpace.spacingW,
+              SvgPicture.asset(postIcon!, colorFilter: ColorFilter.mode(iconColor ?? resolvedFg, BlendMode.srcIn)),
+            ],
+          ],
+        );
+
     return SizedBox(
       width: width,
       height: height,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ButtonStyle(
-          elevation: const WidgetStatePropertyAll(8),
-          shadowColor: backgroundColor != null
-              ? const WidgetStatePropertyAll(Colors.transparent)
-              : WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return Colors.transparent;
-                  } else {
-                    return shadowColor;
-                  }
-                }),
-          foregroundColor: textColor != null
-              ? WidgetStatePropertyAll(textColor)
-              : WidgetStateProperty.resolveWith((states) {
-                  if (isOutline) {
-                    return AppColors.primary;
-                  } else if (states.contains(WidgetState.disabled)) {
-                    return AppColors.greyQuatinary;
-                  } else if (isOutline) {
-                    return AppColors.primary;
-                  } else if (states.contains(WidgetState.hovered) ||
-                      states.contains(WidgetState.pressed)) {
-                    return AppColors.primary400;
-                  } else {
-                    return Colors.white;
-                  }
-                }),
-          textStyle: WidgetStatePropertyAll(CustomTextStyle.textmedium16.w700),
-          backgroundColor: backgroundColor != null
-              ? WidgetStatePropertyAll(backgroundColor)
-              : WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.disabled)) {
-                    return const Color(0xffE2E2E2);
-                  } else if (isOutline) {
-                    return Colors.transparent;
-                  } else if (states.contains(WidgetState.hovered) ||
-                      states.contains(WidgetState.pressed)) {
-                    return AppColors.primary400;
-                  }
-                  return AppColors.primary;
-                }),
-          fixedSize: WidgetStatePropertyAll(
-              width == null ? Size.fromHeight(height) : Size(width!, height)),
-          shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(
+      child: isOutline
+          ? CupertinoButton(
+              onPressed: onPressed,
+              padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(radius),
-              side: isOutline
-                  ? const BorderSide(
-                      color: Color(0xff3C3C3E),
-                      width: 0.5,
-                    )
-                  : BorderSide.none,
-            ),
-          ),
-        ),
-        child: child == null
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (preIcon != null) ...[
-                    SvgPicture.asset(
-                      preIcon!,
-                      color: iconColor ?? textColor,
-                    ),
-                    preIconSpace.spacingW,
-                  ],
-                  Text(
-                    label!,
-                    style: CustomTextStyle.textmedium16.w700,
+              child: Container(
+                width: width,
+                height: height,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+                  border: Border.all(
+                    color: onPressed == null
+                        ? AppColors.greySecondary
+                        : const Color(0xFF3C3C3E),
+                    width: borderWidth,
                   ),
-                  if (postIcon != null) ...[
-                    postIconSpace.spacingW,
-                    SvgPicture.asset(
-                      postIcon!,
-                      color: iconColor ?? textColor,
-                    ),
-                  ],
-                ],
-              )
-            : child!,
-      ),
+                ),
+                child: buttonChild,
+              ),
+            )
+          : CupertinoButton(
+              onPressed: onPressed,
+              padding: EdgeInsets.zero,
+              borderRadius: BorderRadius.circular(radius),
+              color: onPressed == null ? disabledBg : resolvedBg,
+              disabledColor: disabledBg,
+              child: SizedBox(
+                width: width,
+                height: height,
+                child: Center(child: buttonChild),
+              ),
+            ),
     );
   }
 }

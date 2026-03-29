@@ -36,109 +36,91 @@ class CustomTextStyle {
     fontSize: 20,
     fontWeight: FontWeight.w800,
     letterSpacing: -0.50,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle labelLXBold = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w800,
     letterSpacing: -0.50,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle label2XLBold = TextStyle(
     fontSize: 24,
     fontWeight: FontWeight.w700,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle base = TextStyle(
     fontSize: 14,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle labelXLBold = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.w700,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle labelLBold = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w700,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle labelMedium = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w700,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle labelSmall = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w700,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle labelXSmall = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w700,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle subtitleLarge = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w500,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle subtitleMedium = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle subtitleSmall = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w500,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle subtitleXSmall = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w500,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle paragraphLarge = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w400,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle paragraphMedium = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w400,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle paragraphSmall = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w400,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle paragraphXSmall = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,
-    color: AppColors.baseBlack,
   );
 
   static const TextStyle paragraphTiny = TextStyle(
     fontSize: 10,
     fontWeight: FontWeight.w400,
-    color: AppColors.baseBlack,
   );
 }
 

@@ -6,6 +6,10 @@ class ResponseModel<T> {
   final String? token;
   final T? data;
 
+  /// True when the failure was caused by network / infra issues (timeout,
+  /// no connectivity, 5xx server error) rather than a backend business error.
+  bool get isNetworkError => statusCode == -1;
+
   ResponseModel({
     this.valid = false,
     this.message = '',

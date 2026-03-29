@@ -45,7 +45,6 @@ dependencies:
   path_provider: ^2.1.5
   shared_preferences: ^2.2.2
   skeletonizer: ^2.1.3
-  table_calendar: ^3.1.2
   talker_dio_logger: ^2.3.3
   talker_flutter: ^3.5.6
   upgrader: ^11.3.0

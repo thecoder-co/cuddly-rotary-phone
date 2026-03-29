@@ -2,9 +2,25 @@ import 'package:isar/isar.dart';
 
 part 'meal.g.dart';
 
+enum SyncStatus {
+  synced,
+  pendingCreate,
+  pendingUpdate,
+  pendingDelete,
+}
+
 @collection
 class Meal {
   Id id = Isar.autoIncrement;
+  
+  @Index(unique: true, replace: true)
+  String? backendId;
+  
+  @enumerated
+  SyncStatus syncStatus = SyncStatus.pendingCreate; // Offline sync
+  
+  String type = 'LOGENTRY';
+
   String? date;
   String? name;
   bool showAsSubmeal;
@@ -17,34 +33,45 @@ class Meal {
 
   List<SubMeal> subMeals = []; // Embedded sub-meals
 
-  String get calories {
-    var calories = (((caloriePerGram ??
-            subMeals.fold(
-              0,
-              (total, subMeal) =>
-                  (total ?? 0) +
-                  ((subMeal.caloriesPerGram ?? 1) *
-                      (subMeal.chosenWeight ?? 1)),
-            )) ??
-        0));
-    if (weight == null && showAsSubmeal) {
-      calories *= 100;
-    }
-    return calories.toStringAsFixed(1);
+  double get totalSubMealWeight => subMeals.fold<double>(0.0, (total, sm) => total + (sm.chosenWeight ?? 0.0));
+
+  double get inferredCaloriePerGram {
+    if (subMeals.isEmpty) return 0.0;
+    final totalCals = subMeals.fold<double>(0.0, (total, sm) => total + ((sm.caloriesPerGram ?? 0.0) * (sm.chosenWeight ?? 0.0)));
+    final w = totalSubMealWeight;
+    return w > 0 ? (totalCals / w) : 0.0;
   }
 
-  double get caloriesUnit {
-    var calories = (((caloriePerGram ??
-            subMeals.fold(
-              0,
-              (total, subMeal) =>
-                  (total ?? 0) +
-                  ((subMeal.caloriesPerGram ?? 1) *
-                      (subMeal.chosenWeight ?? 1)),
-            )) ??
-        0));
-    return calories;
+  double get inferredProteinPerGram {
+    if (subMeals.isEmpty) return 0.0;
+    final total = subMeals.fold<double>(0.0, (total, sm) => total + ((sm.macros?.protein ?? 0.0) * (sm.chosenWeight ?? 0.0)));
+    final w = totalSubMealWeight;
+    return w > 0 ? (total / w) : 0.0;
   }
+
+  double get inferredFatPerGram {
+    if (subMeals.isEmpty) return 0.0;
+    final total = subMeals.fold<double>(0.0, (total, sm) => total + ((sm.macros?.fats ?? 0.0) * (sm.chosenWeight ?? 0.0)));
+    final w = totalSubMealWeight;
+    return w > 0 ? (total / w) : 0.0;
+  }
+
+  double get inferredCarbsPerGram {
+    if (subMeals.isEmpty) return 0.0;
+    final total = subMeals.fold<double>(0.0, (total, sm) => total + ((sm.macros?.carbs ?? 0.0) * (sm.chosenWeight ?? 0.0)));
+    final w = totalSubMealWeight;
+    return w > 0 ? (total / w) : 0.0;
+  }
+
+  double get actualCaloriePerGram => caloriePerGram ?? inferredCaloriePerGram;
+  double get actualProteinPerGram => macros?.protein ?? inferredProteinPerGram;
+  double get actualFatPerGram => macros?.fats ?? inferredFatPerGram;
+  double get actualCarbsPerGram => macros?.carbs ?? inferredCarbsPerGram;
+
+  double get resolvedWeight => weight ?? (totalSubMealWeight > 0 ? totalSubMealWeight : (showAsSubmeal ? 100.0 : 0.0));
+
+  String get calories => (actualCaloriePerGram * resolvedWeight).toStringAsFixed(1);
+  double get caloriesUnit => actualCaloriePerGram * resolvedWeight;
 
   Meal({
     this.showAsSubmeal = false,
@@ -55,6 +82,9 @@ class Meal {
     this.macros,
     this.subMeals = const [],
     this.withoutWeight = false,
+    this.backendId,
+    this.syncStatus = SyncStatus.pendingCreate,
+    this.type = 'LOGENTRY',
   });
 
   Meal copyWith({
@@ -66,6 +96,9 @@ class Meal {
     Macros? macros,
     List<SubMeal>? subMeals,
     bool? withoutWeight,
+    String? backendId,
+    SyncStatus? syncStatus,
+    String? type,
   }) {
     return Meal(
       date: date ?? this.date,
@@ -76,12 +109,16 @@ class Meal {
       macros: macros ?? this.macros,
       subMeals: subMeals ?? this.subMeals,
       withoutWeight: withoutWeight ?? this.withoutWeight,
+      backendId: backendId ?? this.backendId,
+      syncStatus: syncStatus ?? this.syncStatus,
+      type: type ?? this.type,
     );
   }
 }
 
 @embedded
 class SubMeal {
+  String? backendId; // Match backend UUID
   String? name;
   double? chosenWeight;
   int? parentId;

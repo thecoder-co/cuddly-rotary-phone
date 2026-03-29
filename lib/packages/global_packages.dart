@@ -3,6 +3,7 @@
 library;
 
 export 'package:flutter/material.dart';
+export 'package:flutter/cupertino.dart' hide RefreshCallback;
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';

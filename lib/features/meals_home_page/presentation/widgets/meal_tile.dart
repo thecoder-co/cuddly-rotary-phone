@@ -1,3 +1,4 @@
+import 'package:calorie_tracker/core/dialogs/toast.dart';
 import 'package:calorie_tracker/core/utils/validators.dart';
 import 'package:calorie_tracker/features/meals/models/meal.dart';
 import 'package:calorie_tracker/features/meals/presentation/add_meal.dart';
@@ -52,6 +53,8 @@ class _MealTileState extends ConsumerState<MealTile> {
   @override
   Widget build(BuildContext context) {
     final meal = ref.watch(mealByIdProvider(widget.mealId));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (!meal.hasValue) {
       return const Center(
         child: CircularProgressIndicator.adaptive(),
@@ -81,7 +84,6 @@ class _MealTileState extends ConsumerState<MealTile> {
       children: [
         Slidable(
           key: ValueKey(widget.mealId),
-
           startActionPane: ActionPane(
             motion: const ScrollMotion(),
             dismissible: null,
@@ -90,29 +92,18 @@ class _MealTileState extends ConsumerState<MealTile> {
                 onPressed: (context) {
                   ref
                       .read(mealProvider((query: null, date: null)).notifier)
-                      .deleteMeal(widget.mealId);
+                      .deleteMeal(
+                        meal: meal.value!,
+                        id: meal.value?.backendId,
+                      );
                 },
                 backgroundColor: const Color(0xFFFE4A49),
                 foregroundColor: Colors.white,
                 icon: Icons.delete,
                 label: 'Delete',
               ),
-              // SlidableAction(
-              //   onPressed: (context) {
-              //     pushTo(
-              //       CreateStudySessionScreen(
-              //           date: todo.taskStartDate!.stripTime, todo: todo),
-              //     );
-              //   },
-              //   backgroundColor: const Color(0xFF21B7CA),
-              //   foregroundColor: Colors.white,
-              //   icon: Icons.edit,
-              //   label: 'Edit',
-              // ),
             ],
           ),
-
-          // The end action pane is the one at the right or the bottom side.
           endActionPane: ActionPane(
             motion: const ScrollMotion(),
             children: [
@@ -120,25 +111,16 @@ class _MealTileState extends ConsumerState<MealTile> {
                 onPressed: (context) {
                   ref
                       .read(mealProvider((query: null, date: null)).notifier)
-                      .deleteMeal(widget.mealId);
+                      .deleteMeal(
+                        meal: meal.value!,
+                        id: meal.value?.backendId,
+                      );
                 },
                 backgroundColor: const Color(0xFFFE4A49),
                 foregroundColor: Colors.white,
                 icon: Icons.delete,
                 label: 'Delete',
               ),
-              // SlidableAction(
-              //   onPressed: (context) {
-              //     pushTo(
-              //       CreateStudySessionScreen(
-              //           date: todo.taskStartDate!.stripTime, todo: todo),
-              //     );
-              //   },
-              //   backgroundColor: const Color(0xFF21B7CA),
-              //   foregroundColor: Colors.white,
-              //   icon: Icons.edit,
-              //   label: 'Edit',
-              // ),
             ],
           ),
           child: InkWell(
@@ -155,25 +137,26 @@ class _MealTileState extends ConsumerState<MealTile> {
               }
             },
             child: AnimatedContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               duration: duration,
-              decoration: ShapeDecoration(
-                color: isExpanded ? AppColors.primary50 : null,
-                shape: isExpanded
-                    ? RoundedRectangleBorder(
-                        // side: const BorderSide(width: 1, color: Color(0xFF93CDF0)),
-                        borderRadius: BorderRadius.circular(8),
-                      )
-                    : RoundedRectangleBorder(
-                        // side: const BorderSide(width: 1, color: Color(0xFFE4E8EB)),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+              decoration: BoxDecoration(
+                color: isExpanded
+                    ? (isDark
+                        ? const Color(0xFF2C2C2E)
+                        : const Color(0xFFF2F2F7))
+                    : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.06)
+                      : Colors.black.withOpacity(0.06),
+                  width: 0.5,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    // crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Column(
@@ -183,19 +166,14 @@ class _MealTileState extends ConsumerState<MealTile> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    meal.value!.name ??
-                                        meal.value!.subMeals
-                                            .map((element) => element.name)
-                                            .where((name) =>
-                                                name != null && name.isNotEmpty)
-                                            .join(' and '),
+                                    '${meal.value!.name ?? meal.value!.subMeals.map((element) => element.name).where((name) => name != null && name.isNotEmpty).join(' and ')}${meal.value!.syncStatus != SyncStatus.synced ? ' (Unsynced)' : ''}',
                                     style: CustomTextStyle.textsmall14.w600,
                                   ),
                                 ),
                                 Text(
                                   widget.initialWeight != null
                                       ? (widget.initialWeight! *
-                                              meal.value!.caloriesUnit)
+                                              (meal.value!.caloriePerGram ?? 1))
                                           .toStringAsFixed(2)
                                       : '${(weight) <= 0 || widget.asSubMeal ? '' : '${weight}g/'}${calorieCount}kcal${(weight) <= 0 || widget.asSubMeal ? '/100g' : ''}',
                                   style: CustomTextStyle.textmedium16.w700,
@@ -206,50 +184,21 @@ class _MealTileState extends ConsumerState<MealTile> {
                         ),
                       ),
                       16.gap,
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            isExpanded = !isExpanded;
-                          });
-                        },
-                        child: AnimatedContainer(
-                          duration: duration,
-                          height: 44,
-                          width: 44,
-                          decoration: BoxDecoration(
-                            color: switch (isExpanded) {
-                              true => AppColors.primary,
-                              false => AppColors.primary100,
-                            },
-                            shape: BoxShape.circle,
-                          ),
-                          alignment: Alignment.center,
+                      // Chevron — no background, just a tinted icon
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => setState(() => isExpanded = !isExpanded),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
                           child: AnimatedRotation(
-                            turns: switch (isExpanded) {
-                              false => 0,
-                              true => 0.5,
-                            },
+                            turns: isExpanded ? 0.5 : 0,
                             duration: duration,
-                            child: AnimatedTheme(
-                              onEnd: () {
-                                setState(() {
-                                  closeText = !closeText;
-                                });
-                              },
-                              data: switch (isExpanded) {
-                                true => ThemeData(
-                                    iconTheme: const IconThemeData(
-                                      color: AppColors.primary50,
-                                    ),
-                                  ),
-                                false => ThemeData(
-                                    iconTheme: const IconThemeData(
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                              },
-                              child:
-                                  const Icon(Icons.keyboard_arrow_down_rounded),
+                            child: Icon(
+                              CupertinoIcons.chevron_down,
+                              size: 16,
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.45)
+                                  : CupertinoColors.secondaryLabel,
                             ),
                           ),
                         ),
@@ -285,21 +234,29 @@ class _MealTileState extends ConsumerState<MealTile> {
                           if (meal.value!.macros != null) ...[
                             _tile([
                               'Protein',
-                              '${meal.value!.macros!.protein * 100}g'
+                              '${(meal.value!.macros!.protein * 100).toStringAsFixed(1)}g'
                             ]),
                             _tile([
                               'Carbs',
-                              '${meal.value!.macros!.carbs * 100}'
+                              '${(meal.value!.macros!.carbs * 100).toStringAsFixed(1)}g'
                             ]),
-                            _tile(
-                                ['Fats', '${meal.value!.macros!.fats * 100}']),
+                            _tile([
+                              'Fats',
+                              '${(meal.value!.macros!.fats * 100).toStringAsFixed(1)}g'
+                            ]),
                           ] else if (combinedMacros.isNotEmpty) ...[
                             _tile([
                               'Protein',
-                              '${combinedMacros.protein * 100}g'
+                              '${(combinedMacros.protein * 100).toStringAsFixed(1)}g'
                             ]),
-                            _tile(['Carbs', '${combinedMacros.carbs * 100}']),
-                            _tile(['Fats', '${combinedMacros.fats * 100}']),
+                            _tile([
+                              'Carbs',
+                              '${(combinedMacros.carbs * 100).toStringAsFixed(1)}g'
+                            ]),
+                            _tile([
+                              'Fats',
+                              '${(combinedMacros.fats * 100).toStringAsFixed(1)}g'
+                            ]),
                           ],
                         ],
                       ),

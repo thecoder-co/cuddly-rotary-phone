@@ -17,47 +17,6 @@ class Dialogs {
     );
   }
 
-  static void showErrorSnackbar({
-    required String message,
-  }) {
-    ScaffoldMessenger.of(NavigationService.navigatorKey.currentState!.context)
-        .showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  static void showSnackbar({
-    required String message,
-  }) {
-    ScaffoldMessenger.of(NavigationService.navigatorKey.currentState!.context)
-        .showSnackBar(
-      SnackBar(
-        content: Text(message),
-        // backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  static void showSuccessSnackbar({
-    required String message,
-  }) {
-    ScaffoldMessenger.of(NavigationService.navigatorKey.currentState!.context)
-        .showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
   static Future<bool> confirmDialog({
     String? title,
     String? subtitle,

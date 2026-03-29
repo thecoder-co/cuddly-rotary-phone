@@ -13,68 +13,45 @@ class CustomBottomNav extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      height: 59 + MediaQuery.of(context).padding.bottom,
-      decoration: const BoxDecoration(
-        color: AppColors.primary,
-        border: Border(
-          top: BorderSide(
-            color: AppColors.greySecondary,
-            width: 0.5,
-          ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Light: white tab bar with green accent (standard iOS)
+    // Dark: #1C1C1E (iOS system background level 2)
+    final activeColor = isDark ? AppColors.primary300 : AppColors.primary;
+    final inactiveColor = isDark
+        ? Colors.white.withOpacity(0.45)
+        : CupertinoColors.inactiveGray;
+
+    return CupertinoTabBar(
+      currentIndex: currentIndex,
+      onTap: onTap,
+      activeColor: activeColor,
+      inactiveColor: inactiveColor,
+      backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+      border: Border(
+        top: BorderSide(
+          color: isDark
+              ? Colors.white.withOpacity(0.08)
+              : Colors.black.withOpacity(0.12),
+          width: 0.5,
         ),
       ),
-      alignment: Alignment.topCenter,
-      // padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: items
-            .mapIndexed(
-              (i, e) => Expanded(
-                child: InkWell(
-                  onTap: () {
-                    onTap(i);
-                  },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedContainer(
-                        key: ValueKey(i),
-                        duration: const Duration(milliseconds: 100),
-                        width: i == currentIndex ? 44 : 0,
-                        height: 3,
-                        decoration: ShapeDecoration(
-                          color: AppColors.primary50,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                      5.gap,
-                      SvgPicture.asset(
-                        e.icon,
-                        color: AppColors.primary50,
-                        height: 24,
-                      ),
-                      4.spacingH,
-                      Text(
-                        e.title,
-                        style: CustomTextStyle.textxSmall12
-                            .withColor(AppColors.primary50)
-                            .withWeight(switch (i == currentIndex) {
-                              true => FontWeight.w500,
-                              false => FontWeight.w400,
-                            }),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+      items: items
+          .asMap()
+          .entries
+          .map(
+            (entry) => BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                entry.value.icon,
+                colorFilter: ColorFilter.mode(
+                  entry.key == currentIndex ? activeColor : inactiveColor,
+                  BlendMode.srcIn,
                 ),
+                height: 24,
               ),
-            )
-            .toList(),
-      ),
+              label: entry.value.title,
+            ),
+          )
+          .toList(),
     );
   }
 }

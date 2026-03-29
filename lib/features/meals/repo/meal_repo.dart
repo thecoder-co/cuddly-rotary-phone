@@ -1,0 +1,297 @@
+import 'package:calorie_tracker/core/services/api_handler/api_client_config.dart';
+import 'package:calorie_tracker/core/services/api_handler/app_endpoints.dart';
+import 'package:calorie_tracker/core/services/api_handler/api_handler_models.dart';
+import 'package:calorie_tracker/packages/packages.dart';
+import 'package:calorie_tracker/core/services/local_data/isar_service.dart';
+import 'package:isar/isar.dart';
+
+import '../models/meal_dto.dart';
+import '../models/meal.dart';
+import '../models/meal_analytics_dto.dart';
+import 'dart:developer';
+
+class MealCloudRepo {
+  final BackendService _apiService = BackendService(Dio());
+
+  Future<ResponseModel<MealResponseDto>> createMeal(CreateMealDto model) async {
+    Response response = await _apiService.runCall(
+      _apiService.dio.post(
+        '${AppEndpoints.baseUrl}' '/meals',
+        data: model.toJson(),
+      ),
+    );
+
+    final int statusCode = response.statusCode ?? 000;
+
+    if (statusCode >= 200 && statusCode <= 300) {
+      return ResponseModel(
+        valid: true,
+        statusCode: statusCode,
+        message: response.data['message'],
+        data: MealResponseDto.fromJson(response.data),
+      );
+    }
+
+    return ResponseModel(
+      error: ErrorModel.fromJson(response.data ?? {}),
+      statusCode: statusCode,
+      message: response.data?['message'] ?? 'Something went wrong',
+    );
+  }
+
+  Future<ResponseModel<MealResponseDto>> updateMeal(
+      String id, UpdateMealDto model) async {
+    Response response = await _apiService.runCall(
+      _apiService.dio
+          .patch('${AppEndpoints.baseUrl}/meals/$id', data: model.toJson()),
+    );
+
+    final int statusCode = response.statusCode ?? 000;
+
+    if (statusCode >= 200 && statusCode <= 300) {
+      return ResponseModel(
+        valid: true,
+        statusCode: statusCode,
+        message: response.statusMessage,
+        data: MealResponseDto.fromJson(response.data),
+      );
+    }
+
+    return ResponseModel(
+      error: ErrorModel.fromJson(response.data ?? {}),
+      statusCode: statusCode,
+      message: response.data?['message'] ?? 'Something went wrong',
+    );
+  }
+
+  Future<ResponseModel> deleteMeal(String id) async {
+    Response response = await _apiService.runCall(
+      _apiService.dio.delete('${AppEndpoints.baseUrl}' '/meals/$id'),
+    );
+
+    final int statusCode = response.statusCode ?? 000;
+
+    if (statusCode >= 200 && statusCode <= 300) {
+      return ResponseModel(
+        valid: true,
+        statusCode: statusCode,
+        message: response.statusMessage,
+        data: response.data,
+      );
+    }
+
+    return ResponseModel(
+      error: ErrorModel.fromJson(response.data ?? {}),
+      statusCode: statusCode,
+      message: response.data?['message'] ?? 'Something went wrong',
+    );
+  }
+
+  Future<ResponseModel<DailyMealDto>> getDailyMeals(String date) async {
+    Response response = await _apiService.runCall(
+      _apiService.dio.get('${AppEndpoints.baseUrl}/meals/daily?date=$date'),
+    );
+
+    final int statusCode = response.statusCode ?? 000;
+
+    if (statusCode >= 200 && statusCode <= 300) {
+      // NOTE: Here we should ideally sync the returned data with LocalDB.
+      return ResponseModel(
+        valid: true,
+        statusCode: statusCode,
+        message: response.statusMessage,
+        data: DailyMealDto.fromJson(response.data),
+      );
+    }
+
+    return ResponseModel(
+      error: ErrorModel.fromJson(response.data ?? {}),
+      statusCode: statusCode,
+      message: response.data?['message'] ?? 'Something went wrong',
+    );
+  }
+
+  Future<ResponseModel<AllMealResponseDto>> getAllMeals({
+    String? name,
+    String? type,
+    double? caloriesPerGramLt,
+    double? caloriesPerGramGte,
+    double? caloriesPerGramEq,
+    double? proteinPerGramLt,
+    double? proteinPerGramGte,
+    double? proteinPerGramEq,
+    double? fatPerGramLt,
+    double? fatPerGramGte,
+    double? fatPerGramEq,
+    double? carbsPerGramLt,
+    double? carbsPerGramGte,
+    double? carbsPerGramEq,
+    double? fibrePerGramLt,
+    double? fibrePerGramGte,
+    double? fibrePerGramEq,
+  }) async {
+    Response response = await _apiService.runCall(
+      _apiService.dio.get('${AppEndpoints.baseUrl}' '/meals', queryParameters: {
+        'page': 1,
+        'limit': 100,
+        if (name != null) 'name': name,
+        if (type != null) 'type': type,
+        if (caloriesPerGramLt != null) 'caloriesPerGramLt': caloriesPerGramLt,
+        if (caloriesPerGramGte != null)
+          'caloriesPerGramGte': caloriesPerGramGte,
+        if (caloriesPerGramEq != null) 'caloriesPerGramEq': caloriesPerGramEq,
+        if (proteinPerGramLt != null) 'proteinPerGramLt': proteinPerGramLt,
+        if (proteinPerGramGte != null) 'proteinPerGramGte': proteinPerGramGte,
+        if (proteinPerGramEq != null) 'proteinPerGramEq': proteinPerGramEq,
+        if (fatPerGramLt != null) 'fatPerGramLt': fatPerGramLt,
+        if (fatPerGramGte != null) 'fatPerGramGte': fatPerGramGte,
+        if (fatPerGramEq != null) 'fatPerGramEq': fatPerGramEq,
+        if (carbsPerGramLt != null) 'carbsPerGramLt': carbsPerGramLt,
+        if (carbsPerGramGte != null) 'carbsPerGramGte': carbsPerGramGte,
+        if (carbsPerGramEq != null) 'carbsPerGramEq': carbsPerGramEq,
+        if (fibrePerGramLt != null) 'fibrePerGramLt': fibrePerGramLt,
+        if (fibrePerGramGte != null) 'fibrePerGramGte': fibrePerGramGte,
+        if (fibrePerGramEq != null) 'fibrePerGramEq': fibrePerGramEq,
+      }),
+    );
+
+    final int statusCode = response.statusCode ?? 000;
+
+    if (statusCode >= 200 && statusCode <= 300) {
+      // NOTE: Here we should ideally sync the returned data with LocalDB.
+      return ResponseModel(
+        valid: true,
+        statusCode: statusCode,
+        message: response.statusMessage,
+        data: AllMealResponseDto.fromJson(response.data),
+      );
+    }
+
+    return ResponseModel(
+      error: ErrorModel.fromJson(response.data ?? {}),
+      statusCode: statusCode,
+      message: response.data?['message'] ?? 'Something went wrong',
+    );
+  }
+
+  Future<ResponseModel<MealAnalyticsDto>> getAnalytics(
+      {String? date, String? dateGte, String? dateLt}) async {
+    final queryParams = <String, dynamic>{};
+    if (date != null) queryParams['date'] = date;
+    if (dateGte != null) queryParams['dateGte'] = dateGte;
+    if (dateLt != null) queryParams['dateLt'] = dateLt;
+
+    Response response = await _apiService.runCall(
+      _apiService.dio.get('${AppEndpoints.baseUrl}/meals/analytics',
+          queryParameters: queryParams),
+    );
+
+    final int statusCode = response.statusCode ?? 000;
+
+    if (statusCode >= 200 && statusCode <= 300) {
+      return ResponseModel(
+        valid: true,
+        statusCode: statusCode,
+        message: response.statusMessage,
+        data: MealAnalyticsDto.fromJson(response.data),
+      );
+    }
+
+    return ResponseModel(
+      error: ErrorModel.fromJson(response.data ?? {}),
+      statusCode: statusCode,
+      message: response.data?['message'] ?? 'Something went wrong',
+    );
+  }
+
+  // --- Offline Sync Logic using Isar ---
+
+  Future<int> saveMealLocally(Meal meal) async {
+    final isar = IsarService.isar;
+    return await isar.writeTxn(() async {
+      return await isar.meals.put(meal);
+    });
+  }
+
+  Future<List<Meal>> getPendingMeals() async {
+    final isar = IsarService.isar;
+    return await isar.meals
+        .filter()
+        .syncStatusEqualTo(SyncStatus.pendingCreate)
+        .or()
+        .syncStatusEqualTo(SyncStatus.pendingUpdate)
+        .or()
+        .syncStatusEqualTo(SyncStatus.pendingDelete)
+        .findAll();
+  }
+
+  Future<void> syncPendingMeals() async {
+    final pendingMeals = await getPendingMeals();
+    for (final meal in pendingMeals) {
+      try {
+        if (meal.syncStatus == SyncStatus.pendingCreate) {
+          final dto = CreateMealDto(
+            name: meal.name,
+            type: meal.type,
+            consumedDate: meal.date,
+            caloriePerGram: meal.caloriePerGram,
+            protienPerGram: meal.macros?.protein,
+            fatPerGram: meal.macros?.fats,
+            carbsPerGram: meal.macros?.carbs,
+            weight: meal.weight,
+            components: meal.subMeals
+                .map((e) => MealComponentDto(
+                    subMealId: e.backendId ?? '',
+                    weightUsed: e.chosenWeight ?? 0))
+                .toList(),
+          );
+          final res = await createMeal(dto);
+          if (res.valid) {
+            final isar = IsarService.isar;
+            await isar.writeTxn(() async {
+              meal.syncStatus = SyncStatus.synced;
+              if (res.data?.id != null) {
+                meal.backendId = res.data!.id;
+              }
+              await isar.meals.put(meal);
+            });
+          }
+        } else if (meal.syncStatus == SyncStatus.pendingUpdate) {
+          final dto = UpdateMealDto(
+            name: meal.name,
+            type: meal.type,
+            consumedDate: meal.date,
+            caloriePerGram: meal.caloriePerGram,
+            protienPerGram: meal.macros?.protein,
+            fatPerGram: meal.macros?.fats,
+            carbsPerGram: meal.macros?.carbs,
+            weight: meal.weight,
+            components: meal.subMeals
+                .map((e) => MealComponentDto(
+                    subMealId: e.backendId ?? '',
+                    weightUsed: e.chosenWeight ?? 0))
+                .toList(),
+          );
+          final res = await updateMeal(meal.backendId!, dto);
+          if (res.valid) {
+            final isar = IsarService.isar;
+            await isar.writeTxn(() async {
+              meal.syncStatus = SyncStatus.synced;
+              await isar.meals.put(meal);
+            });
+          }
+        } else if (meal.syncStatus == SyncStatus.pendingDelete) {
+          final res = await deleteMeal(meal.backendId!);
+          if (res.valid) {
+            final isar = IsarService.isar;
+            await isar.writeTxn(() async {
+              await isar.meals.delete(meal.id);
+            });
+          }
+        }
+      } catch (e) {
+        log('Error syncing meal ${meal.id}: $e');
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 class AppEndpoints {
-  static bool liveWhileDebug = true;
+  static bool liveWhileDebug = false;
 
   static String get baseUrl {
     //return baseUrlTest;
@@ -12,8 +12,8 @@ class AppEndpoints {
     }
   }
 
-  static String baseUrlTest = 'https://api.test.calorie_tracker.africa';
-  static String baseUrlLive = 'https://api.calorie_tracker.africa';
+  static String baseUrlTest = 'http://localhost:3000';
+  static String baseUrlLive = 'https://qarr-tracker.onrender.com';
 
   static String get baseUrlWeb {
     //return baseUrlWebTest;

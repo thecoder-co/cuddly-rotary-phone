@@ -24,3 +24,4 @@ export 'package:share_plus/share_plus.dart';
 export 'buttons/buttons.dart';
 export 'dart:convert';
 export '../router/route.dart';
+export 'package:calorie_tracker/core/dialogs/toast.dart';

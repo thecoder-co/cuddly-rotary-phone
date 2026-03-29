@@ -535,11 +535,15 @@ class _AppInputState extends State<AppInput> {
   @override
   Widget build(BuildContext context) {
     Color textColor() {
-      return AppColors.baseBlack;
+      return Theme.of(context).brightness == Brightness.dark
+          ? Colors.white
+          : AppColors.baseBlack;
     }
 
     Color hintColor() {
-      return AppColors.primary400;
+      return Theme.of(context).brightness == Brightness.dark
+          ? Colors.white.withOpacity(0.35)
+          : AppColors.greyTertiary;
     }
 
     return GestureDetector(
@@ -570,7 +574,9 @@ class _AppInputState extends State<AppInput> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(radius),
-              color: AppColors.primary100,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF2C2C2E)
+                  : AppColors.primary100,
             ),
             // height: widget.height,
             width: widget.width,
@@ -720,73 +726,60 @@ class _AppInputState extends State<AppInput> {
     ),
   );
   Widget onEmptyField(Color textColor, Color hintColor) {
-    return TextFormField(
-      focusNode: _focusNode,
-      enabled: widget.enabled,
-
-      expands: widget.expands,
-      readOnly: widget.readOnly,
-
-      onChanged: widget.onChanged,
-      //cursorHeight: 10,
-      obscureText: widget.isPasswordField ? passwordVisibilityChange : false,
-      keyboardType: widget.keyboardType,
-      style: widget.style?.withColor(textColor) ??
-          CustomTextStyle.textmedium16.w500.withColor(textColor),
-      inputFormatters: [
-        if (widget.inputFormatters != null) ...widget.inputFormatters!,
-      ],
-      textAlign: widget.textAlign ?? TextAlign.start,
-      onTap: widget.isDateTimeInputField
-          ? () {
-              handleDateTime();
-            }
-          : widget.isTimeInputField
-              ? () {
-                  handleTime();
-                }
-              : widget.onTap,
-      maxLines: widget.maxLines,
-      minLines: widget.minLines,
-      autofocus: widget.autoFocus,
-      decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-        hintText: widget.isTimeInputField ? '00:00' : widget.hintText,
-        fillColor: Colors.transparent,
-        filled: true,
-        hintStyle: widget.hintStyle?.withColor(hintColor) ??
-            CustomTextStyle.textmedium16.withColor(hintColor),
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
-        errorStyle: const TextStyle(
-          height: 0.00000000000000000000000000000000000000000000001,
-        ),
-      ),
-
+    return FormField<String>(
+      initialValue: controller.text,
       autovalidateMode: widget.autovalidateMode,
-      controller: controller,
       validator: widget.validator == null
           ? null
           : (v) {
-              final error = widget.validator!(v);
-
+              final error = widget.validator!(controller.text);
               if (widget.errorText == null) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
                   setState(() {
                     this.error = error;
                   });
                 });
               }
-              if (error == null) {
-                return null;
-              }
-              return '';
+              return error == null ? null : '';
             },
+      builder: (field) {
+        return CupertinoTextField(
+          focusNode: _focusNode,
+          enabled: widget.enabled,
+          expands: widget.expands,
+          readOnly: widget.readOnly,
+          onChanged: (v) {
+            field.didChange(v);
+            widget.onChanged?.call(v);
+          },
+          obscureText:
+              widget.isPasswordField ? passwordVisibilityChange : false,
+          keyboardType: widget.keyboardType,
+          style: widget.style?.withColor(textColor) ??
+              CustomTextStyle.textmedium16.w500.withColor(textColor),
+          inputFormatters: [
+            if (widget.inputFormatters != null) ...widget.inputFormatters!,
+          ],
+          textAlign: widget.textAlign ?? TextAlign.start,
+          onTap: widget.isDateTimeInputField
+              ? () => handleDateTime()
+              : widget.isTimeInputField
+                  ? () => handleTime()
+                  : widget.onTap,
+          maxLines: widget.isPasswordField ? 1 : widget.maxLines,
+          minLines: widget.minLines,
+          autofocus: widget.autoFocus,
+          controller: controller,
+          placeholder: widget.isTimeInputField ? '00:00' : widget.hintText,
+          placeholderStyle: widget.hintStyle?.withColor(hintColor) ??
+              CustomTextStyle.textmedium16.withColor(hintColor),
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+          // No border — outer Container already provides the styled bg
+          decoration: const BoxDecoration(),
+          cursorColor: AppColors.primary,
+        );
+      },
     );
   }
 }

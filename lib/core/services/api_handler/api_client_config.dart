@@ -165,7 +165,7 @@ class BackendService {
     RequestInterceptorHandler requestInterceptorHandler,
   ) {
     final token = this.token ?? LocalData.token;
-    if (token != null) {
+    if (token != null && !options.headers.containsKey('Authorization')) {
       options.headers.addAll({'Authorization': 'Bearer $token'});
     }
     return requestInterceptorHandler.next(options);

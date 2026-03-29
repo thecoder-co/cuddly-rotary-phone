@@ -3,70 +3,79 @@ import 'dart:io';
 import 'api_response.dart';
 import 'package:dio/dio.dart';
 
+/// Status code used when the failure is not a valid backend response.
+/// This includes: network timeouts, no connectivity, 5xx server errors.
+const int kNetworkErrorCode = -1;
+
 Response handleError(DioException e) {
-  Response response;
-  response = switch (e.type) {
-    DioExceptionType.cancel => response = Response(
+  switch (e.type) {
+    case DioExceptionType.cancel:
+      return Response(
+        statusCode: kNetworkErrorCode,
+        data: apiResponse(message: 'Request cancelled!'),
+        requestOptions: RequestOptions(path: ''),
+      );
+
+    case DioExceptionType.connectionTimeout:
+    case DioExceptionType.connectionError:
+      return Response(
+        statusCode: kNetworkErrorCode,
+        data: apiResponse(message: 'Network connection timed out!'),
+        requestOptions: RequestOptions(path: ''),
+      );
+
+    case DioExceptionType.receiveTimeout:
+    case DioExceptionType.sendTimeout:
+    case DioExceptionType.badCertificate:
+      return Response(
+        statusCode: kNetworkErrorCode,
         data: apiResponse(
-          message: 'Request cancelled!',
+            message: 'Something went wrong. Please try again later!'),
+        requestOptions: RequestOptions(path: ''),
+      );
+
+    case DioExceptionType.unknown:
+      return Response(
+        statusCode: kNetworkErrorCode,
+        data: apiResponse(
+          message: e.error is SocketException
+              ? 'Please check your network connection!'
+              : 'Network connection issue',
         ),
         requestOptions: RequestOptions(path: ''),
-      ),
-    DioExceptionType.connectionTimeout ||
-    DioExceptionType.connectionError =>
-      response = Response(
-        data: apiResponse(
-          message: 'Network connection timed out!',
-        ),
-        requestOptions: RequestOptions(path: ''),
-      ),
-    DioExceptionType.receiveTimeout ||
-    DioExceptionType.sendTimeout ||
-    DioExceptionType.badCertificate =>
-      response = Response(
-        data: apiResponse(
-          message: 'Something went wrong. Please try again later!',
-        ),
-        requestOptions: RequestOptions(path: ''),
-      ),
-    DioExceptionType.unknown => e.error is SocketException
-        ? response = Response(
-            data: apiResponse(
-              message: 'Please check your network connection!',
-            ),
-            requestOptions: RequestOptions(path: ''),
-          )
-        : response = Response(
-            data: apiResponse(
-              message: 'Network connection issue',
-            ),
-            requestOptions: RequestOptions(path: ''),
+      );
+
+    case DioExceptionType.badResponse:
+      final sc = e.response?.statusCode ?? 0;
+      // Treat 5xx as a network/server error – not a handled API failure
+      final effectiveCode = (sc >= 500) ? kNetworkErrorCode : sc;
+
+      if (e.response?.data.runtimeType == String) {
+        return Response(
+          statusCode: effectiveCode,
+          statusMessage: e.response?.statusMessage ?? 'NULL',
+          data: apiResponse(
+            message: e.response?.data ??
+                'Something went wrong. Please try again later',
+            data: {
+              'error': true,
+              'message': 'Something went wrong. Please try again later',
+              'details': e.response?.data,
+            },
           ),
-    DioExceptionType.badResponse => e.response?.data.runtimeType == String
-        ? response = Response(
-            data: apiResponse(
-              message: e.response?.data ??
-                  'Something went wrong. Please try again later',
-              data: {
-                'error': true,
-                'message': 'Something went wrong. Please try again later',
-                'details': e.response?.data,
-              },
-            ),
-            statusCode: e.response?.statusCode ?? 000,
-            statusMessage: e.response?.statusMessage ?? 'NULL',
-            requestOptions: RequestOptions(path: ''),
-          )
-        : response = Response(
-            data: apiResponse(
-              message: e.response?.data?['message'] ??
-                  'Something went wrong. Please try again later',
-              data: e.response?.data,
-            ),
-            statusCode: e.response?.statusCode ?? 000,
-            statusMessage: e.response?.statusMessage ?? 'NULL',
-            requestOptions: RequestOptions(path: ''),
-          ),
-  };
-  return response;
+          requestOptions: RequestOptions(path: ''),
+        );
+      }
+
+      return Response(
+        statusCode: effectiveCode,
+        statusMessage: e.response?.statusMessage ?? 'NULL',
+        data: apiResponse(
+          message: e.response?.data?['message'] ??
+              'Something went wrong. Please try again later',
+          data: e.response?.data,
+        ),
+        requestOptions: RequestOptions(path: ''),
+      );
+  }
 }
