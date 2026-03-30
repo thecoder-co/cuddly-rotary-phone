@@ -69,3 +69,4 @@ Provider Naming & Implementation
     If asked to add logic to a Widget, automatically suggest moving it to a new or existing Provider file.
 
     Always ensure ref is used correctly to maintain reactivity.
+- Always prefer regular widgets to slivers (e.g. use `ListView` and `RefreshIndicator` instead of `CustomScrollView` and `CupertinoSliverRefreshControl` where appropriate).

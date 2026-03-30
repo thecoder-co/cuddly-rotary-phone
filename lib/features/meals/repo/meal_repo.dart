@@ -2,13 +2,9 @@ import 'package:calorie_tracker/core/services/api_handler/api_client_config.dart
 import 'package:calorie_tracker/core/services/api_handler/app_endpoints.dart';
 import 'package:calorie_tracker/core/services/api_handler/api_handler_models.dart';
 import 'package:calorie_tracker/packages/packages.dart';
-import 'package:calorie_tracker/core/services/local_data/isar_service.dart';
-import 'package:isar/isar.dart';
 
 import '../models/meal_dto.dart';
-import '../models/meal.dart';
 import '../models/meal_analytics_dto.dart';
-import 'dart:developer';
 
 class MealCloudRepo {
   final BackendService _apiService = BackendService(Dio());
@@ -204,94 +200,5 @@ class MealCloudRepo {
     );
   }
 
-  // --- Offline Sync Logic using Isar ---
 
-  Future<int> saveMealLocally(Meal meal) async {
-    final isar = IsarService.isar;
-    return await isar.writeTxn(() async {
-      return await isar.meals.put(meal);
-    });
-  }
-
-  Future<List<Meal>> getPendingMeals() async {
-    final isar = IsarService.isar;
-    return await isar.meals
-        .filter()
-        .syncStatusEqualTo(SyncStatus.pendingCreate)
-        .or()
-        .syncStatusEqualTo(SyncStatus.pendingUpdate)
-        .or()
-        .syncStatusEqualTo(SyncStatus.pendingDelete)
-        .findAll();
-  }
-
-  Future<void> syncPendingMeals() async {
-    final pendingMeals = await getPendingMeals();
-    for (final meal in pendingMeals) {
-      try {
-        if (meal.syncStatus == SyncStatus.pendingCreate) {
-          final dto = CreateMealDto(
-            name: meal.name,
-            type: meal.type,
-            consumedDate: meal.date,
-            caloriePerGram: meal.caloriePerGram,
-            protienPerGram: meal.macros?.protein,
-            fatPerGram: meal.macros?.fats,
-            carbsPerGram: meal.macros?.carbs,
-            weight: meal.weight,
-            components: meal.subMeals
-                .map((e) => MealComponentDto(
-                    subMealId: e.backendId ?? '',
-                    weightUsed: e.chosenWeight ?? 0))
-                .toList(),
-          );
-          final res = await createMeal(dto);
-          if (res.valid) {
-            final isar = IsarService.isar;
-            await isar.writeTxn(() async {
-              meal.syncStatus = SyncStatus.synced;
-              if (res.data?.id != null) {
-                meal.backendId = res.data!.id;
-              }
-              await isar.meals.put(meal);
-            });
-          }
-        } else if (meal.syncStatus == SyncStatus.pendingUpdate) {
-          final dto = UpdateMealDto(
-            name: meal.name,
-            type: meal.type,
-            consumedDate: meal.date,
-            caloriePerGram: meal.caloriePerGram,
-            protienPerGram: meal.macros?.protein,
-            fatPerGram: meal.macros?.fats,
-            carbsPerGram: meal.macros?.carbs,
-            weight: meal.weight,
-            components: meal.subMeals
-                .map((e) => MealComponentDto(
-                    subMealId: e.backendId ?? '',
-                    weightUsed: e.chosenWeight ?? 0))
-                .toList(),
-          );
-          final res = await updateMeal(meal.backendId!, dto);
-          if (res.valid) {
-            final isar = IsarService.isar;
-            await isar.writeTxn(() async {
-              meal.syncStatus = SyncStatus.synced;
-              await isar.meals.put(meal);
-            });
-          }
-        } else if (meal.syncStatus == SyncStatus.pendingDelete) {
-          final res = await deleteMeal(meal.backendId!);
-          if (res.valid) {
-            final isar = IsarService.isar;
-            await isar.writeTxn(() async {
-              await isar.meals.delete(meal.id);
-            });
-          }
-        }
-      } catch (e) {
-        log('Error syncing meal ${meal.id}: $e');
-      }
-    }
-  }
 }

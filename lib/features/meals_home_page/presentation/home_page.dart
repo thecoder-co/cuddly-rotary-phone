@@ -31,7 +31,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ),
         middle: Text(
-          'Today',
+          DateTime.parse(date).isCurrentDay
+              ? 'Today'
+              : DateTime.parse(date).formatDatePretty,
           style: TextStyle(
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : AppColors.primary900,
@@ -59,96 +61,96 @@ class _HomePageState extends ConsumerState<HomePage> {
         bottom: false,
         child: Material(
           color: Colors.transparent,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome',
-                      style: CustomTextStyle.base
-                          .withColor(isDark
-                              ? AppColors.primary50
-                              : const Color(0xff565656))
-                          .withSize(13),
-                    ),
-                    Text(
-                      'Qarr, baby❤️',
-                      style: CustomTextStyle.textxLarge20.w700,
-                    ),
-                    Text(
-                      'You are amazing',
-                      style: CustomTextStyle.base.withColor(isDark
-                          ? Colors.white.withOpacity(0.45)
-                          : const Color(0xff444444)),
-                    ),
-                    20.gap,
-                    DateSelector(
-                      onDateSelected: (v) {
-                        setState(() {
-                          date = v.formatDateDash;
-                        });
-                      },
-                    ),
-                    24.gap,
-                  ],
+          child: RefreshIndicator.adaptive(
+            onRefresh: () async {
+              ref.invalidate(mealProvider((date: date, query: null)));
+            },
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome',
+                        style: CustomTextStyle.base
+                            .withColor(isDark
+                                ? AppColors.primary50
+                                : const Color(0xff565656))
+                            .withSize(13),
+                      ),
+                      Text(
+                        'Qarr, baby❤️',
+                        style: CustomTextStyle.textxLarge20.w700,
+                      ),
+                      Text(
+                        'You are amazing',
+                        style: CustomTextStyle.base.withColor(isDark
+                            ? Colors.white.withOpacity(0.45)
+                            : const Color(0xff444444)),
+                      ),
+                      20.gap,
+                      DateSelector(
+                        onDateSelected: (v) {
+                          setState(() {
+                            date = v.formatDateDash;
+                          });
+                        },
+                      ),
+                      24.gap,
+                    ],
+                  ),
                 ),
-              ),
-              meals.whenOrNull(
-                    data: (data) {
-                      return Expanded(
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "Today's meals",
-                                    style: CustomTextStyle.textmedium16.w600,
-                                  ),
-                                ),
-                                Text(
-                                  '${data.calories}kcal',
-                                  style: CustomTextStyle.textxLarge20.w700,
-                                ),
-                              ],
-                            ).paddingSymmetric(horizontal: 20),
-                            Expanded(
-                              child: RefreshIndicator.adaptive(
-                                onRefresh: () async {
-                                  ref.invalidate(
-                                      mealProvider((date: date, query: null)));
-                                },
-                                child: ListView.separated(
-                                  itemCount: data.meals?.length ?? 0,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 12),
-                                  separatorBuilder:
-                                      (BuildContext context, int index) {
-                                    return 12.gap;
-                                  },
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return MealTile(
-                                        mealId: data.meals![index].id);
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
+                if (meals.valueOrNull != null) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          DateTime.parse(date).isCurrentDay
+                              ? "Today's meals"
+                              : "${DateTime.parse(date).formatDatePretty} meals",
+                          style: CustomTextStyle.textmedium16.w600,
                         ),
-                      );
+                      ),
+                      Text(
+                        '${meals.valueOrNull!.calories}kcal',
+                        style: CustomTextStyle.textxLarge20.w700,
+                      ),
+                    ],
+                  ).paddingSymmetric(horizontal: 20),
+                  12.gap,
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    itemCount: meals.valueOrNull!.meals?.length ?? 0,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return 12.gap;
                     },
-                  ) ??
-                  const Expanded(
+                    itemBuilder: (BuildContext context, int index) {
+                      return MealTile(
+                          mealId: meals.valueOrNull!.meals![index].id);
+                    },
+                  ),
+                ] else if (meals.isLoading)
+                  const SizedBox(
+                    height: 200,
                     child: Center(
                       child: CupertinoActivityIndicator(),
                     ),
+                  )
+                else if (meals.hasError)
+                  SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: Text('Error: ${meals.error}'),
+                    ),
                   ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

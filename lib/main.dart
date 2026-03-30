@@ -2,36 +2,19 @@ import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/core/services/local_data/local_data.dart';
 import 'package:calorie_tracker/features/home/presentation/home.dart';
 import 'package:calorie_tracker/features/auth/presentation/login_screen.dart';
-import 'package:calorie_tracker/features/auth/repo/auth_repo.dart';
 import 'package:calorie_tracker/features/meals/repo/meal_repo.dart';
+import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
+import 'package:calorie_tracker/features/meals/services/meal_sync_service.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalData.init();
   if (LocalData.token != null) {
-    _refreshTokenOnStartup(); // fire-and-forget, does not block startup
-    MealCloudRepo().syncPendingMeals();
+    MealSyncService(localRepo: LocalMealRepo(), cloudRepo: MealCloudRepo())
+        .syncPendingMeals();
   }
   runApp(const ProviderScope(child: MyApp()));
-}
-
-Future<void> _refreshTokenOnStartup() async {
-  try {
-    final res = await AuthRepo().refreshToken();
-    if (res.valid && res.data != null) {
-      final tokens = res.data!.token;
-      await LocalData.setToken(
-        tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-      );
-    } else if (!res.isNetworkError) {
-      await LocalData.removeToken();
-      pushTo(const LoginScreen());
-    }
-  } catch (_) {
-    // Never crash on startup due to a refresh failure
-  }
 }
 
 class MyApp extends ConsumerWidget {

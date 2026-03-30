@@ -31,6 +31,11 @@ class _MealAnalyticsScreenState extends ConsumerState<MealAnalyticsScreen> {
               period: _period,
               onPeriodChanged: (p) => setState(() => _period = p),
             ),
+            CupertinoSliverRefreshControl(
+              onRefresh: () async {
+                ref.invalidate(analyticsProvider(_period));
+              },
+            ),
             analytics.when(
               data: (data) => _AnalyticsBody(data: data),
               loading: () => const SliverFillRemaining(

@@ -1,9 +1,23 @@
 import 'package:calorie_tracker/features/meals_home/presentation/home.dart';
 import 'package:calorie_tracker/features/user/presentation/settings_screen.dart';
+import 'package:calorie_tracker/features/auth/providers/auth_provider.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 
-class Home extends StatelessWidget {
+class Home extends ConsumerStatefulWidget {
   const Home({super.key});
+
+  @override
+  ConsumerState<Home> createState() => _HomeState();
+}
+
+class _HomeState extends ConsumerState<Home> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authProvider.notifier).refreshTokenOnStartup();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

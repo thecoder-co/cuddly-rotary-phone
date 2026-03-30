@@ -6,6 +6,7 @@ import 'package:calorie_tracker/packages/packages.dart';
 import '../models/auth_dto.dart';
 import '../repo/auth_repo.dart';
 import '../presentation/verify_otp_screen.dart';
+import '../presentation/login_screen.dart';
 
 final authProvider = NotifierProvider<AuthNotifier, AuthRepo>(AuthNotifier.new);
 
@@ -13,6 +14,17 @@ class AuthNotifier extends Notifier<AuthRepo> {
   @override
   AuthRepo build() {
     return AuthRepo();
+  }
+
+  Future<void> refreshTokenOnStartup() async {
+    final res = await state.refreshToken();
+    if (res.valid && res.data != null) {
+      final tokens = res.data!.token;
+      await LocalData.setToken(
+        tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      );
+    }
   }
 
   Future<void> createUser({

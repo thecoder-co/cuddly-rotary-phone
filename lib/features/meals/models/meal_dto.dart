@@ -1,22 +1,69 @@
 import 'dart:convert';
 
 class MealComponentDto {
-  final String subMealId;
-  final double weightUsed;
+  String? subMealId;
+  String? name;
+  int? caloriePerGram;
+  int? protienPerGram;
+  int? fatPerGram;
+  int? carbsPerGram;
+  int? fibrePerGram;
+  int? weightUsed;
 
-  MealComponentDto({required this.subMealId, required this.weightUsed});
+  MealComponentDto({
+    this.subMealId,
+    this.name,
+    this.caloriePerGram,
+    this.protienPerGram,
+    this.fatPerGram,
+    this.carbsPerGram,
+    this.fibrePerGram,
+    this.weightUsed,
+  });
+
+  MealComponentDto copyWith({
+    String? subMealId,
+    String? name,
+    int? caloriePerGram,
+    int? protienPerGram,
+    int? fatPerGram,
+    int? carbsPerGram,
+    int? fibrePerGram,
+    int? weightUsed,
+  }) =>
+      MealComponentDto(
+        subMealId: subMealId ?? this.subMealId,
+        name: name ?? this.name,
+        caloriePerGram: caloriePerGram ?? this.caloriePerGram,
+        protienPerGram: protienPerGram ?? this.protienPerGram,
+        fatPerGram: fatPerGram ?? this.fatPerGram,
+        carbsPerGram: carbsPerGram ?? this.carbsPerGram,
+        fibrePerGram: fibrePerGram ?? this.fibrePerGram,
+        weightUsed: weightUsed ?? this.weightUsed,
+      );
+
+  factory MealComponentDto.fromJson(Map<String, dynamic> json) =>
+      MealComponentDto(
+        subMealId: json["subMealId"],
+        name: json["name"],
+        caloriePerGram: json["caloriePerGram"],
+        protienPerGram: json["protienPerGram"],
+        fatPerGram: json["fatPerGram"],
+        carbsPerGram: json["carbsPerGram"],
+        fibrePerGram: json["fibrePerGram"],
+        weightUsed: json["weightUsed"],
+      );
 
   Map<String, dynamic> toJson() => {
-        'subMealId': subMealId,
-        'weightUsed': weightUsed,
+        "subMealId": subMealId,
+        "name": name,
+        "caloriePerGram": caloriePerGram,
+        "protienPerGram": protienPerGram,
+        "fatPerGram": fatPerGram,
+        "carbsPerGram": carbsPerGram,
+        "fibrePerGram": fibrePerGram,
+        "weightUsed": weightUsed,
       };
-
-  factory MealComponentDto.fromJson(Map<String, dynamic> json) {
-    return MealComponentDto(
-      subMealId: json['subMealId'] ?? '',
-      weightUsed: (json['weightUsed'] ?? 0).toDouble(),
-    );
-  }
 }
 
 class CreateMealDto {
