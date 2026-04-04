@@ -187,7 +187,9 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                               ? Icon(
                                   CupertinoIcons.check_mark,
                                   color: isLocked
-                                      ? CupertinoColors.systemGrey.withOpacity(0.5)
+                                      ? CupertinoColors.systemGrey.withValues(
+                                          alpha: 0.5,
+                                        )
                                       : CupertinoColors.systemGreen,
                                   size: 18,
                                 )

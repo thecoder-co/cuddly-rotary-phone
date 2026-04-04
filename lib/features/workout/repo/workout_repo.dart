@@ -114,30 +114,6 @@ class WorkoutCloudRepo {
 
   // ----- Exercises -----
 
-  Future<ResponseModel<List<ExerciseDto>>> getExercises() async {
-    Response response = await _apiService.runCall(
-      _apiService.dio.get('${AppEndpoints.baseUrl}/exercises'),
-    );
-
-    final statusCode = response.statusCode ?? 000;
-    if (statusCode >= 200 && statusCode <= 300) {
-      return ResponseModel(
-        valid: true,
-        statusCode: statusCode,
-        message: response.statusMessage,
-        data: (response.data as List)
-            .map((x) => ExerciseDto.fromJson(x))
-            .toList(),
-      );
-    }
-
-    return ResponseModel(
-      error: ErrorModel.fromJson(response.data ?? {}),
-      statusCode: statusCode,
-      message: response.data?['message'] ?? 'Something went wrong',
-    );
-  }
-
   Future<ResponseModel<List<ExerciseDto>>> getMyExercises() async {
     Response response = await _apiService.runCall(
       _apiService.dio.get('${AppEndpoints.baseUrl}/exercises/my'),

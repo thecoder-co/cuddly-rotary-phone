@@ -114,12 +114,11 @@ class WorkoutSyncService {
         .toList();
     if (parentAdds.isNotEmpty) {
       try {
-        final ids =
-            parentAdds
-                .map((e) => e.backendId)
-                .where((id) => id != null)
-                .cast<String>()
-                .toList();
+        final ids = parentAdds
+            .map((e) => e.backendId)
+            .where((id) => id != null)
+            .cast<String>()
+            .toList();
         if (ids.isNotEmpty) {
           final res = await cloudRepo.addExercisesFromParent(
             AddExercisesDto(exerciseIds: ids),
@@ -141,10 +140,11 @@ class WorkoutSyncService {
     // 2. Individual Create/Update/Delete
     for (final exercise in pending) {
       // Skip handled bulk adds
-      if (exercise.syncStatus == SyncStatus.pendingAddFromParent) continue;
 
       try {
-        if (exercise.syncStatus == SyncStatus.pendingCreate) {
+        if (exercise.syncStatus == SyncStatus.pendingAddFromParent) {
+          continue;
+        } else if (exercise.syncStatus == SyncStatus.pendingCreate) {
           final dto = CreateExerciseDto(
             name: exercise.name,
             description: exercise.description,
@@ -172,7 +172,7 @@ class WorkoutSyncService {
             });
           }
         } else if (exercise.syncStatus == SyncStatus.pendingDelete) {
-          // Note: Backend endpoint for exercise deletion may not exist yet, 
+          // Note: Backend endpoint for exercise deletion may not exist yet,
           // we log or skip for now while keeping the local status.
         }
       } catch (e) {
@@ -196,11 +196,9 @@ class WorkoutSyncService {
     syncPendingExercises();
   }
 
-  Future<void> syncExercises(bool onlyMy) async {
+  Future<void> syncExercises() async {
     try {
-      final res = onlyMy
-          ? await cloudRepo.getMyExercises()
-          : await cloudRepo.getExercises();
+      final res = await cloudRepo.getMyExercises();
       if (!res.valid || res.data == null) return;
 
       await localRepo.isar.writeTxn(() async {
@@ -216,7 +214,7 @@ class WorkoutSyncService {
           isarExercise.backendId = backendId;
           isarExercise.name = p.name;
           isarExercise.popularity = p.popularity;
-          isarExercise.ownerId = p.ownerId;
+          isarExercise.ownerId = LocalData.userId;
           isarExercise.oneRmFormula = p.oneRmFormula;
           isarExercise.description = p.description;
           isarExercise.createdAt = p.createdAt;
@@ -230,18 +228,23 @@ class WorkoutSyncService {
     } catch (_) {}
   }
 
-  Future<void> syncPaginatedExercises({
+  Future<bool> syncPaginatedExercises({
     String? query,
     int page = 1,
-    int limit = 20,
+    int limit = 100,
   }) async {
+    bool hasMore = false;
     try {
       final res = await cloudRepo.getPaginatedExercises(
         name: query,
         page: page,
         limit: limit,
       );
-      if (!res.valid || res.data == null || res.data!.data == null) return;
+      if (!res.valid || res.data == null || res.data!.data == null)
+        return false;
+
+      final pageData = res.data!;
+      hasMore = (pageData.page ?? 1) < (pageData.totalPages ?? 1);
 
       await localRepo.isar.writeTxn(() async {
         for (final p in res.data!.data!) {
@@ -256,7 +259,9 @@ class WorkoutSyncService {
           isarExercise.backendId = backendId;
           isarExercise.name = p.name;
           isarExercise.popularity = p.popularity;
-          isarExercise.ownerId = p.ownerId;
+          if (isarExercise.ownerId != LocalData.userId) {
+            isarExercise.ownerId = p.ownerId;
+          }
           isarExercise.oneRmFormula = p.oneRmFormula;
           isarExercise.description = p.description;
           isarExercise.createdAt = p.createdAt;
@@ -268,8 +273,8 @@ class WorkoutSyncService {
         }
       });
     } catch (_) {}
+    return hasMore;
   }
-
 
   // ----- Sets -----
 

@@ -30,7 +30,7 @@ final isarExercisesStreamProvider = StreamProvider.family<List<Exercise>, bool>(
 
     Future(() async {
       await syncService.syncPendingExercises();
-      await syncService.syncExercises(onlyMy);
+      await syncService.syncExercises();
     });
 
     return localRepo.watchExercises(onlyMy);
@@ -263,6 +263,9 @@ class SearchExercisesNotifier extends Notifier<SearchState> {
     ref.onDispose(() {
       _debounce?.cancel();
     });
+    Future.microtask(() {
+      _performSync();
+    });
     return SearchState();
   }
 
@@ -285,16 +288,17 @@ class SearchExercisesNotifier extends Notifier<SearchState> {
   Future<void> _performSync() async {
     state = state.copyWith(isSyncing: true);
     final syncService = ref.read(workoutSyncServiceProvider);
+    bool more = state.hasMore;
 
     try {
-      await syncService.syncPaginatedExercises(
+      more = await syncService.syncPaginatedExercises(
         query: state.query,
         page: state.page,
-        limit: 20,
       );
     } catch (_) {
+      more = false;
     } finally {
-      state = state.copyWith(isSyncing: false);
+      state = state.copyWith(isSyncing: false, hasMore: more);
     }
   }
 }

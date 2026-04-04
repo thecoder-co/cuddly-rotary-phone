@@ -430,18 +430,20 @@ class PaginatedExercisesDto {
     this.totalPages,
   });
 
-  factory PaginatedExercisesDto.fromJson(Map<String, dynamic> json) =>
-      PaginatedExercisesDto(
-        data: json["data"] == null
-            ? []
-            : List<ExerciseDto>.from(
-                json["data"]!.map((x) => ExerciseDto.fromJson(x)),
-              ),
-        total: json["total"],
-        page: json["page"],
-        limit: json["limit"],
-        totalPages: json["totalPages"],
-      );
+  factory PaginatedExercisesDto.fromJson(Map<String, dynamic> json) {
+    final meta = json["meta"] ?? {};
+    return PaginatedExercisesDto(
+      data: json["data"] == null
+          ? []
+          : List<ExerciseDto>.from(
+              json["data"]!.map((x) => ExerciseDto.fromJson(x)),
+            ),
+      total: meta["total"] ?? json["total"],
+      page: meta["currentPage"] ?? json["page"],
+      limit: meta["perPage"] ?? json["limit"],
+      totalPages: meta["lastPage"] ?? json["totalPages"],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
