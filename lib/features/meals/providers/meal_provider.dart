@@ -9,33 +9,39 @@ typedef MealQuery = ({String? date, String? query});
 
 final localMealRepoProvider = Provider((ref) => LocalMealRepo());
 
-final mealByIdProvider = FutureProvider.family<Meal?, int>((ref, id) async {
+final mealByIdProvider = FutureProvider.family<Meal?, dynamic>((ref, id) async {
   return await ref.watch(localMealRepoProvider).getMeal(id);
 });
 
-final isarMealsStreamProvider = StreamProvider.family<List<Meal>, MealQuery>((ref, arg) {
-  final localRepo = ref.watch(localMealRepoProvider);
-  final syncService = ref.read(mealSyncServiceProvider);
-  
-  // Fire and forget sync operation
-  Future(() async {
-    await syncService.syncPendingMeals();
-    if (arg.date != null) {
-      await syncService.syncDailyMeals(arg.date!);
-    } else {
-      await syncService.syncAllMeals(arg.query);
-    }
-  });
+final isarMealsStreamProvider = StreamProvider.autoDispose
+    .family<List<Meal>, MealQuery>((ref, arg) {
+      final localRepo = ref.watch(localMealRepoProvider);
+      final syncService = ref.read(mealSyncServiceProvider);
 
-  return localRepo.watchMeals(date: arg.date, query: arg.query);
-});
+      // Fire and forget sync operation
+      Future(() async {
+        await syncService.syncPendingMeals();
+        if (arg.date != null) {
+          await syncService.syncDailyMeals(arg.date!);
+        } else {
+          await syncService.syncAllMeals(arg.query);
+        }
+      });
 
-final mealProvider = AutoDisposeAsyncNotifierProviderFamily<MealNotifier, MealRepo, MealQuery>(MealNotifier.new);
+      return localRepo.watchMeals(date: arg.date, query: arg.query);
+    });
 
-class MealNotifier extends AutoDisposeFamilyAsyncNotifier<MealRepo, MealQuery> {
+final mealProvider = AsyncNotifierProvider.autoDispose
+    .family<MealNotifier, MealRepo, MealQuery>(MealNotifier.new);
+
+class MealNotifier extends AsyncNotifier<MealRepo> {
+  final MealQuery arg;
+
+  MealNotifier(this.arg);
+
   @override
-  FutureOr<MealRepo> build(arg) async {
-    // Listens seamlessly to the streamed updates natively. 
+  FutureOr<MealRepo> build() async {
+    // Listens seamlessly to the streamed updates natively.
     final meals = await ref.watch(isarMealsStreamProvider(arg).future);
     return MealRepo(meals: meals);
   }
@@ -44,24 +50,26 @@ class MealNotifier extends AutoDisposeFamilyAsyncNotifier<MealRepo, MealQuery> {
     meal.syncStatus = SyncStatus.pendingCreate;
     meal.backendId = 'local_${DateTime.now().microsecondsSinceEpoch}';
     meal.name ??= meal.subMeals.map((e) => e.name).join(' and ');
-    
+
     final localRepo = ref.read(localMealRepoProvider);
     final id = await localRepo.saveMeal(meal);
-    
+
     // Background sync (fire and forget)
     ref.read(mealSyncServiceProvider).syncPendingMeals();
-    
+
     return (await localRepo.getMeal(id))!;
   }
 
   Future<Meal?> updateMeal({required Meal meal, required String? id}) async {
     final isLocalId = id != null && id.startsWith('local_');
-    meal.syncStatus = (id == null || isLocalId) ? SyncStatus.pendingCreate : SyncStatus.pendingUpdate;
+    meal.syncStatus = (id == null || isLocalId)
+        ? SyncStatus.pendingCreate
+        : SyncStatus.pendingUpdate;
     meal.backendId = id;
-    
+
     final localRepo = ref.read(localMealRepoProvider);
     final savedId = await localRepo.saveMeal(meal);
-    
+
     // Background sync (fire and forget)
     ref.read(mealSyncServiceProvider).syncPendingMeals();
 
@@ -70,16 +78,16 @@ class MealNotifier extends AutoDisposeFamilyAsyncNotifier<MealRepo, MealQuery> {
 
   Future<void> deleteMeal({required Meal meal, required String? id}) async {
     final localRepo = ref.read(localMealRepoProvider);
-    
+
     if (id == null || id.startsWith('local_')) {
       await localRepo.deleteMeal(meal.id);
       return;
     }
-    
+
     // Mark as pendingDelete and resave so the syncService can pick it up
     meal.syncStatus = SyncStatus.pendingDelete;
     await localRepo.saveMeal(meal);
-    
+
     // Background sync (fire and forget)
     ref.read(mealSyncServiceProvider).syncPendingMeals();
   }
@@ -100,7 +108,5 @@ class MealRepo {
       )
       .toStringAsFixed(2);
 
-  MealRepo({
-    this.meals,
-  });
+  MealRepo({this.meals});
 }

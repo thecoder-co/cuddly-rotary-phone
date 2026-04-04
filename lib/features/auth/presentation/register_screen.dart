@@ -58,6 +58,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _emailController,
                     labelText: 'Email Address',
                     hintText: 'john@example.com',
+
                     keyboardType: TextInputType.emailAddress,
                     validator: (v) => v!.isEmpty ? 'Required' : null,
                   ),
@@ -66,7 +67,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     label: 'Register & Send OTP',
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        ref.read(authProvider.notifier).createUser(
+                        ref
+                            .read(authProvider.notifier)
+                            .createUser(
                               model: CreateUserDto(
                                 email: _emailController.text.trim(),
                                 name: _nameController.text.trim(),
@@ -80,8 +83,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     onPressed: () => pushReplacementTo(const LoginScreen()),
                     child: Text(
                       'Already have an account? Log in',
-                      style: CustomTextStyle.textmedium16.w600
-                          .withColor(AppColors.primary),
+                      style: CustomTextStyle.textmedium16.w600.withColor(
+                        AppColors.primary,
+                      ),
                     ),
                   ),
                 ],

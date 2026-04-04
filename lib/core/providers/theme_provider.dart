@@ -2,17 +2,17 @@ import 'package:calorie_tracker/core/services/local_data/local_data.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 
 final themeModeProvider =
-    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
-  return ThemeModeNotifier();
-});
+    NotifierProvider.autoDispose<ThemeModeNotifier, ThemeMode>(
+      ThemeModeNotifier.new,
+    );
 
-class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier()
-      : super(
-          LocalData.prefs.getBool('darkMode') == true
-              ? ThemeMode.dark
-              : ThemeMode.light,
-        );
+class ThemeModeNotifier extends Notifier<ThemeMode> {
+  @override
+  build() {
+    return LocalData.prefs.getBool('darkMode') == true
+        ? ThemeMode.dark
+        : ThemeMode.light;
+  }
 
   void toggle() {
     final isDark = state == ThemeMode.dark;

@@ -7,8 +7,6 @@ import 'package:calorie_tracker/packages/nav_bar/custom_nav_bar.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 import 'dart:async';
 
-import 'package:upgrader/upgrader.dart';
-
 class HasViewed {
   static List<String> codes = [];
 }
@@ -26,9 +24,7 @@ class _HomeScreenState extends ConsumerState<MealsHome> {
   void initState() {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-      ),
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ref.read(indexProvider.notifier).state = widget.startIndex;
@@ -66,44 +62,35 @@ class _HomeScreenState extends ConsumerState<MealsHome> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        systemNavigationBarColor:
-            isDark ? const Color(0xFF121212) : Colors.white,
+        systemNavigationBarColor: isDark
+            ? const Color(0xFF121212)
+            : Colors.white,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarIconBrightness:
-            isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness: isDark
+            ? Brightness.light
+            : Brightness.dark,
       ),
-      child: UpgradeAlert(
-        child: Scaffold(
-          key: _scaffoldKey,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          body: [
-            const HomePage(),
-            const MealsPage(),
-            const MealAnalyticsScreen(),
-          ][index],
-          bottomNavigationBar: CustomBottomNav(
-            currentIndex: switch (index) {
-              4 => 0,
-              _ => index,
-            },
-            onTap: (i) {
-              ref.read(indexProvider.notifier).state = i;
-            },
-            items: [
-              CustomNavBarItem(
-                icon: IconsaxBold.home2,
-                title: 'Home',
-              ),
-              CustomNavBarItem(
-                icon: IconsaxBold.award,
-                title: 'Meals',
-              ),
-              CustomNavBarItem(
-                icon: IconsaxBold.menu,
-                title: 'Analytics',
-              ),
-            ],
-          ),
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: [
+          const HomePage(),
+          const MealsPage(),
+          const MealAnalyticsScreen(),
+        ][index],
+        bottomNavigationBar: CustomBottomNav(
+          currentIndex: switch (index) {
+            4 => 0,
+            _ => index,
+          },
+          onTap: (i) {
+            ref.read(indexProvider.notifier).state = i;
+          },
+          items: [
+            CustomNavBarItem(icon: IconsaxBold.home2, title: 'Home'),
+            CustomNavBarItem(icon: IconsaxBold.award, title: 'Meals'),
+            CustomNavBarItem(icon: IconsaxBold.menu, title: 'Analytics'),
+          ],
         ),
       ),
     );

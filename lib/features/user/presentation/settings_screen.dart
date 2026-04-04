@@ -1,4 +1,6 @@
+import 'package:calorie_tracker/core/dialogs/dialog.dart';
 import 'package:calorie_tracker/core/providers/theme_provider.dart';
+import 'package:calorie_tracker/core/services/local_data/isar_service.dart';
 import 'package:calorie_tracker/core/services/local_data/local_data.dart';
 import 'package:calorie_tracker/features/auth/presentation/login_screen.dart';
 import 'package:calorie_tracker/features/user/providers/user_provider.dart';
@@ -54,9 +56,12 @@ class SettingsScreen extends ConsumerWidget {
                               shape: BoxShape.circle,
                               color: AppColors.primary.withOpacity(0.15),
                               border: Border.all(
-                                  color: AppColors.primary300, width: 1.5),
+                                color: AppColors.primary300,
+                                width: 1.5,
+                              ),
                             ),
-                            child: userAsync.whenOrNull(
+                            child:
+                                userAsync.whenOrNull(
                                   data: (user) => Center(
                                     child: Text(
                                       (user?.name ?? 'U')
@@ -69,7 +74,8 @@ class SettingsScreen extends ConsumerWidget {
                                   ),
                                 ) ??
                                 const Center(
-                                    child: CupertinoActivityIndicator()),
+                                  child: CupertinoActivityIndicator(),
+                                ),
                           ),
                           const SizedBox(width: 14),
                           Expanded(
@@ -77,14 +83,15 @@ class SettingsScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  userAsync.valueOrNull?.name ?? '—',
+                                  userAsync.value?.name ?? '—',
                                   style: CustomTextStyle.textmedium16.w700,
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  userAsync.valueOrNull?.email ?? '—',
-                                  style: CustomTextStyle.textsmall14
-                                      .withColor(AppColors.greyTertiary),
+                                  userAsync.value?.email ?? '—',
+                                  style: CustomTextStyle.textsmall14.withColor(
+                                    AppColors.greyTertiary,
+                                  ),
                                 ),
                               ],
                             ),
@@ -115,12 +122,12 @@ class SettingsScreen extends ConsumerWidget {
                     _SettingsTile(
                       icon: CupertinoIcons.person,
                       title: 'Name',
-                      subtitle: userAsync.valueOrNull?.name,
+                      subtitle: userAsync.value?.name,
                     ),
                     _SettingsTile(
                       icon: CupertinoIcons.mail,
                       title: 'Email',
-                      subtitle: userAsync.valueOrNull?.email,
+                      subtitle: userAsync.value?.email,
                     ),
                     const SizedBox(height: 20),
 
@@ -134,6 +141,31 @@ class SettingsScreen extends ConsumerWidget {
                       onTap: () async {
                         await LocalData.removeToken();
                         pushToAndClearStack(const LoginScreen());
+                      },
+                    ),
+                    _SettingsTile(
+                      icon: CupertinoIcons.trash,
+                      title: 'Clear Local Data',
+                      subtitle: 'Drop all rows from Isar',
+                      titleColor: AppColors.error500,
+                      iconColor: AppColors.error500,
+                      onTap: () async {
+                        final confirmed = await Dialogs.confirmDialog(
+                          title: 'Clear Local Data',
+                          subtitle:
+                              'This will permanently delete all your local meals, exercises, and workout data. This action cannot be undone.',
+                          yesText: 'Clear All',
+                          noText: 'Cancel',
+                        );
+
+                        if (confirmed) {
+                          try {
+                            await IsarService.clearAll();
+                            AppToast.success('Local data cleared successfully');
+                          } catch (e) {
+                            AppToast.error('Failed to clear data: $e');
+                          }
+                        }
                       },
                     ),
                     const SizedBox(height: 32),
@@ -223,15 +255,17 @@ class _SettingsTile extends StatelessWidget {
                   Text(
                     title,
                     style: CustomTextStyle.textsmall14.w600.withColor(
-                        titleColor ??
-                            (isDark ? Colors.white : AppColors.primary900)),
+                      titleColor ??
+                          (isDark ? Colors.white : AppColors.primary900),
+                    ),
                   ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      style: CustomTextStyle.textsmall14
-                          .withColor(AppColors.greyTertiary),
+                      style: CustomTextStyle.textsmall14.withColor(
+                        AppColors.greyTertiary,
+                      ),
                     ),
                   ],
                 ],
@@ -239,8 +273,11 @@ class _SettingsTile extends StatelessWidget {
             ),
             if (trailing != null) trailing!,
             if (trailing == null && onTap != null)
-              const Icon(CupertinoIcons.chevron_right,
-                  color: AppColors.greySecondary, size: 16),
+              const Icon(
+                CupertinoIcons.chevron_right,
+                color: AppColors.greySecondary,
+                size: 16,
+              ),
           ],
         ),
       ),

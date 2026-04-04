@@ -1,5 +1,17 @@
 import 'package:calorie_tracker/packages/packages.dart';
 
-final indexProvider = StateProvider<int>((ref) {
-  return 0;
-});
+final indexProvider = NotifierProvider.autoDispose<IndexNotifier, int>(
+  IndexNotifier.new,
+);
+
+class IndexNotifier extends Notifier<int> {
+  @override
+  build() {
+    return 0;
+  }
+
+  @override
+  set state(int value) {
+    super.state = value;
+  }
+}

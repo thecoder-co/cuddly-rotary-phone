@@ -74,22 +74,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Welcome',
-                        style: CustomTextStyle.base
-                            .withColor(isDark
-                                ? AppColors.primary50
-                                : const Color(0xff565656))
-                            .withSize(13),
-                      ),
-                      Text(
-                        'Qarr, baby❤️',
-                        style: CustomTextStyle.textxLarge20.w700,
-                      ),
-                      Text(
-                        'You are amazing',
-                        style: CustomTextStyle.base.withColor(isDark
-                            ? Colors.white.withOpacity(0.45)
-                            : const Color(0xff444444)),
+                        'Track Meals',
+                        style: CustomTextStyle.textxLarge20.w700.withColor(
+                          isDark ? Colors.white : AppColors.primary900,
+                        ),
                       ),
                       20.gap,
                       DateSelector(
@@ -103,19 +91,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ],
                   ),
                 ),
-                if (meals.valueOrNull != null) ...[
+                if (meals.value != null) ...[
                   Row(
+                    mainAxisAlignment: .end,
                     children: [
-                      Expanded(
-                        child: Text(
-                          DateTime.parse(date).isCurrentDay
-                              ? "Today's meals"
-                              : "${DateTime.parse(date).formatDatePretty} meals",
-                          style: CustomTextStyle.textmedium16.w600,
-                        ),
-                      ),
                       Text(
-                        '${meals.valueOrNull!.calories}kcal',
+                        '${meals.value!.calories}kcal',
                         style: CustomTextStyle.textxLarge20.w700,
                       ),
                     ],
@@ -125,29 +106,26 @@ class _HomePageState extends ConsumerState<HomePage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                    itemCount: meals.valueOrNull!.meals?.length ?? 0,
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    itemCount: meals.value!.meals?.length ?? 0,
                     separatorBuilder: (BuildContext context, int index) {
                       return 12.gap;
                     },
                     itemBuilder: (BuildContext context, int index) {
-                      return MealTile(
-                          mealId: meals.valueOrNull!.meals![index].id);
+                      return MealTile(mealId: meals.value!.meals![index].id);
                     },
                   ),
                 ] else if (meals.isLoading)
                   const SizedBox(
                     height: 200,
-                    child: Center(
-                      child: CupertinoActivityIndicator(),
-                    ),
+                    child: Center(child: CupertinoActivityIndicator()),
                   )
                 else if (meals.hasError)
                   SizedBox(
                     height: 200,
-                    child: Center(
-                      child: Text('Error: ${meals.error}'),
-                    ),
+                    child: Center(child: Text('Error: ${meals.error}')),
                   ),
               ],
             ),

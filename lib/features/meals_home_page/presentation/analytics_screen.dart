@@ -1,6 +1,7 @@
 import 'package:calorie_tracker/features/meals/models/meal_analytics_dto.dart';
 import 'package:calorie_tracker/features/meals_home_page/providers/analytics_provider.dart';
 import 'package:calorie_tracker/packages/packages.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
 
 // ---------------------------------------------------------------------------
@@ -418,9 +419,16 @@ class _TrendChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (trends.isEmpty) return const SizedBox();
+    
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final values = trends.map((t) => t.calories ?? 0).toList();
+    final maxVal = values.isNotEmpty ? values.reduce(math.max) : 0;
+    
     return Container(
-      height: 180,
-      padding: const EdgeInsets.all(16),
+      height: 240, 
+      padding: const EdgeInsets.only(top: 16, right: 24, left: 16, bottom: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
@@ -437,131 +445,120 @@ class _TrendChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.show_chart_rounded,
-                  color: AppColors.primary, size: 16),
+              const Icon(Icons.show_chart_rounded, color: AppColors.primary, size: 16),
               const SizedBox(width: 6),
-              Text('Calories over time',
-                  style: CustomTextStyle.textsmall14
-                      .withColor(AppColors.primary700)),
+              Text('Calories over time', style: CustomTextStyle.textsmall14.withColor(AppColors.primary700)),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
           Expanded(
-            child: CustomPaint(
-              painter: _ChartPainter(trends: trends),
-              size: Size.infinite,
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: (maxVal / 3).clamp(1.0, double.infinity),
+                  getDrawingHorizontalLine: (value) {
+                    return const FlLine(
+                      color: AppColors.primary50,
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 22,
+                      interval: (trends.length > 5) ? (trends.length / 5).floorToDouble().clamp(1.0, double.infinity) : 1.0,
+                      getTitlesWidget: (value, meta) {
+                        final index = value.toInt();
+                        if (index < 0 || index >= trends.length) return const SizedBox.shrink();
+                        final date = trends[index].date;
+                        if (date == null) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            '${date.month}/${date.day}',
+                            style: CustomTextStyle.textsmall14.withColor(AppColors.greyTertiary).copyWith(fontSize: 10),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 36,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          value.toInt().toString(),
+                          style: CustomTextStyle.textsmall14.withColor(AppColors.greyTertiary).copyWith(fontSize: 10),
+                          textAlign: TextAlign.right,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: trends.asMap().entries.map((e) {
+                      return FlSpot(e.key.toDouble(), (e.value.calories ?? 0).toDouble());
+                    }).toList(),
+                    isCurved: true,
+                    color: AppColors.primary,
+                    barWidth: 2.5,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        if (index == 0 || index == trends.length - 1) {
+                          return FlDotCirclePainter(
+                            radius: 4,
+                            color: Colors.white,
+                            strokeWidth: 3,
+                            strokeColor: AppColors.primary,
+                          );
+                        }
+                        return FlDotCirclePainter(radius: 0, color: Colors.transparent, strokeWidth: 0);
+                      },
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.primary.withOpacity(0.25),
+                          AppColors.primary.withOpacity(0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+                lineTouchData: LineTouchData(
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipColor: (_) => isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                    tooltipRoundedRadius: 8,
+                    getTooltipItems: (touchedSpots) {
+                      return touchedSpots.map((spot) {
+                        return LineTooltipItem(
+                          '${spot.y.toInt()} kcal',
+                          CustomTextStyle.textsmall14.w700.withColor(AppColors.primary),
+                        );
+                      }).toList();
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 4),
-          // X-axis labels
-          if (trends.length >= 2)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(_fmtDate(trends.first.date),
-                    style: CustomTextStyle.textsmall14
-                        .withColor(AppColors.greyTertiary)
-                        .copyWith(fontSize: 10)),
-                Text(_fmtDate(trends.last.date),
-                    style: CustomTextStyle.textsmall14
-                        .withColor(AppColors.greyTertiary)
-                        .copyWith(fontSize: 10)),
-              ],
-            ),
         ],
       ),
     );
   }
-
-  String _fmtDate(DateTime? d) {
-    if (d == null) return '';
-    return '${d.month}/${d.day}';
-  }
-}
-
-class _ChartPainter extends CustomPainter {
-  final List<Trend> trends;
-
-  const _ChartPainter({required this.trends});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (trends.isEmpty) return;
-
-    final values = trends.map((t) => t.calories ?? 0).toList();
-    final maxVal = values.reduce(math.max);
-    final minVal = values.reduce(math.min);
-    final range = (maxVal - minVal).clamp(1.0, double.infinity);
-
-    final n = trends.length;
-    double xStep = n > 1 ? size.width / (n - 1) : size.width;
-
-    // Grid lines
-    final gridPaint = Paint()
-      ..color = AppColors.primary50
-      ..strokeWidth = 1;
-    for (int i = 0; i <= 3; i++) {
-      final y = size.height * i / 3;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    // Build path points
-    final points = List.generate(n, (i) {
-      final x = i * xStep;
-      final norm = maxVal == minVal ? 0.5 : (values[i] - minVal) / range;
-      final y = size.height - norm * size.height;
-      return Offset(x, y);
-    });
-
-    // Filled area
-    final fillPath = Path()..moveTo(points.first.dx, size.height);
-    for (final p in points) {
-      fillPath.lineTo(p.dx, p.dy);
-    }
-    fillPath
-      ..lineTo(points.last.dx, size.height)
-      ..close();
-
-    canvas.drawPath(
-      fillPath,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.primary.withOpacity(0.25),
-            AppColors.primary.withOpacity(0.0),
-          ],
-        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
-    );
-
-    // Line
-    final linePaint = Paint()
-      ..color = AppColors.primary
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-
-    final linePath = Path()..moveTo(points.first.dx, points.first.dy);
-    for (int i = 1; i < points.length; i++) {
-      // Smooth Bezier
-      final prev = points[i - 1];
-      final curr = points[i];
-      final cpX = (prev.dx + curr.dx) / 2;
-      linePath.cubicTo(cpX, prev.dy, cpX, curr.dy, curr.dx, curr.dy);
-    }
-    canvas.drawPath(linePath, linePaint);
-
-    // Data point dots on last and first
-    final dotPaint = Paint()
-      ..color = AppColors.primary
-      ..style = PaintingStyle.fill;
-    for (final p in [points.first, points.last]) {
-      canvas.drawCircle(p, 4, Paint()..color = Colors.white);
-      canvas.drawCircle(p, 3, dotPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_ChartPainter old) => old.trends != trends;
 }

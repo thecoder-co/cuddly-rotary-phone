@@ -24,6 +24,7 @@ class CustomBottomNav extends ConsumerWidget {
     return CupertinoTabBar(
       currentIndex: currentIndex,
       onTap: onTap,
+
       activeColor: activeColor,
       inactiveColor: inactiveColor,
       backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
@@ -40,13 +41,16 @@ class CustomBottomNav extends ConsumerWidget {
           .entries
           .map(
             (entry) => BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                entry.value.icon,
-                colorFilter: ColorFilter.mode(
-                  entry.key == currentIndex ? activeColor : inactiveColor,
-                  BlendMode.srcIn,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: SvgPicture.asset(
+                  entry.value.icon,
+                  colorFilter: ColorFilter.mode(
+                    entry.key == currentIndex ? activeColor : inactiveColor,
+                    BlendMode.srcIn,
+                  ),
+                  height: 24,
                 ),
-                height: 24,
               ),
               label: entry.value.title,
             ),
@@ -61,9 +65,5 @@ class CustomNavBarItem {
   final String title;
   final dynamic badge;
 
-  CustomNavBarItem({
-    required this.icon,
-    required this.title,
-    this.badge,
-  });
+  CustomNavBarItem({required this.icon, required this.title, this.badge});
 }

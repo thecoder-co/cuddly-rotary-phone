@@ -8,16 +8,14 @@ class InputIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      asset,
-      color: Colors.black,
-    ).paddingOnly(r: 12);
+    return SvgPicture.asset(asset, color: Colors.black).paddingOnly(r: 12);
   }
 }
 
 class AppInput extends StatefulWidget {
   final TextEditingController? controller;
   final String? Function(String? v)? validator;
+  final bool autocorrect;
   final dynamic Function(dynamic v)? dropdownValidator;
 
   /// If initialText is not null, it will override the initialText from controller
@@ -87,6 +85,7 @@ class AppInput extends StatefulWidget {
   final TextStyle? style;
   final TextStyle? hintStyle;
 
+  final Color? backgroundColor;
   final bool isDropDown;
 
   /// If obscureText is true, maxLines must be specified as 1.
@@ -104,6 +103,7 @@ class AppInput extends StatefulWidget {
     this.trailingIcon,
     this.hintStyle,
     this.firstDate,
+    this.backgroundColor,
     this.lastDate,
     this.obscureText,
     this.style,
@@ -117,6 +117,7 @@ class AppInput extends StatefulWidget {
     this.labelStyle,
     this.keyboardType,
     this.helperText,
+    this.autocorrect = false,
     this.leadingIcon,
     this.maxLines = 1,
     this.labelText,
@@ -125,22 +126,22 @@ class AppInput extends StatefulWidget {
     this.errorText,
     this.expands = false,
     this.width,
-  })  : isPasswordField = false,
-        initialDateTime = null,
-        initialTime = null,
-        isDateTimeInputField = false,
-        isTimeInputField = false,
-        dropdownValidator = null,
-        isDropDown = false,
-        currentCountryCode = null,
-        onDateTimeChanged = null,
-        onTimeChanged = null,
-        items = null,
-        onDropdownChanged = null,
-        initialItem = null,
-        onCountryPicked = null,
-        currentCurrency = null,
-        onCurrencyPicked = null;
+  }) : isPasswordField = false,
+       initialDateTime = null,
+       initialTime = null,
+       isDateTimeInputField = false,
+       isTimeInputField = false,
+       dropdownValidator = null,
+       isDropDown = false,
+       currentCountryCode = null,
+       onDateTimeChanged = null,
+       onTimeChanged = null,
+       items = null,
+       onDropdownChanged = null,
+       initialItem = null,
+       onCountryPicked = null,
+       currentCurrency = null,
+       onCurrencyPicked = null;
 
   const AppInput.datePicker({
     super.key,
@@ -153,12 +154,14 @@ class AppInput extends StatefulWidget {
     this.trailingIcon,
     this.hintStyle,
     this.obscureText,
+    this.backgroundColor,
     this.style,
     required this.onDateTimeChanged,
     this.labelStyle,
     this.inputFormatters,
     this.minLines,
     this.firstDate,
+    this.autocorrect = false,
     this.lastDate,
     this.textAlign,
     this.enabled = true,
@@ -173,24 +176,24 @@ class AppInput extends StatefulWidget {
     this.errorText,
     this.expands = false,
     this.width,
-  })  : isPasswordField = false,
-        controller = null,
-        isDateTimeInputField = true,
-        isTimeInputField = false,
-        dropdownValidator = null,
-        initialTime = null,
-        isDropDown = false,
-        currentCountryCode = null,
-        onTimeChanged = null,
-        items = null,
-        readOnly = true,
-        initialText = null,
-        onChanged = null,
-        onDropdownChanged = null,
-        initialItem = null,
-        onCountryPicked = null,
-        currentCurrency = null,
-        onCurrencyPicked = null;
+  }) : isPasswordField = false,
+       controller = null,
+       isDateTimeInputField = true,
+       isTimeInputField = false,
+       dropdownValidator = null,
+       initialTime = null,
+       isDropDown = false,
+       currentCountryCode = null,
+       onTimeChanged = null,
+       items = null,
+       readOnly = true,
+       initialText = null,
+       onChanged = null,
+       onDropdownChanged = null,
+       initialItem = null,
+       onCountryPicked = null,
+       currentCurrency = null,
+       onCurrencyPicked = null;
 
   const AppInput.timePicker({
     super.key,
@@ -206,6 +209,7 @@ class AppInput extends StatefulWidget {
     this.style,
     required this.onTimeChanged,
     this.autoFocus = false,
+    this.backgroundColor,
     this.labelStyle,
     this.firstDate,
     this.lastDate,
@@ -214,6 +218,7 @@ class AppInput extends StatefulWidget {
     this.enabled = true,
     this.keyboardType,
     this.helperText,
+    this.autocorrect = false,
     this.textAlign,
     this.leadingIcon,
     this.maxLines = 1,
@@ -223,24 +228,24 @@ class AppInput extends StatefulWidget {
     this.errorText,
     this.expands = false,
     this.width,
-  })  : isPasswordField = false,
-        controller = null,
-        isDateTimeInputField = false,
-        isTimeInputField = true,
-        isDropDown = false,
-        initialDateTime = null,
-        currentCountryCode = null,
-        dropdownValidator = null,
-        onDateTimeChanged = null,
-        items = null,
-        onDropdownChanged = null,
-        readOnly = true,
-        initialText = null,
-        onChanged = null,
-        initialItem = null,
-        onCountryPicked = null,
-        currentCurrency = null,
-        onCurrencyPicked = null;
+  }) : isPasswordField = false,
+       controller = null,
+       isDateTimeInputField = false,
+       isTimeInputField = true,
+       isDropDown = false,
+       initialDateTime = null,
+       currentCountryCode = null,
+       dropdownValidator = null,
+       onDateTimeChanged = null,
+       items = null,
+       onDropdownChanged = null,
+       readOnly = true,
+       initialText = null,
+       onChanged = null,
+       initialItem = null,
+       onCountryPicked = null,
+       currentCurrency = null,
+       onCurrencyPicked = null;
 
   const AppInput.dropdown({
     super.key,
@@ -256,7 +261,9 @@ class AppInput extends StatefulWidget {
     this.hintStyle,
     this.textAlign,
     this.obscureText,
+    this.backgroundColor,
     this.style,
+    this.autocorrect = false,
     this.autoFocus = false,
     this.inputFormatters,
     this.minLines,
@@ -274,23 +281,23 @@ class AppInput extends StatefulWidget {
     required this.onDropdownChanged,
     this.expands = false,
     this.width,
-  })  : isPasswordField = false,
-        initialText = null,
-        onDateTimeChanged = null,
-        onTimeChanged = null,
-        controller = null,
-        onChanged = null,
-        validator = null,
-        readOnly = false,
-        initialDateTime = null,
-        initialTime = null,
-        isDateTimeInputField = false,
-        isTimeInputField = false,
-        isDropDown = true,
-        currentCountryCode = null,
-        onCountryPicked = null,
-        currentCurrency = null,
-        onCurrencyPicked = null;
+  }) : isPasswordField = false,
+       initialText = null,
+       onDateTimeChanged = null,
+       onTimeChanged = null,
+       controller = null,
+       onChanged = null,
+       validator = null,
+       readOnly = false,
+       initialDateTime = null,
+       initialTime = null,
+       isDateTimeInputField = false,
+       isTimeInputField = false,
+       isDropDown = true,
+       currentCountryCode = null,
+       onCountryPicked = null,
+       currentCurrency = null,
+       onCurrencyPicked = null;
 
   const AppInput.password({
     super.key,
@@ -305,11 +312,13 @@ class AppInput extends StatefulWidget {
     this.firstDate,
     this.lastDate,
     this.trailingIcon,
+    this.backgroundColor,
     this.autoFocus = false,
     this.hintStyle,
     this.labelStyle,
     this.textAlign,
     this.readOnly = false,
+    this.autocorrect = false,
     this.obscureText,
     this.style,
     this.onTap,
@@ -325,22 +334,22 @@ class AppInput extends StatefulWidget {
     this.errorText,
     this.expands = false,
     this.width,
-  })  : isDropDown = false,
-        initialItem = null,
-        isPasswordField = true,
-        dropdownValidator = null,
-        initialDateTime = null,
-        initialTime = null,
-        isDateTimeInputField = false,
-        isTimeInputField = false,
-        onDateTimeChanged = null,
-        onDropdownChanged = null,
-        onTimeChanged = null,
-        currentCountryCode = null,
-        items = null,
-        onCountryPicked = null,
-        currentCurrency = null,
-        onCurrencyPicked = null;
+  }) : isDropDown = false,
+       initialItem = null,
+       isPasswordField = true,
+       dropdownValidator = null,
+       initialDateTime = null,
+       initialTime = null,
+       isDateTimeInputField = false,
+       isTimeInputField = false,
+       onDateTimeChanged = null,
+       onDropdownChanged = null,
+       onTimeChanged = null,
+       currentCountryCode = null,
+       items = null,
+       onCountryPicked = null,
+       currentCurrency = null,
+       onCurrencyPicked = null;
 
   // const AppInput.phoneNumber({
   //   super.key,
@@ -480,20 +489,26 @@ class _AppInputState extends State<AppInput> {
   }
 
   void onPhoneInit() {
-    _phoneDropdownValue =
-        countries.data!.firstWhere((element) => element.dialCode == '234');
+    _phoneDropdownValue = countries.data!.firstWhere(
+      (element) => element.dialCode == '234',
+    );
 
     if (widget.currentCountryCode != null) {
-      _phoneDropdownValue = countries.data!.firstWhereOrNull((element) =>
-              element.shortCode == widget.currentCountryCode ||
-              element.dialCode == widget.currentCountryCode) ??
+      _phoneDropdownValue =
+          countries.data!.firstWhereOrNull(
+            (element) =>
+                element.shortCode == widget.currentCountryCode ||
+                element.dialCode == widget.currentCountryCode,
+          ) ??
           countries.data!.first;
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         widget.onCountryPicked!(_phoneDropdownValue!);
       });
     } else {
-      _phoneDropdownValue = countries.data!
-              .firstWhereOrNull((element) => element.shortCode == 'NG') ??
+      _phoneDropdownValue =
+          countries.data!.firstWhereOrNull(
+            (element) => element.shortCode == 'NG',
+          ) ??
           countries.data!.first;
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         widget.onCountryPicked!(_phoneDropdownValue!);
@@ -548,7 +563,8 @@ class _AppInputState extends State<AppInput> {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: widget.onTap ??
+      onTap:
+          widget.onTap ??
           (widget.readOnly
               ? null
               : () async {
@@ -574,9 +590,11 @@ class _AppInputState extends State<AppInput> {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(radius),
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF2C2C2E)
-                  : AppColors.primary100,
+              color:
+                  widget.backgroundColor ??
+                  (Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF2C2C2E)
+                      : AppColors.baseBackground),
             ),
             // height: widget.height,
             width: widget.width,
@@ -596,7 +614,7 @@ class _AppInputState extends State<AppInput> {
                           child: dropDown(textColor(), hintColor()),
                         )
                       else
-                        onEmptyField(textColor(), hintColor())
+                        onEmptyField(textColor(), hintColor()),
                     ],
                   ),
                 ),
@@ -612,7 +630,8 @@ class _AppInputState extends State<AppInput> {
             8.spacingH,
             Text(
               errorText!,
-              style: widget.style?.withColor(AppColors.error400) ??
+              style:
+                  widget.style?.withColor(AppColors.error400) ??
                   CustomTextStyle.textsmall14.withColor(AppColors.error400),
             ).paddingOnly(l: 8),
           ],
@@ -620,7 +639,8 @@ class _AppInputState extends State<AppInput> {
             4.spacingH,
             Text(
               widget.helperText!,
-              style: widget.style?.withColor(AppColors.greyTertiary) ??
+              style:
+                  widget.style?.withColor(AppColors.greyTertiary) ??
                   CustomTextStyle.textsmall14.withColor(AppColors.greyTertiary),
             ),
           ],
@@ -676,14 +696,18 @@ class _AppInputState extends State<AppInput> {
           ? null
           : Text(
               widget.hintText!,
-              style: widget.hintStyle?.withColor(hintColor) ??
+              style:
+                  widget.hintStyle?.withColor(hintColor) ??
                   CustomTextStyle.textmedium16.withColor(hintColor),
             ),
-      style: widget.style?.withColor(textColor) ??
+      style:
+          widget.style?.withColor(textColor) ??
           CustomTextStyle.textmedium16.w500.withColor(textColor),
       decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 15.5, horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 15.5,
+          horizontal: 12,
+        ),
         hintText: widget.hintText,
         fillColor: Colors.transparent,
         filled: true,
@@ -720,10 +744,7 @@ class _AppInputState extends State<AppInput> {
 
   var border = OutlineInputBorder(
     borderRadius: BorderRadius.circular(12),
-    borderSide: const BorderSide(
-      color: AppColors.bordersLight,
-      width: 1,
-    ),
+    borderSide: const BorderSide(color: AppColors.bordersLight, width: 1),
   );
   Widget onEmptyField(Color textColor, Color hintColor) {
     return FormField<String>(
@@ -748,15 +769,18 @@ class _AppInputState extends State<AppInput> {
           focusNode: _focusNode,
           enabled: widget.enabled,
           expands: widget.expands,
+          autocorrect: widget.autocorrect,
           readOnly: widget.readOnly,
           onChanged: (v) {
             field.didChange(v);
             widget.onChanged?.call(v);
           },
-          obscureText:
-              widget.isPasswordField ? passwordVisibilityChange : false,
+          obscureText: widget.isPasswordField
+              ? passwordVisibilityChange
+              : false,
           keyboardType: widget.keyboardType,
-          style: widget.style?.withColor(textColor) ??
+          style:
+              widget.style?.withColor(textColor) ??
               CustomTextStyle.textmedium16.w500.withColor(textColor),
           inputFormatters: [
             if (widget.inputFormatters != null) ...widget.inputFormatters!,
@@ -765,14 +789,15 @@ class _AppInputState extends State<AppInput> {
           onTap: widget.isDateTimeInputField
               ? () => handleDateTime()
               : widget.isTimeInputField
-                  ? () => handleTime()
-                  : widget.onTap,
+              ? () => handleTime()
+              : widget.onTap,
           maxLines: widget.isPasswordField ? 1 : widget.maxLines,
           minLines: widget.minLines,
           autofocus: widget.autoFocus,
           controller: controller,
           placeholder: widget.isTimeInputField ? '00:00' : widget.hintText,
-          placeholderStyle: widget.hintStyle?.withColor(hintColor) ??
+          placeholderStyle:
+              widget.hintStyle?.withColor(hintColor) ??
               CustomTextStyle.textmedium16.withColor(hintColor),
           padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
           // No border — outer Container already provides the styled bg

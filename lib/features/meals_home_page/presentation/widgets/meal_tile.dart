@@ -25,7 +25,7 @@ enum WeightConversions {
 }
 
 class MealTile extends ConsumerStatefulWidget {
-  final int mealId;
+  final dynamic mealId;
   final double? initialWeight;
   final bool validateWeight;
   final bool asSubMeal;
@@ -56,11 +56,10 @@ class _MealTileState extends ConsumerState<MealTile> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (!meal.hasValue) {
-      return const Center(
-        child: CircularProgressIndicator.adaptive(),
-      );
+      return const Center(child: CircularProgressIndicator.adaptive());
     }
-    final weight = (meal.value!.weight ??
+    final weight =
+        (meal.value!.weight ??
         meal.value!.subMeals.fold(
           0,
           (previousValue, element) =>
@@ -69,15 +68,15 @@ class _MealTileState extends ConsumerState<MealTile> {
         0);
     final calorieCount = meal.value!.calories;
 
-    final combinedMacros = meal.value!.subMeals.fold(
-      Macros(),
-      (previousValue, element) {
-        previousValue.carbs += (element.macros?.carbs ?? 0);
-        previousValue.protein += (element.macros?.protein ?? 0);
-        previousValue.fats += (element.macros?.fats ?? 0);
-        return previousValue;
-      },
-    );
+    final combinedMacros = meal.value!.subMeals.fold(Macros(), (
+      previousValue,
+      element,
+    ) {
+      previousValue.carbs += (element.macros?.carbs ?? 0);
+      previousValue.protein += (element.macros?.protein ?? 0);
+      previousValue.fats += (element.macros?.fats ?? 0);
+      return previousValue;
+    });
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -92,10 +91,7 @@ class _MealTileState extends ConsumerState<MealTile> {
                 onPressed: (context) {
                   ref
                       .read(mealProvider((query: null, date: null)).notifier)
-                      .deleteMeal(
-                        meal: meal.value!,
-                        id: meal.value?.backendId,
-                      );
+                      .deleteMeal(meal: meal.value!, id: meal.value?.backendId);
                 },
                 backgroundColor: const Color(0xFFFE4A49),
                 foregroundColor: Colors.white,
@@ -111,10 +107,7 @@ class _MealTileState extends ConsumerState<MealTile> {
                 onPressed: (context) {
                   ref
                       .read(mealProvider((query: null, date: null)).notifier)
-                      .deleteMeal(
-                        meal: meal.value!,
-                        id: meal.value?.backendId,
-                      );
+                      .deleteMeal(meal: meal.value!, id: meal.value?.backendId);
                 },
                 backgroundColor: const Color(0xFFFE4A49),
                 foregroundColor: Colors.white,
@@ -128,12 +121,7 @@ class _MealTileState extends ConsumerState<MealTile> {
               if (widget.shouldReturn) {
                 pop(meal.value!);
               } else {
-                pushTo(
-                  AddMealPage(
-                    date: meal.value!.date,
-                    meal: meal.value!,
-                  ),
-                );
+                pushTo(AddMealPage(date: meal.value!.date, meal: meal.value!));
               }
             },
             child: AnimatedContainer(
@@ -142,8 +130,8 @@ class _MealTileState extends ConsumerState<MealTile> {
               decoration: BoxDecoration(
                 color: isExpanded
                     ? (isDark
-                        ? const Color(0xFF2C2C2E)
-                        : const Color(0xFFF2F2F7))
+                          ? const Color(0xFF2C2C2E)
+                          : const Color(0xFFF2F2F7))
                     : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
@@ -173,11 +161,12 @@ class _MealTileState extends ConsumerState<MealTile> {
                                 Text(
                                   widget.initialWeight != null
                                       ? (widget.initialWeight! *
-                                              (meal.value!.caloriePerGram ?? 1))
-                                          .toStringAsFixed(2)
+                                                (meal.value!.caloriePerGram ??
+                                                    1))
+                                            .toStringAsFixed(2)
                                       : '${(weight) <= 0 || widget.asSubMeal ? '' : '${weight}g/'}${calorieCount}kcal${(weight) <= 0 || widget.asSubMeal ? '/100g' : ''}',
                                   style: CustomTextStyle.textmedium16.w700,
-                                )
+                                ),
                               ],
                             ),
                           ],
@@ -205,6 +194,14 @@ class _MealTileState extends ConsumerState<MealTile> {
                       ),
                     ],
                   ),
+                  if (meal.value!.syncError != null) ...[
+                    Text(
+                      'Sync Error: ${meal.value!.syncError}',
+                      style: CustomTextStyle.textxSmall12.w700.copyWith(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
                   if (isExpanded) ...[
                     16.gap,
                     AnimatedOpacity(
@@ -215,14 +212,11 @@ class _MealTileState extends ConsumerState<MealTile> {
                         children: [
                           for (var (index, element)
                               in meal.value!.subMeals.indexed) ...[
-                            _tile(
-                              [
-                                element.name ?? '',
-                                '${element.chosenWeight}g',
-                                '${(element.caloriesPerGram ?? 1) * (element.chosenWeight ?? 1)}kcal'
-                              ],
-                              onTap: () {},
-                            ),
+                            _tile([
+                              element.name ?? '',
+                              '${element.chosenWeight}g',
+                              '${(element.caloriesPerGram ?? 1) * (element.chosenWeight ?? 1)}kcal',
+                            ], onTap: () {}),
                             if (index != meal.value!.subMeals.length - 1) 2.gap,
                           ],
                           8.gap,
@@ -234,34 +228,34 @@ class _MealTileState extends ConsumerState<MealTile> {
                           if (meal.value!.macros != null) ...[
                             _tile([
                               'Protein',
-                              '${(meal.value!.macros!.protein * 100).toStringAsFixed(1)}g'
+                              '${(meal.value!.macros!.protein * 100).toStringAsFixed(1)}g',
                             ]),
                             _tile([
                               'Carbs',
-                              '${(meal.value!.macros!.carbs * 100).toStringAsFixed(1)}g'
+                              '${(meal.value!.macros!.carbs * 100).toStringAsFixed(1)}g',
                             ]),
                             _tile([
                               'Fats',
-                              '${(meal.value!.macros!.fats * 100).toStringAsFixed(1)}g'
+                              '${(meal.value!.macros!.fats * 100).toStringAsFixed(1)}g',
                             ]),
                           ] else if (combinedMacros.isNotEmpty) ...[
                             _tile([
                               'Protein',
-                              '${(combinedMacros.protein * 100).toStringAsFixed(1)}g'
+                              '${(combinedMacros.protein * 100).toStringAsFixed(1)}g',
                             ]),
                             _tile([
                               'Carbs',
-                              '${(combinedMacros.carbs * 100).toStringAsFixed(1)}g'
+                              '${(combinedMacros.carbs * 100).toStringAsFixed(1)}g',
                             ]),
                             _tile([
                               'Fats',
-                              '${(combinedMacros.fats * 100).toStringAsFixed(1)}g'
+                              '${(combinedMacros.fats * 100).toStringAsFixed(1)}g',
                             ]),
                           ],
                         ],
                       ),
                     ),
-                  ]
+                  ],
                 ],
               ),
             ),
@@ -280,9 +274,7 @@ class _MealTileState extends ConsumerState<MealTile> {
                   validator: widget.validateWeight
                       ? Validator().isNotEmpty().validate
                       : null,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
@@ -293,7 +285,8 @@ class _MealTileState extends ConsumerState<MealTile> {
                       return;
                     }
                     widget.onWeightChanged!(
-                        weightUnit.convertToGrams(double.parse(v)));
+                      weightUnit.convertToGrams(double.parse(v)),
+                    );
                   },
                 ),
               ),
@@ -302,9 +295,7 @@ class _MealTileState extends ConsumerState<MealTile> {
                 child: AppInput.dropdown(
                   initialItem: weightUnit,
                   items: WeightConversions.values
-                      .where(
-                        (e) => e != WeightConversions.g100,
-                      )
+                      .where((e) => e != WeightConversions.g100)
                       .map(
                         (e) =>
                             DropdownMenuItem(value: e, child: Text(e.format)),
@@ -316,7 +307,7 @@ class _MealTileState extends ConsumerState<MealTile> {
                 ),
               ),
             ],
-          )
+          ),
         ],
       ],
     );
@@ -331,23 +322,17 @@ class _MealTileState extends ConsumerState<MealTile> {
       onTap: onTap,
       child: Row(
         children: [
-          Text(
-            '\u2022 ',
-            style: CustomTextStyle.textxSmall12.w700,
-          ),
-          ...tiles.mapIndexed(
-            (index, element) {
-              return Expanded(
-                child: Text(
-                  element,
-                  style: CustomTextStyle.textxSmall12.copyWith(
-                    fontWeight:
-                        index == 0 ? FontWeight.w600 : FontWeight.normal,
-                  ),
+          Text('\u2022 ', style: CustomTextStyle.textxSmall12.w700),
+          ...tiles.mapIndexed((index, element) {
+            return Expanded(
+              child: Text(
+                element,
+                style: CustomTextStyle.textxSmall12.copyWith(
+                  fontWeight: index == 0 ? FontWeight.w600 : FontWeight.normal,
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          }),
           3.gap,
           Icon(
             Icons.keyboard_arrow_right,

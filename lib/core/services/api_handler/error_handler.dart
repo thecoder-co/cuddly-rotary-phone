@@ -30,7 +30,8 @@ Response handleError(DioException e) {
       return Response(
         statusCode: kNetworkErrorCode,
         data: apiResponse(
-            message: 'Something went wrong. Please try again later!'),
+          message: 'Something went wrong. Please try again later!',
+        ),
         requestOptions: RequestOptions(path: ''),
       );
 
@@ -55,7 +56,8 @@ Response handleError(DioException e) {
           statusCode: effectiveCode,
           statusMessage: e.response?.statusMessage ?? 'NULL',
           data: apiResponse(
-            message: e.response?.data ??
+            message:
+                e.response?.data ??
                 'Something went wrong. Please try again later',
             data: {
               'error': true,
@@ -67,11 +69,26 @@ Response handleError(DioException e) {
         );
       }
 
+      if (e.response?.data?['message'] is List) {
+        return Response(
+          statusCode: effectiveCode,
+          statusMessage: e.response?.statusMessage ?? 'NULL',
+          data: apiResponse(
+            message:
+                (e.response?.data?['message'] as List?)?.join(', ') ??
+                'Something went wrong. Please try again later',
+            data: e.response?.data,
+          ),
+          requestOptions: RequestOptions(path: ''),
+        );
+      }
+
       return Response(
         statusCode: effectiveCode,
         statusMessage: e.response?.statusMessage ?? 'NULL',
         data: apiResponse(
-          message: e.response?.data?['message'] ??
+          message:
+              e.response?.data?['message'] ??
               'Something went wrong. Please try again later',
           data: e.response?.data,
         ),

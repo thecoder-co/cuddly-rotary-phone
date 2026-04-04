@@ -1,4 +1,4 @@
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 part 'meal.g.dart';
 
@@ -7,18 +7,19 @@ enum SyncStatus {
   pendingCreate,
   pendingUpdate,
   pendingDelete,
+  pendingAddFromParent,
 }
 
 @collection
 class Meal {
   Id id = Isar.autoIncrement;
-  
+
   @Index(unique: true, replace: true)
   String? backendId;
-  
+
   @enumerated
   SyncStatus syncStatus = SyncStatus.pendingCreate; // Offline sync
-  
+  String? syncError;
   String type = 'LOGENTRY';
 
   String? date;
@@ -33,32 +34,51 @@ class Meal {
 
   List<SubMeal> subMeals = []; // Embedded sub-meals
 
-  double get totalSubMealWeight => subMeals.fold<double>(0.0, (total, sm) => total + (sm.chosenWeight ?? 0.0));
+  double get totalSubMealWeight => subMeals.fold<double>(
+    0.0,
+    (total, sm) => total + (sm.chosenWeight ?? 0.0),
+  );
 
   double get inferredCaloriePerGram {
     if (subMeals.isEmpty) return 0.0;
-    final totalCals = subMeals.fold<double>(0.0, (total, sm) => total + ((sm.caloriesPerGram ?? 0.0) * (sm.chosenWeight ?? 0.0)));
+    final totalCals = subMeals.fold<double>(
+      0.0,
+      (total, sm) =>
+          total + ((sm.caloriesPerGram ?? 0.0) * (sm.chosenWeight ?? 0.0)),
+    );
     final w = totalSubMealWeight;
     return w > 0 ? (totalCals / w) : 0.0;
   }
 
   double get inferredProteinPerGram {
     if (subMeals.isEmpty) return 0.0;
-    final total = subMeals.fold<double>(0.0, (total, sm) => total + ((sm.macros?.protein ?? 0.0) * (sm.chosenWeight ?? 0.0)));
+    final total = subMeals.fold<double>(
+      0.0,
+      (total, sm) =>
+          total + ((sm.macros?.protein ?? 0.0) * (sm.chosenWeight ?? 0.0)),
+    );
     final w = totalSubMealWeight;
     return w > 0 ? (total / w) : 0.0;
   }
 
   double get inferredFatPerGram {
     if (subMeals.isEmpty) return 0.0;
-    final total = subMeals.fold<double>(0.0, (total, sm) => total + ((sm.macros?.fats ?? 0.0) * (sm.chosenWeight ?? 0.0)));
+    final total = subMeals.fold<double>(
+      0.0,
+      (total, sm) =>
+          total + ((sm.macros?.fats ?? 0.0) * (sm.chosenWeight ?? 0.0)),
+    );
     final w = totalSubMealWeight;
     return w > 0 ? (total / w) : 0.0;
   }
 
   double get inferredCarbsPerGram {
     if (subMeals.isEmpty) return 0.0;
-    final total = subMeals.fold<double>(0.0, (total, sm) => total + ((sm.macros?.carbs ?? 0.0) * (sm.chosenWeight ?? 0.0)));
+    final total = subMeals.fold<double>(
+      0.0,
+      (total, sm) =>
+          total + ((sm.macros?.carbs ?? 0.0) * (sm.chosenWeight ?? 0.0)),
+    );
     final w = totalSubMealWeight;
     return w > 0 ? (total / w) : 0.0;
   }
@@ -68,9 +88,14 @@ class Meal {
   double get actualFatPerGram => macros?.fats ?? inferredFatPerGram;
   double get actualCarbsPerGram => macros?.carbs ?? inferredCarbsPerGram;
 
-  double get resolvedWeight => weight ?? (totalSubMealWeight > 0 ? totalSubMealWeight : (showAsSubmeal ? 100.0 : 0.0));
+  double get resolvedWeight =>
+      weight ??
+      (totalSubMealWeight > 0
+          ? totalSubMealWeight
+          : (showAsSubmeal ? 100.0 : 0.0));
 
-  String get calories => (actualCaloriePerGram * resolvedWeight).toStringAsFixed(1);
+  String get calories =>
+      (actualCaloriePerGram * resolvedWeight).toStringAsFixed(1);
   double get caloriesUnit => actualCaloriePerGram * resolvedWeight;
 
   Meal({
@@ -132,11 +157,7 @@ class Macros {
   double protein;
   double carbs;
 
-  Macros({
-    this.fats = 0,
-    this.protein = 0,
-    this.carbs = 0,
-  });
+  Macros({this.fats = 0, this.protein = 0, this.carbs = 0});
   bool get isEmpty => fats == 0 && protein == 0 && carbs == 0;
   bool get isNotEmpty => !isEmpty;
 }

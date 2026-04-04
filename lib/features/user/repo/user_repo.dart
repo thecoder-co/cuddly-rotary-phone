@@ -1,6 +1,3 @@
-import 'package:calorie_tracker/core/services/api_handler/api_client_config.dart';
-import 'package:calorie_tracker/core/services/api_handler/api_handler_models.dart';
-import 'package:calorie_tracker/core/services/api_handler/app_endpoints.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 import '../models/profile_dto.dart';
 

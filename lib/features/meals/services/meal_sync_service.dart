@@ -2,6 +2,7 @@ import 'package:calorie_tracker/features/meals/models/meal.dart';
 import 'package:calorie_tracker/features/meals/models/meal_dto.dart';
 import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
 import 'package:calorie_tracker/features/meals/repo/meal_repo.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:developer';
 
@@ -32,20 +33,19 @@ class MealSyncService {
             fatPerGram: meal.macros?.fats,
             carbsPerGram: meal.macros?.carbs,
             weight: meal.weight,
-            components: meal.subMeals
-                .map((e) {
-                  final isLocal = e.backendId == null || e.backendId!.startsWith('local');
-                  return MealComponentDto(
-                    subMealId: isLocal ? null : e.backendId,
-                    name: isLocal ? e.name : null,
-                    caloriePerGram: isLocal ? e.caloriesPerGram?.toInt() : null,
-                    protienPerGram: isLocal ? e.macros?.protein.toInt() : null,
-                    fatPerGram: isLocal ? e.macros?.fats.toInt() : null,
-                    carbsPerGram: isLocal ? e.macros?.carbs.toInt() : null,
-                    weightUsed: e.chosenWeight?.toInt(),
-                  );
-                })
-                .toList(),
+            components: meal.subMeals.map((e) {
+              final isLocal =
+                  e.backendId == null || e.backendId!.startsWith('local');
+              return MealComponentDto(
+                subMealId: isLocal ? null : e.backendId,
+                name: isLocal ? e.name : null,
+                caloriePerGram: isLocal ? e.caloriesPerGram?.toInt() : null,
+                protienPerGram: isLocal ? e.macros?.protein.toInt() : null,
+                fatPerGram: isLocal ? e.macros?.fats.toInt() : null,
+                carbsPerGram: isLocal ? e.macros?.carbs.toInt() : null,
+                weightUsed: e.chosenWeight?.toInt(),
+              );
+            }).toList(),
           );
           final res = await cloudRepo.createMeal(dto);
           if (res.valid) {
@@ -53,7 +53,13 @@ class MealSyncService {
               meal.syncStatus = SyncStatus.synced;
               if (res.data?.id != null) {
                 meal.backendId = res.data!.id;
+                meal.syncError = null;
               }
+              await localRepo.isar.meals.put(meal);
+            });
+          } else {
+            await localRepo.isar.writeTxn(() async {
+              meal.syncError = res.error?.message;
               await localRepo.isar.meals.put(meal);
             });
           }
@@ -67,25 +73,30 @@ class MealSyncService {
             fatPerGram: meal.macros?.fats,
             carbsPerGram: meal.macros?.carbs,
             weight: meal.weight,
-            components: meal.subMeals
-                .map((e) {
-                  final isLocal = e.backendId == null || e.backendId!.startsWith('local');
-                  return MealComponentDto(
-                    subMealId: isLocal ? null : e.backendId,
-                    name: isLocal ? e.name : null,
-                    caloriePerGram: isLocal ? e.caloriesPerGram?.toInt() : null,
-                    protienPerGram: isLocal ? e.macros?.protein.toInt() : null,
-                    fatPerGram: isLocal ? e.macros?.fats.toInt() : null,
-                    carbsPerGram: isLocal ? e.macros?.carbs.toInt() : null,
-                    weightUsed: e.chosenWeight?.toInt(),
-                  );
-                })
-                .toList(),
+            components: meal.subMeals.map((e) {
+              final isLocal =
+                  e.backendId == null || e.backendId!.startsWith('local');
+              return MealComponentDto(
+                subMealId: isLocal ? null : e.backendId,
+                name: isLocal ? e.name : null,
+                caloriePerGram: isLocal ? e.caloriesPerGram?.toInt() : null,
+                protienPerGram: isLocal ? e.macros?.protein.toInt() : null,
+                fatPerGram: isLocal ? e.macros?.fats.toInt() : null,
+                carbsPerGram: isLocal ? e.macros?.carbs.toInt() : null,
+                weightUsed: e.chosenWeight?.toInt(),
+              );
+            }).toList(),
           );
           final res = await cloudRepo.updateMeal(meal.backendId!, dto);
           if (res.valid) {
             await localRepo.isar.writeTxn(() async {
               meal.syncStatus = SyncStatus.synced;
+              meal.syncError = null;
+              await localRepo.isar.meals.put(meal);
+            });
+          } else {
+            await localRepo.isar.writeTxn(() async {
+              meal.syncError = res.error?.message;
               await localRepo.isar.meals.put(meal);
             });
           }
@@ -94,12 +105,19 @@ class MealSyncService {
           if (res.valid) {
             await localRepo.deleteMeal(meal.id);
           } else if (!res.isNetworkError && res.statusCode == 404) {
-             // Already deleted on backend
+            // Already deleted on backend
             await localRepo.deleteMeal(meal.id);
+          } else {
+            await localRepo.isar.writeTxn(() async {
+              meal.syncError = res.error?.message;
+              meal.syncError = null;
+              await localRepo.isar.meals.put(meal);
+            });
           }
         }
       } catch (e) {
         log('Error syncing meal ${meal.id}: $e');
+        if (kDebugMode) rethrow;
       }
     }
   }

@@ -15,5 +15,4 @@ export 'package:dio/dio.dart';
 export 'package:collection/collection.dart';
 
 export 'package:flutter/services.dart';
-export 'package:skeletonizer/skeletonizer.dart';
 export 'package:flutter/gestures.dart';

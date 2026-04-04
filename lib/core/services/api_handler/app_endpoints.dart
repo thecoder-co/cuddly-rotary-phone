@@ -14,16 +14,4 @@ class AppEndpoints {
 
   static String baseUrlTest = 'http://localhost:3000';
   static String baseUrlLive = 'https://qarr-tracker.onrender.com';
-
-  static String get baseUrlWeb {
-    //return baseUrlWebTest;
-    if (kDebugMode && (!liveWhileDebug)) {
-      return baseUrlWebTest;
-    } else {
-      return baseUrlWebLive;
-    }
-  }
-
-  static String baseUrlWebTest = 'https://app.test.calorie_tracker.africa';
-  static String baseUrlWebLive = 'https://app.calorie_tracker.africa';
 }

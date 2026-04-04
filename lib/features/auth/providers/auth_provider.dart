@@ -27,9 +27,7 @@ class AuthNotifier extends Notifier<AuthRepo> {
     }
   }
 
-  Future<void> createUser({
-    required CreateUserDto model,
-  }) async {
+  Future<void> createUser({required CreateUserDto model}) async {
     Dialogs.showLoadingDialog();
     final res = await state.createUser(model: model);
     pop();
@@ -42,9 +40,7 @@ class AuthNotifier extends Notifier<AuthRepo> {
     }
   }
 
-  Future<void> sendLoginOtp({
-    required SendLoginOtpDto model,
-  }) async {
+  Future<void> sendLoginOtp({required SendLoginOtpDto model}) async {
     Dialogs.showLoadingDialog();
     final res = await state.sendLoginOtp(model: model);
     pop();
@@ -57,9 +53,7 @@ class AuthNotifier extends Notifier<AuthRepo> {
     }
   }
 
-  Future<void> verifyToken({
-    required TokenDto model,
-  }) async {
+  Future<void> verifyToken({required TokenDto model}) async {
     Dialogs.showLoadingDialog();
     final res = await state.verifyToken(model: model);
     pop();

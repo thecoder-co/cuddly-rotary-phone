@@ -9,11 +9,7 @@ import 'package:calorie_tracker/packages/packages.dart';
 class AddMealPage extends ConsumerStatefulWidget {
   final String? date;
   final Meal? meal;
-  const AddMealPage({
-    super.key,
-    this.date,
-    this.meal,
-  });
+  const AddMealPage({super.key, this.date, this.meal});
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _HomePageState();
 }
@@ -48,9 +44,93 @@ class _HomePageState extends ConsumerState<AddMealPage> {
   //   setState(() {});
   // }
 
+  calculateOverrides() {
+    double totalCalories = 0;
+    double totalWeight = 0;
+    double totalProtein = 0;
+    double totalCarbs = 0;
+    double totalFats = 0;
+
+    for (var submeal in submeals) {
+      final weight = submeal.chosenWeight ?? 0;
+      totalWeight += weight;
+      totalCalories += (submeal.caloriesPerGram ?? 0) * weight;
+      totalProtein += (submeal.macros?.protein ?? 0) * weight;
+      totalCarbs += (submeal.macros?.carbs ?? 0) * weight;
+      totalFats += (submeal.macros?.fats ?? 0) * weight;
+    }
+
+    if (totalWeight == 0) {
+      caloriesController.clear();
+      weightController.clear();
+      proteinController.clear();
+      carbsController.clear();
+      fatsController.clear();
+      setState(() {
+        model.caloriePerGram = null;
+        model.weight = null;
+        model.macros = Macros();
+      });
+      return;
+    }
+
+    final calPerGram = totalCalories / totalWeight;
+    final protPerGram = totalProtein / totalWeight;
+    final carbPerGram = totalCarbs / totalWeight;
+    final fatPerGram = totalFats / totalWeight;
+
+    caloriesController.text = (calPerGram * calorieWeightUnit.grams)
+        .toStringAsFixed(2);
+    weightController.text = (totalWeight).toStringAsFixed(2);
+    proteinController.text = (protPerGram * proteinWeightUnit.grams)
+        .toStringAsFixed(2);
+    carbsController.text = (carbPerGram * carbsWeightUnit.grams)
+        .toStringAsFixed(2);
+    fatsController.text = (fatPerGram * fatsWeightUnit.grams).toStringAsFixed(
+      2,
+    );
+
+    setState(() {
+      model.weight = totalWeight;
+      model.caloriePerGram = calPerGram;
+      model.macros ??= Macros();
+      model.macros!.protein = protPerGram;
+      model.macros!.carbs = carbPerGram;
+      model.macros!.fats = fatPerGram;
+    });
+  }
+
+  final caloriesController = TextEditingController();
+  final weightController = TextEditingController();
+  final proteinController = TextEditingController();
+  final carbsController = TextEditingController();
+  final fatsController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
+    if (widget.meal != null) {
+      if (widget.meal!.caloriePerGram != null) {
+        caloriesController.text = (widget.meal!.caloriePerGram! * 100)
+            .toStringAsFixed(2);
+      }
+      if (widget.meal!.weight != null) {
+        weightController.text = (widget.meal!.weight!).toStringAsFixed(2);
+      }
+      if (widget.meal!.macros?.protein != null) {
+        proteinController.text = (widget.meal!.macros!.protein * 100)
+            .toStringAsFixed(2);
+      }
+      if (widget.meal!.macros?.carbs != null) {
+        carbsController.text = (widget.meal!.macros!.carbs * 100)
+            .toStringAsFixed(2);
+      }
+      if (widget.meal!.macros?.fats != null) {
+        fatsController.text = (widget.meal!.macros!.fats * 100).toStringAsFixed(
+          2,
+        );
+      }
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // fetchSubMeals();
     });
@@ -62,9 +142,7 @@ class _HomePageState extends ConsumerState<AddMealPage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Meal? meal = await pushTo(const MealsPage(
-            shouldReturn: true,
-          ));
+          Meal? meal = await pushTo(const MealsPage(shouldReturn: true));
           if (meal == null) return;
           setState(() {
             submeals.add(
@@ -76,6 +154,7 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                 ..parentId = meal.id,
             );
           });
+          calculateOverrides();
         },
         child: const Icon(Icons.add_rounded),
       ),
@@ -86,14 +165,16 @@ class _HomePageState extends ConsumerState<AddMealPage> {
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
+              crossAxisAlignment: .start,
               children: [
                 MediaQuery.paddingOf(context).top.gap,
                 Text(
-                  'Add Meal${widget.meal?.backendId == null ? ' (*)' : ''}',
+                  'Log Meal${widget.meal?.backendId == null ? ' (*)' : ''}',
                   style: CustomTextStyle.textxLarge20.w700,
                 ),
                 16.gap,
                 AppInput(
+                  style: CustomTextStyle.textxLarge20.w700,
                   textAlign: TextAlign.center,
                   hintText: 'Name',
                   initialText: widget.meal?.name,
@@ -108,53 +189,59 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                   },
                 ),
                 24.gap,
-                Text(
-                  'Submeals',
-                  style: CustomTextStyle.textmedium16.w600,
-                ),
-                SizedBox(
-                  height: 300,
-                  child: submeals.isEmpty
-                      ? const Center(
-                          child: Text('No submeals'),
-                        )
-                      : ListView.separated(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          itemCount: submeals.length,
-                          separatorBuilder: (context, index) {
-                            return 12.gap;
-                          },
-                          itemBuilder: (context, index) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      submeals.removeAt(index);
-                                    });
-                                  },
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Icon(Icons.delete_rounded,
-                                        color: Colors.red),
+                Text('Submeals', style: CustomTextStyle.textmedium16.w700),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: SizedBox(
+                    height: 300,
+                    child: submeals.isEmpty
+                        ? const Center(child: Text('No submeals'))
+                        : ListView.separated(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            itemCount: submeals.length,
+                            separatorBuilder: (context, index) {
+                              return 12.gap;
+                            },
+                            itemBuilder: (context, index) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        submeals.removeAt(index);
+                                      });
+                                      calculateOverrides();
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.delete_rounded,
+                                        color: Colors.red,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                MealTile(
-                                  mealId: submeals[index].parentId!,
-                                  asSubMeal: true,
-                                  initialWeight: submeals[index].chosenWeight,
-                                  validateWeight: model.caloriePerGram == null,
-                                  onWeightChanged: (weight) {
-                                    setState(() {
-                                      submeals[index].chosenWeight = weight;
-                                    });
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                                  MealTile(
+                                    mealId:
+                                        submeals[index].parentId ??
+                                        submeals[index].backendId ??
+                                        0,
+                                    asSubMeal: true,
+                                    initialWeight: submeals[index].chosenWeight,
+                                    validateWeight:
+                                        model.caloriePerGram == null,
+                                    onWeightChanged: (weight) {
+                                      setState(() {
+                                        submeals[index].chosenWeight = weight;
+                                      });
+                                      calculateOverrides();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                  ),
                 ),
                 Text(
                   'Calorie Overrides',
@@ -167,15 +254,13 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                     Flexible(
                       flex: 2,
                       child: AppInput(
+                        controller: caloriesController,
                         labelText: 'Override Calories',
                         hintText: 'Calories per unit',
-                        initialText: widget.meal?.caloriePerGram == null
-                            ? null
-                            : (widget.meal!.caloriePerGram! * 100)
-                                .toStringAsFixed(2),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*')),
+                            RegExp(r'^\d*\.?\d*'),
+                          ),
                         ],
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
@@ -187,7 +272,8 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                             return;
                           }
                           final parsed = double.tryParse(
-                              v.replaceAll(RegExp(r'\.$'), '.0'));
+                            v.replaceAll(RegExp(r'\.$'), '.0'),
+                          );
                           if (parsed == null) return;
                           setState(() {
                             model.caloriePerGram =
@@ -203,7 +289,9 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                         items: WeightConversions.values
                             .map(
                               (e) => DropdownMenuItem(
-                                  value: e, child: Text('per ${e.format}')),
+                                value: e,
+                                child: Text('per ${e.format}'),
+                              ),
                             )
                             .toList(),
                         onDropdownChanged: (v) {
@@ -222,12 +310,13 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                     Flexible(
                       flex: 2,
                       child: AppInput(
-                        initialText: widget.meal?.weight?.toString(),
+                        controller: weightController,
                         labelText: 'Weight',
                         hintText: 'Add item weight...',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*')),
+                            RegExp(r'^\d*\.?\d*'),
+                          ),
                         ],
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
@@ -239,7 +328,8 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                             return;
                           }
                           final parsed = double.tryParse(
-                              v.replaceAll(RegExp(r'\.$'), '.0'));
+                            v.replaceAll(RegExp(r'\.$'), '.0'),
+                          );
                           if (parsed == null) return;
                           model.weight = weightUnit.convertToGrams(parsed);
                         },
@@ -250,18 +340,19 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                       child: AppInput.dropdown(
                         initialItem: WeightConversions.g1,
                         items: WeightConversions.values
-                            .where(
-                              (e) => e != WeightConversions.g100,
-                            )
+                            .where((e) => e != WeightConversions.g100)
                             .map(
                               (e) => DropdownMenuItem(
-                                  value: e, child: Text(e.format)),
+                                value: e,
+                                child: Text(e.format),
+                              ),
                             )
                             .toList(),
                         onDropdownChanged: (v) {
                           weightUnit = v;
-                          model.weight =
-                              weightUnit.convertToGrams(double.parse(v));
+                          model.weight = weightUnit.convertToGrams(
+                            double.parse(v),
+                          );
                           // model.weight = weightUnit.convertToGrams(double.parse(model));
                         },
                       ),
@@ -269,10 +360,7 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                   ],
                 ),
                 24.gap,
-                Text(
-                  'Macros',
-                  style: CustomTextStyle.textmedium16.w600,
-                ),
+                Text('Macros', style: CustomTextStyle.textmedium16.w600),
                 20.gap,
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -280,15 +368,13 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                     Flexible(
                       flex: 2,
                       child: AppInput(
-                        initialText: widget.meal?.macros?.protein == null
-                            ? null
-                            : (widget.meal!.macros!.protein * 100)
-                                .toStringAsFixed(2),
+                        controller: proteinController,
                         labelText: 'Override Protein',
                         hintText: 'Add text to use this protein count',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*')),
+                            RegExp(r'^\d*\.?\d*'),
+                          ),
                         ],
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
@@ -301,7 +387,8 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                             return;
                           }
                           final parsed = double.tryParse(
-                              v.replaceAll(RegExp(r'\.$'), '.0'));
+                            v.replaceAll(RegExp(r'\.$'), '.0'),
+                          );
                           if (parsed != null)
                             model.macros!.protein =
                                 parsed / proteinWeightUnit.grams;
@@ -313,8 +400,12 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                       child: AppInput.dropdown(
                         initialItem: WeightConversions.g100,
                         items: WeightConversions.values
-                            .map((e) => DropdownMenuItem(
-                                value: e, child: Text('per ${e.format}')))
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text('per ${e.format}'),
+                              ),
+                            )
                             .toList(),
                         onDropdownChanged: (v) {
                           proteinWeightUnit = v;
@@ -330,15 +421,13 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                     Flexible(
                       flex: 2,
                       child: AppInput(
-                        initialText: widget.meal?.macros?.carbs == null
-                            ? null
-                            : (widget.meal!.macros!.carbs * 100)
-                                .toStringAsFixed(2),
+                        controller: carbsController,
                         labelText: 'Override Carbs',
                         hintText: 'Add text to use this carb count',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*')),
+                            RegExp(r'^\d*\.?\d*'),
+                          ),
                         ],
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
@@ -351,7 +440,8 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                             return;
                           }
                           final parsed = double.tryParse(
-                              v.replaceAll(RegExp(r'\.$'), '.0'));
+                            v.replaceAll(RegExp(r'\.$'), '.0'),
+                          );
                           if (parsed != null)
                             model.macros!.carbs =
                                 parsed / carbsWeightUnit.grams;
@@ -363,8 +453,12 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                       child: AppInput.dropdown(
                         initialItem: WeightConversions.g100,
                         items: WeightConversions.values
-                            .map((e) => DropdownMenuItem(
-                                value: e, child: Text('per ${e.format}')))
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text('per ${e.format}'),
+                              ),
+                            )
                             .toList(),
                         onDropdownChanged: (v) {
                           carbsWeightUnit = v;
@@ -380,15 +474,13 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                     Flexible(
                       flex: 2,
                       child: AppInput(
-                        initialText: widget.meal?.macros?.fats == null
-                            ? null
-                            : (widget.meal!.macros!.fats * 100)
-                                .toStringAsFixed(2),
+                        controller: fatsController,
                         labelText: 'Override Fats',
                         hintText: 'Add text to use this fat count',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*')),
+                            RegExp(r'^\d*\.?\d*'),
+                          ),
                         ],
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
@@ -401,7 +493,8 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                             return;
                           }
                           final parsed = double.tryParse(
-                              v.replaceAll(RegExp(r'\.$'), '.0'));
+                            v.replaceAll(RegExp(r'\.$'), '.0'),
+                          );
                           if (parsed != null)
                             model.macros!.fats = parsed / fatsWeightUnit.grams;
                         },
@@ -412,8 +505,12 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                       child: AppInput.dropdown(
                         initialItem: WeightConversions.g100,
                         items: WeightConversions.values
-                            .map((e) => DropdownMenuItem(
-                                value: e, child: Text('per ${e.format}')))
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text('per ${e.format}'),
+                              ),
+                            )
                             .toList(),
                         onDropdownChanged: (v) {
                           fatsWeightUnit = v;
@@ -451,16 +548,22 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                     );
                     if (widget.meal == null) {
                       final data = await ref
-                          .read(mealProvider((date: widget.date, query: null))
-                              .notifier)
-                          .addMeal(
-                            meal: mainMeal,
-                          );
+                          .read(
+                            mealProvider((
+                              date: widget.date,
+                              query: null,
+                            )).notifier,
+                          )
+                          .addMeal(meal: mainMeal);
                       pop(data);
                     } else {
                       final data = await ref
-                          .read(mealProvider((date: widget.date, query: null))
-                              .notifier)
+                          .read(
+                            mealProvider((
+                              date: widget.date,
+                              query: null,
+                            )).notifier,
+                          )
                           .updateMeal(
                             meal: mainMeal,
                             id: widget.meal?.backendId,

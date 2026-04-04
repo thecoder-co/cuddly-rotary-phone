@@ -1,6 +1,6 @@
 import 'package:calorie_tracker/core/services/local_data/isar_service.dart';
 import 'package:calorie_tracker/features/meals/models/meal.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 class LocalMealRepo {
   final Isar isar;
@@ -19,7 +19,10 @@ class LocalMealRepo {
     });
   }
 
-  Future<Meal?> getMeal(int id) async {
+  Future<Meal?> getMeal(dynamic id) async {
+    if (id is String) {
+      return await isar.meals.getByBackendId(id);
+    }
     return await isar.meals.get(id);
   }
 
