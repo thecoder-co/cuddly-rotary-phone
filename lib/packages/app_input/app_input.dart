@@ -1,3 +1,4 @@
+import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/core/utils/extensions/date_extensions.dart';
 
 import '../packages.dart';
@@ -12,7 +13,7 @@ class InputIcon extends StatelessWidget {
   }
 }
 
-class AppInput extends StatefulWidget {
+class AppInput extends ConsumerStatefulWidget {
   final TextEditingController? controller;
   final String? Function(String? v)? validator;
   final bool autocorrect;
@@ -389,10 +390,10 @@ class AppInput extends StatefulWidget {
   //       onCurrencyPicked = null;
 
   @override
-  State<AppInput> createState() => _AppInputState();
+  ConsumerState<AppInput> createState() => _AppInputState();
 }
 
-class _AppInputState extends State<AppInput> {
+class _AppInputState extends ConsumerState<AppInput> {
   final _onNullController = TextEditingController();
 
   bool isFocused = false;
@@ -549,16 +550,13 @@ class _AppInputState extends State<AppInput> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     Color textColor() {
-      return Theme.of(context).brightness == Brightness.dark
-          ? Colors.white
-          : AppColors.baseBlack;
+      return isDark ? Colors.white : AppColors.baseBlack;
     }
 
     Color hintColor() {
-      return Theme.of(context).brightness == Brightness.dark
-          ? Colors.white.withOpacity(0.35)
-          : AppColors.greyTertiary;
+      return isDark ? Colors.white.withOpacity(0.35) : AppColors.greyTertiary;
     }
 
     return GestureDetector(
@@ -592,9 +590,7 @@ class _AppInputState extends State<AppInput> {
               borderRadius: BorderRadius.circular(radius),
               color:
                   widget.backgroundColor ??
-                  (Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFF2C2C2E)
-                      : AppColors.baseBackground),
+                  (isDark ? const Color(0xFF2C2C2E) : AppColors.baseBackground),
             ),
             // height: widget.height,
             width: widget.width,

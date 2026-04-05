@@ -100,13 +100,15 @@ class MealNotifier extends AsyncNotifier<MealRepo> {
 class MealRepo {
   List<Meal>? meals;
 
-  String? get calories => meals
-      ?.fold(
+  double get doubleCalories =>
+      meals?.fold(
         0.0,
         (previousValue, element) =>
-            double.parse(element.calories) + previousValue,
-      )
-      .toStringAsFixed(2);
+            double.parse(element.calories) + previousValue!,
+      ) ??
+      0.0;
+
+  String? get calories => doubleCalories.toStringAsFixed(2);
 
   MealRepo({this.meals});
 }

@@ -35,320 +35,323 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
       backgroundColor: isDark
           ? CupertinoColors.black
           : CupertinoColors.systemGroupedBackground,
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: isDark
-            ? const Color(0xFF1C1C1E)
-            : CupertinoColors.white,
-        previousPageTitle: 'Back',
-
-        middle: Text(widget.title),
-      ),
       child: Material(
-        type: MaterialType.transparency,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: CupertinoSearchTextField(
-                  controller: _searchController,
-                  placeholder: 'Search',
-                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                ),
-              ),
-              Expanded(
-                child: Builder(
-                  builder: (context) {
-                    Widget buildList(List<Exercise> exerciseList) {
-                      final query = _searchController.text.toLowerCase();
-                      final filtered = exerciseList
-                          .where(
-                            (e) => (e.name ?? '').toLowerCase().contains(query),
-                          )
-                          .toList();
+        color: Colors.transparent,
+        child: CustomScrollView(
+          slivers: [
+            CupertinoSliverNavigationBar(
+              previousPageTitle: 'Back',
+              largeTitle: Text(widget.title),
+            ),
+            SliverSafeArea(
+              top: false,
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: CupertinoSearchTextField(
+                        controller: _searchController,
+                        placeholder: 'Search',
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                    Builder(
+                      builder: (context) {
+                        Widget buildList(List<Exercise> exerciseList) {
+                          final query = _searchController.text.toLowerCase();
+                          final filtered = exerciseList
+                              .where(
+                                (e) => (e.name ?? '').toLowerCase().contains(query),
+                              )
+                              .toList();
 
-                      return ListView(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF1C1C1E)
-                                  : CupertinoColors.white,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              children: [
-                                ...filtered.asMap().entries.map((entry) {
-                                  final int idx = entry.key;
-                                  final Exercise exercise = entry.value;
-                                  final setBackendId =
-                                      exercise.backendId ??
-                                      'local_${exercise.id}';
-                                  final setsAsync = ref.watch(
-                                    workoutSetProvider(setBackendId),
-                                  );
-                                  final lastUsed =
-                                      setsAsync.value?.firstOrNull?.date;
-
-                                  return Column(
-                                    children: [
-                                      if (idx > 0)
-                                        Divider(
-                                          height: 1,
-                                          color: isDark
-                                              ? Colors.grey.shade800
-                                              : Colors.grey.shade200,
-                                          indent: 16,
-                                        ),
-                                      Slidable(
-                                        key: ValueKey(exercise.id),
-                                        startActionPane: ActionPane(
-                                          motion: const BehindMotion(),
-                                          children: [
-                                            SlidableAction(
-                                              onPressed: (_) {},
-                                              backgroundColor: isDark
-                                                  ? Colors.green.shade900
-                                                        .withValues(alpha: 0.5)
-                                                  : Colors.green.shade100,
-                                              foregroundColor:
-                                                  CupertinoColors.systemGreen,
-                                              icon: CupertinoIcons.circle_fill,
-                                              label: 'Record',
-                                            ),
-                                          ],
-                                        ),
-                                        endActionPane: ActionPane(
-                                          motion: const BehindMotion(),
-                                          children: [
-                                            SlidableAction(
-                                              onPressed: (_) {
-                                                if (widget.program != null) {
-                                                  final idToRemove =
-                                                      exercise.backendId ??
-                                                      exercise.id.toString();
-                                                  final updatedExercises =
-                                                      widget.program!.exercises
-                                                          .where(
-                                                            (pe) =>
-                                                                pe.exerciseId !=
-                                                                idToRemove,
-                                                          )
-                                                          .toList();
-                                                  widget.program!.exercises =
-                                                      updatedExercises;
-                                                  ref
-                                                      .read(
-                                                        workoutProgramProvider
-                                                            .notifier,
-                                                      )
-                                                      .updateProgram(
-                                                        widget.program!,
-                                                        widget
-                                                            .program!
-                                                            .backendId,
-                                                      );
-                                                } else {
-                                                  ref
-                                                      .read(
-                                                        workoutExerciseProvider(
-                                                          false,
-                                                        ).notifier,
-                                                      )
-                                                      .deleteExercise(
-                                                        exercise,
-                                                        exercise.backendId,
-                                                      );
-                                                }
-                                              },
-                                              backgroundColor: isDark
-                                                  ? Colors.red.shade900
-                                                        .withValues(alpha: 0.5)
-                                                  : Colors.red.shade100,
-                                              foregroundColor: CupertinoColors
-                                                  .destructiveRed,
-                                              icon: CupertinoIcons.delete,
-                                              label: 'Delete',
-                                            ),
-                                          ],
-                                        ),
-                                        child: CupertinoListTile(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                            vertical: 12,
-                                          ),
-                                          title: Text(
-                                            exercise.name ?? 'Unnamed',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: isDark
-                                                  ? CupertinoColors.white
-                                                  : CupertinoColors.black,
-                                            ),
-                                          ),
-                                          subtitle: exercise.description != null
-                                              ? Text(
-                                                  exercise.description!,
-                                                  style: const TextStyle(
-                                                    color: CupertinoColors
-                                                        .systemGrey,
-                                                  ),
-                                                )
-                                              : null,
-                                          additionalInfo: Text(
-                                            lastUsed != null
-                                                ? _formatDate(lastUsed)
-                                                : '',
-                                            style: const TextStyle(
-                                              color: CupertinoColors.systemGrey,
-                                            ),
-                                          ),
-                                          trailing:
-                                              const CupertinoListTileChevron(),
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              CupertinoPageRoute(
-                                                builder: (context) =>
-                                                    ExerciseDetailsScreen(
-                                                      exercise: exercise,
-                                                    ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }),
-                                // Add Exercises Button at bottom
-                                if (filtered.isNotEmpty)
-                                  Divider(
-                                    height: 1,
-                                    color: isDark
-                                        ? Colors.grey.shade800
-                                        : Colors.grey.shade200,
-                                  ),
-                                CupertinoButton(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        CupertinoIcons.add,
-                                        color: primaryColor,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        widget.program != null
-                                            ? 'Edit Exercises'
-                                            : 'Add Exercises',
-                                        style: TextStyle(
-                                          color: primaryColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  onPressed: () async {
-                                    if (widget.program != null) {
-                                      Navigator.push(
-                                        context,
-                                        CupertinoPageRoute(
-                                          builder: (context) =>
-                                              AddProgramScreen(
-                                                program: widget.program,
-                                              ),
-                                        ),
+                          return ListView(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFF1C1C1E)
+                                      : CupertinoColors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  children: [
+                                    ...filtered.asMap().entries.map((entry) {
+                                      final int idx = entry.key;
+                                      final Exercise exercise = entry.value;
+                                      final setBackendId =
+                                          exercise.backendId ??
+                                          'local_${exercise.id}';
+                                      final setsAsync = ref.watch(
+                                        workoutSetProvider(setBackendId),
                                       );
-                                    } else {
-                                      List<Exercise>? selected =
-                                          await Navigator.push<List<Exercise>?>(
+                                      final lastUsed =
+                                          setsAsync.value?.firstOrNull?.date;
+
+                                      return Column(
+                                        children: [
+                                          if (idx > 0)
+                                            Divider(
+                                              height: 1,
+                                              color: isDark
+                                                  ? Colors.grey.shade800
+                                                  : Colors.grey.shade200,
+                                              indent: 16,
+                                            ),
+                                          Slidable(
+                                            key: ValueKey(exercise.id),
+                                            startActionPane: ActionPane(
+                                              motion: const BehindMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (_) {},
+                                                  backgroundColor: isDark
+                                                      ? Colors.green.shade900
+                                                            .withValues(alpha: 0.5)
+                                                      : Colors.green.shade100,
+                                                  foregroundColor:
+                                                      CupertinoColors.systemGreen,
+                                                  icon: CupertinoIcons.circle_fill,
+                                                  label: 'Record',
+                                                ),
+                                              ],
+                                            ),
+                                            endActionPane: ActionPane(
+                                              motion: const BehindMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (_) {
+                                                    if (widget.program != null) {
+                                                      final idToRemove =
+                                                          exercise.backendId ??
+                                                          exercise.id.toString();
+                                                      final updatedExercises =
+                                                          widget.program!.exercises
+                                                              .where(
+                                                                (pe) =>
+                                                                    pe.exerciseId !=
+                                                                    idToRemove,
+                                                              )
+                                                              .toList();
+                                                      widget.program!.exercises =
+                                                          updatedExercises;
+                                                      ref
+                                                          .read(
+                                                            workoutProgramProvider
+                                                                .notifier,
+                                                          )
+                                                          .updateProgram(
+                                                            widget.program!,
+                                                            widget
+                                                                .program!
+                                                                .backendId,
+                                                          );
+                                                    } else {
+                                                      ref
+                                                          .read(
+                                                            workoutExerciseProvider(
+                                                              false,
+                                                            ).notifier,
+                                                          )
+                                                          .deleteExercise(
+                                                            exercise,
+                                                            exercise.backendId,
+                                                          );
+                                                    }
+                                                  },
+                                                  backgroundColor: isDark
+                                                      ? Colors.red.shade900
+                                                            .withValues(alpha: 0.5)
+                                                      : Colors.red.shade100,
+                                                  foregroundColor: CupertinoColors
+                                                      .destructiveRed,
+                                                  icon: CupertinoIcons.delete,
+                                                  label: 'Delete',
+                                                ),
+                                              ],
+                                            ),
+                                            child: CupertinoListTile(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 12,
+                                              ),
+                                              title: Text(
+                                                exercise.name ?? 'Unnamed',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isDark
+                                                      ? CupertinoColors.white
+                                                      : CupertinoColors.black,
+                                                ),
+                                              ),
+                                              subtitle: exercise.description != null
+                                                  ? Text(
+                                                      exercise.description!,
+                                                      style: const TextStyle(
+                                                        color: CupertinoColors
+                                                            .systemGrey,
+                                                      ),
+                                                    )
+                                                  : null,
+                                              additionalInfo: Text(
+                                                lastUsed != null
+                                                    ? _formatDate(lastUsed)
+                                                    : '',
+                                                style: const TextStyle(
+                                                  color: CupertinoColors.systemGrey,
+                                                ),
+                                              ),
+                                              trailing:
+                                                  const CupertinoListTileChevron(),
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  CupertinoPageRoute(
+                                                    builder: (context) =>
+                                                        ExerciseDetailsScreen(
+                                                          exercise: exercise,
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                                    // Add Exercises Button at bottom
+                                    if (filtered.isNotEmpty)
+                                      Divider(
+                                        height: 1,
+                                        color: isDark
+                                            ? Colors.grey.shade800
+                                            : Colors.grey.shade200,
+                                      ),
+                                    CupertinoButton(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            CupertinoIcons.add,
+                                            color: primaryColor,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            widget.program != null
+                                                ? 'Edit Exercises'
+                                                : 'Add Exercises',
+                                            style: TextStyle(
+                                              color: primaryColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      onPressed: () async {
+                                        if (widget.program != null) {
+                                          Navigator.push(
                                             context,
                                             CupertinoPageRoute(
-                                              builder: (_) => AddExerciseScreen(
-                                                initialSelectedIds: exerciseList
-                                                    .map(
-                                                      (e) => e.backendId ?? '',
-                                                    )
-                                                    .where(
-                                                      (id) => id.isNotEmpty,
-                                                    )
-                                                    .toList(),
-                                              ),
+                                              builder: (context) =>
+                                                  AddProgramScreen(
+                                                    program: widget.program,
+                                                  ),
                                             ),
                                           );
+                                        } else {
+                                          List<Exercise>? selected =
+                                              await Navigator.push<List<Exercise>?>(
+                                                context,
+                                                CupertinoPageRoute(
+                                                  builder: (_) => AddExerciseScreen(
+                                                    initialSelectedIds: exerciseList
+                                                        .map(
+                                                          (e) => e.backendId ?? '',
+                                                        )
+                                                        .where(
+                                                          (id) => id.isNotEmpty,
+                                                        )
+                                                        .toList(),
+                                                  ),
+                                                ),
+                                              );
 
-                                      if (selected != null) {
-                                        final currentIds = exerciseList
-                                            .map((e) => e.backendId)
-                                            .where((id) => id != null)
-                                            .toSet();
+                                          if (selected != null) {
+                                            final currentIds = exerciseList
+                                                .map((e) => e.backendId)
+                                                .where((id) => id != null)
+                                                .toSet();
 
-                                        final newIds = selected
-                                            .map((e) => e.backendId)
-                                            .where(
-                                              (id) =>
-                                                  id != null &&
-                                                  !currentIds.contains(id),
-                                            )
-                                            .cast<String>()
-                                            .toList();
-
-                                        if (newIds.isNotEmpty) {
-                                          try {
-                                            await ref
-                                                .read(
-                                                  workoutSyncServiceProvider,
+                                            final newIds = selected
+                                                .map((e) => e.backendId)
+                                                .where(
+                                                  (id) =>
+                                                      id != null &&
+                                                      !currentIds.contains(id),
                                                 )
-                                                .localAddExercisesFromParent(
-                                                  newIds,
+                                                .cast<String>()
+                                                .toList();
+
+                                            if (newIds.isNotEmpty) {
+                                              try {
+                                                await ref
+                                                    .read(
+                                                      workoutSyncServiceProvider,
+                                                    )
+                                                    .localAddExercisesFromParent(
+                                                      newIds,
+                                                    );
+                                                AppToast.success(
+                                                  'Exercises added to your list',
                                                 );
-                                            AppToast.success(
-                                              'Exercises added to your list',
-                                            );
-                                          } catch (e) {
-                                            AppToast.error(
-                                              'Failed to add exercises: $e',
-                                            );
+                                              } catch (e) {
+                                                AppToast.error(
+                                                  'Failed to add exercises: $e',
+                                                );
+                                              }
+                                            }
                                           }
                                         }
-                                      }
-                                    }
-                                  },
+                                      },
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+                          );
+                        }
+
+                        return exercisesAsync.when(
+                          data: buildList,
+                          loading: () =>
+                              const Center(child: CupertinoActivityIndicator()),
+                          error: (err, stack) => Center(
+                            child: Text(
+                              'Error: $err',
+                              style: const TextStyle(
+                                color: CupertinoColors.destructiveRed,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 24),
-                        ],
-                      );
-                    }
-
-                    return exercisesAsync.when(
-                      data: buildList,
-                      loading: () =>
-                          const Center(child: CupertinoActivityIndicator()),
-                      error: (err, stack) => Center(
-                        child: Text(
-                          'Error: $err',
-                          style: const TextStyle(
-                            color: CupertinoColors.destructiveRed,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

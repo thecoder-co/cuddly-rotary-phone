@@ -17,7 +17,8 @@ class WorkoutAnalyticsScreen extends ConsumerStatefulWidget {
       _WorkoutAnalyticsScreenState();
 }
 
-class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen> {
+class _WorkoutAnalyticsScreenState
+    extends ConsumerState<WorkoutAnalyticsScreen> {
   String _formatDateForTitle(DateTime date) {
     final now = DateTime.now();
     final d = DateTime(date.year, date.month, date.day);
@@ -46,7 +47,9 @@ class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen>
   @override
   Widget build(BuildContext context) {
     final selectedDate = ref.watch(workoutSelectedDateProvider);
-    final setsAsync = ref.watch(isarWorkoutSetsByDateStreamProvider(selectedDate));
+    final setsAsync = ref.watch(
+      isarWorkoutSetsByDateStreamProvider(selectedDate),
+    );
     final exercisesAsync = ref.watch(workoutExerciseProvider(false));
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -82,7 +85,9 @@ class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen>
                 child: DateSelector(
                   initialDate: selectedDate,
                   onDateSelected: (date) {
-                    ref.read(workoutSelectedDateProvider.notifier).setDate(date);
+                    ref
+                        .read(workoutSelectedDateProvider.notifier)
+                        .setDate(date);
                   },
                 ),
               ),
@@ -93,19 +98,18 @@ class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen>
                       return const Center(
                         child: Text(
                           'No workouts recorded for this day',
-                          style: TextStyle(
-                            color: CupertinoColors.systemGrey,
-                          ),
+                          style: TextStyle(color: CupertinoColors.systemGrey),
                         ),
                       );
                     }
 
                     final grouped = _groupSetsByExercise(sets);
-                    
+
                     return exercisesAsync.when(
                       data: (exercises) {
                         final exerciseMap = {
-                          for (var e in exercises) e.backendId ?? e.id.toString(): e
+                          for (var e in exercises)
+                            e.backendId ?? e.id.toString(): e,
                         };
 
                         return ListView.builder(
@@ -114,7 +118,8 @@ class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen>
                           itemBuilder: (context, index) {
                             final exerciseId = grouped.keys.elementAt(index);
                             final daySets = grouped[exerciseId]!;
-                            final exercise = exerciseMap[exerciseId] ?? 
+                            final exercise =
+                                exerciseMap[exerciseId] ??
                                 Exercise(name: 'Unknown Exercise');
 
                             return Padding(
@@ -141,7 +146,9 @@ class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen>
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: isDark
@@ -151,7 +158,9 @@ class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen>
                                       ),
                                       clipBehavior: Clip.antiAlias,
                                       child: Column(
-                                        children: daySets.asMap().entries.map((entry) {
+                                        children: daySets.asMap().entries.map((
+                                          entry,
+                                        ) {
                                           final idx = entry.key;
                                           final set = entry.value;
                                           return Column(
@@ -169,16 +178,26 @@ class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen>
                                                   Navigator.push(
                                                     context,
                                                     CupertinoPageRoute(
-                                                      builder: (context) => EditSetScreen(
-                                                        exercise: exercise,
-                                                        workoutSet: set,
-                                                      ),
+                                                      builder: (context) =>
+                                                          EditSetScreen(
+                                                            exercise: exercise,
+                                                            workoutSet: set,
+                                                          ),
                                                     ),
                                                   );
                                                 },
                                                 onDelete: () {
                                                   // Using the specific set identifier for deletion
-                                                  ref.read(workoutSetProvider(exerciseId).notifier).deleteSet(set, set.backendId);
+                                                  ref
+                                                      .read(
+                                                        workoutSetProvider(
+                                                          exerciseId,
+                                                        ).notifier,
+                                                      )
+                                                      .deleteSet(
+                                                        set,
+                                                        set.backendId,
+                                                      );
                                                 },
                                               ),
                                             ],
@@ -193,12 +212,16 @@ class _WorkoutAnalyticsScreenState extends ConsumerState<WorkoutAnalyticsScreen>
                           },
                         );
                       },
-                      loading: () => const Center(child: CupertinoActivityIndicator()),
-                      error: (err, stack) => Center(child: Text('Error loading exercises: $err')),
+                      loading: () =>
+                          const Center(child: CupertinoActivityIndicator()),
+                      error: (err, stack) =>
+                          Center(child: Text('Error loading exercises: $err')),
                     );
                   },
-                  loading: () => const Center(child: CupertinoActivityIndicator()),
-                  error: (err, stack) => Center(child: Text('Error loading sets: $err')),
+                  loading: () =>
+                      const Center(child: CupertinoActivityIndicator()),
+                  error: (err, stack) =>
+                      Center(child: Text('Error loading sets: $err')),
                 ),
               ),
             ],

@@ -1,3 +1,4 @@
+import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/features/workout/models/exercise.dart';
 import 'package:calorie_tracker/features/workout/models/program.dart';
 import 'package:calorie_tracker/features/workout/presentation/add_exercise_screen.dart';
@@ -68,16 +69,19 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
   @override
   Widget build(BuildContext context) {
     final exercisesAsync = ref.watch(workoutExerciseProvider(true));
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
 
     return Material(
       type: MaterialType.transparency,
       child: CupertinoPageScaffold(
-        backgroundColor: const Color(0xFF000000),
+        backgroundColor: isDark
+            ? CupertinoColors.black
+            : CupertinoColors.systemGroupedBackground,
         navigationBar: CupertinoNavigationBar(
           backgroundColor: const Color(0xFF000000).withOpacity(0.8),
           middle: Text(
             widget.program == null ? 'New Workout' : 'Edit Workout',
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
           ),
           leading: CupertinoButton(
             padding: EdgeInsets.zero,
@@ -135,6 +139,7 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
                     AppInput(
                       controller: _nameController,
                       hintText: 'Upper Body, Monday, Triceps...',
+                      backgroundColor: isDark ? null : Colors.white,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -169,7 +174,9 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
 
                         return Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1C1C1E),
+                            color: isDark
+                                ? const Color(0xFF1C1C1E)
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Column(
@@ -201,10 +208,12 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
                                       horizontal: 16,
                                       vertical: 14,
                                     ),
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       border: Border(
                                         bottom: BorderSide(
-                                          color: Color(0xFF38383A),
+                                          color: isDark
+                                              ? const Color(0xFF38383A)
+                                              : Colors.grey,
                                           width: 0.5,
                                         ),
                                       ),
@@ -239,8 +248,10 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
                                         Expanded(
                                           child: Text(
                                             exercise.name ?? 'Unknown',
-                                            style: const TextStyle(
-                                              color: Colors.white,
+                                            style: TextStyle(
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : Colors.black,
                                               fontSize: 16,
                                             ),
                                           ),
@@ -278,18 +289,20 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
                                     });
                                   }
                                 },
-                                child: const Row(
+                                child: Row(
                                   children: [
                                     Expanded(
                                       child: Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                           horizontal: 16,
                                           vertical: 14,
                                         ),
                                         child: Text(
                                           'Others',
                                           style: TextStyle(
-                                            color: Colors.white,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black,
                                             fontSize: 16,
                                           ),
                                         ),

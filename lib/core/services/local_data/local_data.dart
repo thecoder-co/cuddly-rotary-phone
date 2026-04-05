@@ -64,4 +64,50 @@ class LocalData {
   static List<String> get lastSearches {
     return prefs.getStringList('lastSearches') ?? [];
   }
+
+  // ── Module Settings ───────────────────────────────────────────────────────
+
+  // Meal Settings: Calorie Budget
+  static int get calorieBudget => prefs.getInt('calorieBudget') ?? 2000;
+  static Future<void> setCalorieBudget(int value) async {
+    await prefs.setInt('calorieBudget', value);
+  }
+
+  static bool get useCustomCalorieBudget =>
+      prefs.getBool('useCustomCalorieBudget') ?? false;
+  static Future<void> setUseCustomCalorieBudget(bool value) async {
+    await prefs.setBool('useCustomCalorieBudget', value);
+  }
+
+  // Per-day calorie budgets (Monday=1, Sunday=7)
+  static int getCalorieBudgetForDay(int day) {
+    return prefs.getInt('calorieBudget_day_$day') ?? calorieBudget;
+  }
+
+  /// Returns the budget for the specific date based on current settings
+  static int getBudgetForDate(DateTime date) {
+    if (!useCustomCalorieBudget) return calorieBudget;
+    return getCalorieBudgetForDay(date.weekday);
+  }
+
+  /// Average budget for the week (7 days)
+  static int get averageWeeklyBudget {
+    if (!useCustomCalorieBudget) return calorieBudget;
+    int sum = 0;
+    for (int i = 1; i <= 7; i++) {
+      sum += getCalorieBudgetForDay(i);
+    }
+    return (sum / 7).round();
+  }
+
+  static Future<void> setCalorieBudgetForDay(int day, int value) async {
+    await prefs.setInt('calorieBudget_day_$day', value);
+  }
+
+  // Workout Settings: Rest Interval (in seconds)
+  static int get restIntervalSeconds =>
+      prefs.getInt('restIntervalSeconds') ?? 90;
+  static Future<void> setRestIntervalSeconds(int value) async {
+    await prefs.setInt('restIntervalSeconds', value);
+  }
 }

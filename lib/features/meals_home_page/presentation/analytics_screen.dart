@@ -1,5 +1,6 @@
 import 'package:calorie_tracker/features/meals/models/meal_analytics_dto.dart';
 import 'package:calorie_tracker/features/meals_home_page/providers/analytics_provider.dart';
+import 'package:calorie_tracker/core/services/local_data/local_data.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
@@ -192,13 +193,27 @@ class _AnalyticsBody extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _StatCard(
-                  icon: Icons.local_fire_department_rounded,
-                  label: 'Avg. Calories',
-                  value: '${summary?.averageDailyCalories ?? 0}',
-                  unit: 'kcal/day',
-                  color: const Color(0xFFE45858),
-                ),
+                child: Builder(builder: (context) {
+                  final avg = (summary?.averageDailyCalories ?? 0).toInt();
+                  final budget = LocalData.averageWeeklyBudget;
+                  
+                  Color color = const Color(0xFFE45858); // Default reddish
+                  if (avg < budget) {
+                    color = const Color(0xFF4CAF50); // Green
+                  } else if (avg == budget) {
+                    color = const Color(0xFFFFA726); // Orange
+                  } else {
+                    color = const Color(0xFFE53935); // Red
+                  }
+
+                  return _StatCard(
+                    icon: Icons.local_fire_department_rounded,
+                    label: 'Avg. Calories',
+                    value: '$avg/$budget',
+                    unit: 'kcal/day',
+                    color: color,
+                  );
+                }),
               ),
               const SizedBox(width: 12),
               Expanded(

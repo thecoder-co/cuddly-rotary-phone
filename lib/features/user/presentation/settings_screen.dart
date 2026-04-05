@@ -3,8 +3,11 @@ import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/core/services/local_data/isar_service.dart';
 import 'package:calorie_tracker/core/services/local_data/local_data.dart';
 import 'package:calorie_tracker/features/auth/presentation/login_screen.dart';
+import 'package:calorie_tracker/features/user/presentation/meal_settings_screen.dart';
+import 'package:calorie_tracker/features/user/presentation/workout_settings_screen.dart';
 import 'package:calorie_tracker/features/user/providers/user_provider.dart';
 import 'package:calorie_tracker/packages/packages.dart';
+import 'package:flutter/cupertino.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -120,7 +123,35 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Account ─────────────────────────────────────────────
+                    // ── Module Settings ──────────────────────────────────────
+                    const _SectionLabel('Module Settings'),
+                    _SettingsTile(
+                      icon: CupertinoIcons.flame,
+                      title: 'Meal Settings',
+                      iconColor: Colors.orange,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) => const MealSettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _SettingsTile(
+                      icon: CupertinoIcons.sportscourt,
+                      title: 'Workout Settings',
+                      iconColor: CupertinoColors.systemGreen,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) => const WorkoutSettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
                     const _SectionLabel('Account'),
                     _SettingsTile(
                       icon: CupertinoIcons.person,

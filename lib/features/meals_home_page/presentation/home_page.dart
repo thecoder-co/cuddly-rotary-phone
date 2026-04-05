@@ -3,6 +3,7 @@ import 'package:calorie_tracker/features/meals_home_page/presentation/widgets/da
 import 'package:calorie_tracker/features/meals_home_page/presentation/widgets/meal_tile.dart';
 import 'package:calorie_tracker/features/meals/presentation/add_meal.dart';
 import 'package:calorie_tracker/features/meals/providers/meal_provider.dart';
+import 'package:calorie_tracker/core/services/local_data/local_data.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -94,17 +95,39 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ],
                   ),
                 ),
-                if (meals.value != null) ...[
-                  Row(
-                    mainAxisAlignment: .end,
-                    children: [
-                      Text(
-                        '${meals.value!.calories}kcal',
-                        style: CustomTextStyle.textxLarge20.w700,
-                      ),
-                    ],
-                  ).paddingSymmetric(horizontal: 20),
-                  12.gap,
+                  if (meals.value != null) ...[
+                    Builder(builder: (context) {
+                      final current = (meals.value!.doubleCalories).toInt();
+                      final budget = LocalData.getBudgetForDate(DateTime.parse(date));
+                      
+                      Color calorieColor = Colors.green;
+                      if (current == budget) {
+                        calorieColor = Colors.orange;
+                      } else if (current > budget) {
+                        calorieColor = Colors.red;
+                      }
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              style: CustomTextStyle.textxLarge20.w700.copyWith(
+                                color: isDark ? Colors.white : AppColors.primary900,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: '$current',
+                                  style: TextStyle(color: calorieColor),
+                                ),
+                                TextSpan(text: '/${budget}kcal'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ).paddingSymmetric(horizontal: 20);
+                    }),
+                    12.gap,
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

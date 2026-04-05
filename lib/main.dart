@@ -83,9 +83,7 @@ class MyApp extends ConsumerWidget {
             ),
             textButtonTheme: TextButtonThemeData(
               style: ButtonStyle(
-                textStyle: MaterialStateProperty.all(
-                  CustomTextStyle.labelSmall,
-                ),
+                textStyle: WidgetStateProperty.all(CustomTextStyle.labelSmall),
               ),
             ),
 

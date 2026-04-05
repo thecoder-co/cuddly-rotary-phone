@@ -1,3 +1,4 @@
+import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:calorie_tracker/features/workout/models/exercise.dart';
 import 'package:flutter/cupertino.dart';
@@ -45,13 +46,13 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchExercisesProvider);
     final exercisesAsync = ref.watch(isarExercisesStreamProvider(false));
-
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     return Material(
       type: MaterialType.transparency,
       child: CupertinoPageScaffold(
-        backgroundColor: CupertinoColors.black,
+        backgroundColor: isDark ? CupertinoColors.black : Colors.white,
         navigationBar: CupertinoNavigationBar(
-          backgroundColor: CupertinoColors.black,
+          backgroundColor: isDark ? CupertinoColors.black : Colors.white,
           border: null,
           leading: CupertinoButton(
             padding: EdgeInsets.zero,
@@ -61,9 +62,11 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
             ),
             onPressed: () => Navigator.pop(context),
           ),
-          middle: const Text(
+          middle: Text(
             'Add Exercise',
-            style: TextStyle(color: CupertinoColors.white),
+            style: TextStyle(
+              color: isDark ? CupertinoColors.white : Colors.black,
+            ),
           ),
           trailing: const Icon(
             CupertinoIcons.square_grid_2x2,
@@ -84,10 +87,16 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                       child: CupertinoSearchTextField(
                         controller: _searchController,
                         placeholder: 'Search or enter exercise name...',
-                        backgroundColor: const Color(0xFF1C1C1E),
-                        style: const TextStyle(color: CupertinoColors.white),
-                        placeholderStyle: const TextStyle(
-                          color: CupertinoColors.systemGrey,
+                        backgroundColor: isDark
+                            ? const Color(0xFF1C1C1E)
+                            : CupertinoColors.systemGroupedBackground,
+                        style: TextStyle(
+                          color: isDark ? CupertinoColors.white : Colors.black,
+                        ),
+                        placeholderStyle: TextStyle(
+                          color: isDark
+                              ? CupertinoColors.systemGrey
+                              : Colors.black,
                         ),
                         itemColor: CupertinoColors.systemGreen,
                         onChanged: (value) {
@@ -161,7 +170,9 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                           filtered.length + (searchState.isSyncing ? 1 : 0),
                       separatorBuilder: (context, index) => Divider(
                         height: 1,
-                        color: Colors.grey.shade900,
+                        color: isDark
+                            ? Colors.grey.shade900
+                            : Colors.grey.shade200,
                         indent: 50,
                       ),
                       itemBuilder: (context, index) {
@@ -187,9 +198,10 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                               ? Icon(
                                   CupertinoIcons.check_mark,
                                   color: isLocked
-                                      ? CupertinoColors.systemGrey.withValues(
-                                          alpha: 0.5,
-                                        )
+                                      ? isDark
+                                            ? CupertinoColors.systemGrey
+                                                  .withValues(alpha: 0.5)
+                                            : CupertinoColors.systemGreen
                                       : CupertinoColors.systemGreen,
                                   size: 18,
                                 )
@@ -198,8 +210,14 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                             exercise.name ?? 'Unnamed',
                             style: TextStyle(
                               color: isLocked
-                                  ? CupertinoColors.white.withOpacity(0.5)
-                                  : CupertinoColors.white,
+                                  ? isDark
+                                        ? CupertinoColors.systemGrey.withValues(
+                                            alpha: 0.5,
+                                          )
+                                        : CupertinoColors.systemGreen
+                                  : isDark
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black,
                               fontSize: 16,
                             ),
                           ),
@@ -268,6 +286,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
     double size = 24,
     bool isHeader = false,
   }) {
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     return SizedBox(
       width: size,
       height: size,
@@ -277,7 +296,9 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: const Color(0xFF2C2C2E),
+                color: isDark
+                    ? const Color(0xFF2C2C2E)
+                    : CupertinoColors.systemGrey,
                 width: isHeader ? 2 : 3,
               ),
             ),

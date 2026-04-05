@@ -76,8 +76,9 @@ class WorkoutSyncService {
           if (backendId == null) continue;
 
           final existing = await localRepo.getProgramByBackendId(backendId);
-          if (existing != null && existing.syncStatus != SyncStatus.synced)
+          if (existing != null && existing.syncStatus != SyncStatus.synced) {
             continue;
+          }
 
           final isarProgram = existing ?? Program();
           isarProgram.backendId = backendId;
@@ -207,8 +208,9 @@ class WorkoutSyncService {
           if (backendId == null) continue;
 
           final existing = await localRepo.getExerciseByBackendId(backendId);
-          if (existing != null && existing.syncStatus != SyncStatus.synced)
+          if (existing != null && existing.syncStatus != SyncStatus.synced) {
             continue;
+          }
 
           final isarExercise = existing ?? Exercise();
           isarExercise.backendId = backendId;
@@ -240,8 +242,9 @@ class WorkoutSyncService {
         page: page,
         limit: limit,
       );
-      if (!res.valid || res.data == null || res.data!.data == null)
+      if (!res.valid || res.data == null || res.data!.data == null) {
         return false;
+      }
 
       final pageData = res.data!;
       hasMore = (pageData.page ?? 1) < (pageData.totalPages ?? 1);
@@ -252,8 +255,9 @@ class WorkoutSyncService {
           if (backendId == null) continue;
 
           final existing = await localRepo.getExerciseByBackendId(backendId);
-          if (existing != null && existing.syncStatus != SyncStatus.synced)
+          if (existing != null && existing.syncStatus != SyncStatus.synced) {
             continue;
+          }
 
           final isarExercise = existing ?? Exercise();
           isarExercise.backendId = backendId;

@@ -2,6 +2,7 @@
 /// messages in a Flutter app.
 library;
 
+import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -161,7 +162,7 @@ class CustomCloseBottomsheet extends StatelessWidget {
   }
 }
 
-class CustomBottomSheet extends StatelessWidget {
+class CustomBottomSheet extends ConsumerWidget {
   final bool showBar;
   final List<Widget>? children;
   final Widget? child;
@@ -173,16 +174,17 @@ class CustomBottomSheet extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
