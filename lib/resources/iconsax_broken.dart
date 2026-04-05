@@ -2377,6 +2377,6 @@ class IconsaxBroken {
     xrpXrp_,
     youtube,
     zelZel_,
-    zoom
+    zoom,
   ];
 }

@@ -11,8 +11,10 @@ class AuthRepo {
 
   Future<ResponseModel> createUser({required CreateUserDto model}) async {
     Response response = await _apiService.runCall(
-      _apiService.dio
-          .post('${AppEndpoints.baseUrl}/create-user', data: model.toJson()),
+      _apiService.dio.post(
+        '${AppEndpoints.baseUrl}/create-user',
+        data: model.toJson(),
+      ),
     );
 
     final int statusCode = response.statusCode ?? 000;
@@ -35,8 +37,10 @@ class AuthRepo {
 
   Future<ResponseModel> sendLoginOtp({required SendLoginOtpDto model}) async {
     Response response = await _apiService.runCall(
-      _apiService.dio
-          .post('${AppEndpoints.baseUrl}/send-login-otp', data: model.toJson()),
+      _apiService.dio.post(
+        '${AppEndpoints.baseUrl}/send-login-otp',
+        data: model.toJson(),
+      ),
     );
 
     final int statusCode = response.statusCode ?? 000;
@@ -57,11 +61,14 @@ class AuthRepo {
     );
   }
 
-  Future<ResponseModel<AuthResponseDto>> verifyToken(
-      {required TokenDto model}) async {
+  Future<ResponseModel<AuthResponseDto>> verifyToken({
+    required TokenDto model,
+  }) async {
     Response response = await _apiService.runCall(
-      _apiService.dio
-          .post('${AppEndpoints.baseUrl}/token', data: model.toJson()),
+      _apiService.dio.post(
+        '${AppEndpoints.baseUrl}/token',
+        data: model.toJson(),
+      ),
     );
 
     final int statusCode = response.statusCode ?? 000;
@@ -87,9 +94,7 @@ class AuthRepo {
       _apiService.dio.get(
         '${AppEndpoints.baseUrl}/token/refresh',
         options: Options(
-          headers: {
-            'Authorization': 'Bearer ${LocalData.refreshToken}',
-          },
+          headers: {'Authorization': 'Bearer ${LocalData.refreshToken}'},
         ),
       ),
     );

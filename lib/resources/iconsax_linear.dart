@@ -2430,6 +2430,6 @@ class IconsaxLinear {
     xrpXrp_,
     youtube,
     zelZel_,
-    zoom
+    zoom,
   ];
 }

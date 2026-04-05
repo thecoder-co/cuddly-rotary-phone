@@ -286,6 +286,7 @@ class WorkoutSyncService {
           final dto = CreateWorkoutSetDto(
             exerciseId: set.exerciseId,
             reps: set.reps,
+
             weight: set.weight,
             comment: set.comment,
           );
@@ -302,6 +303,7 @@ class WorkoutSyncService {
             reps: set.reps,
             weight: set.weight,
             comment: set.comment,
+            date: set.date,
           );
           final res = await cloudRepo.updateSet(set.backendId!, dto);
           if (res.valid) {
@@ -320,5 +322,38 @@ class WorkoutSyncService {
         log('Error syncing workout set ${set.id}: $e');
       }
     }
+  }
+
+  Future<void> syncWorkoutSets({String? exerciseId, int page = 1}) async {
+    try {
+      final res = await cloudRepo.getSets(exerciseId: exerciseId, page: page);
+      if (!res.valid || res.data == null || res.data!.data == null) return;
+
+      await localRepo.isar.writeTxn(() async {
+        for (final s in res.data!.data!) {
+          final backendId = s.id;
+          if (backendId == null) continue;
+
+          final existing = await localRepo.getWorkoutSetByBackendId(backendId);
+          // Preserve local pending changes
+          if (existing != null &&
+              (existing.syncStatus == SyncStatus.pendingUpdate ||
+                  existing.syncStatus == SyncStatus.pendingDelete)) {
+            continue;
+          }
+
+          final isarSet = existing ?? WorkoutSet();
+          isarSet.backendId = backendId;
+          isarSet.exerciseId = s.exerciseId;
+          isarSet.reps = s.reps;
+          isarSet.weight = s.weight;
+          isarSet.comment = s.comment;
+          isarSet.date = s.date ?? s.createdAt;
+          isarSet.syncStatus = SyncStatus.synced;
+
+          await localRepo.isar.workoutSets.put(isarSet);
+        }
+      });
+    } catch (_) {}
   }
 }

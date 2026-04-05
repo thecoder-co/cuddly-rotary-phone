@@ -1,6 +1,6 @@
 import 'package:calorie_tracker/features/workout/presentation/exercises_screen.dart';
 import 'package:calorie_tracker/features/workout/presentation/programs_screen.dart';
-import 'package:calorie_tracker/features/workout/presentation/analytics_placeholder_screen.dart';
+import 'package:calorie_tracker/features/workout/presentation/workout_analytics_screen.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,11 +51,11 @@ class _WorkoutHomeState extends ConsumerState<WorkoutHome> {
               : CupertinoColors.white,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.fitness_center),
+              icon: Icon(CupertinoIcons.list_bullet),
               label: 'Programs',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.timer),
+              icon: Icon(Icons.fitness_center),
               label: 'My Workouts',
             ),
             BottomNavigationBarItem(
@@ -71,7 +71,7 @@ class _WorkoutHomeState extends ConsumerState<WorkoutHome> {
             case 1:
               return const ExercisesScreen(title: 'My Workouts');
             case 2:
-              return const AnalyticsPlaceholderScreen();
+              return const WorkoutAnalyticsScreen();
             default:
               return const ProgramsScreen();
           }

@@ -11,9 +11,8 @@ class Dialogs {
     showDialog(
       context: NavigationService.navigatorKey.currentState!.context,
       barrierDismissible: kDebugMode,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator.adaptive(),
-      ),
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator.adaptive()),
     );
   }
 
@@ -26,17 +25,10 @@ class Dialogs {
     final t = await openBottomSheet(
       children: [
         34.gap,
-        if (title != null)
-          Text(
-            title,
-            style: CustomTextStyle.labelLBold,
-          ),
+        if (title != null) Text(title, style: CustomTextStyle.labelLBold),
         8.gap,
         if (subtitle != null)
-          Text(
-            subtitle,
-            style: CustomTextStyle.paragraphMedium,
-          ),
+          Text(subtitle, style: CustomTextStyle.paragraphMedium),
         34.gap,
         AppButton(
           onPressed: () {
@@ -111,8 +103,9 @@ class CustomCloseBottomsheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
@@ -245,13 +238,7 @@ class _ChoiceBottomsheetState<T> extends State<ChoiceBottomsheet<T>> {
         children: [
           Expanded(
             child: ListView(
-              children: widget.titles
-                  .map(
-                    (e) => _tile(
-                      title: e,
-                    ),
-                  )
-                  .toList(),
+              children: widget.titles.map((e) => _tile(title: e)).toList(),
             ),
           ),
           19.gap,
@@ -259,8 +246,11 @@ class _ChoiceBottomsheetState<T> extends State<ChoiceBottomsheet<T>> {
             onPressed: title == null
                 ? null
                 : () {
-                    pop(widget.titles
-                        .firstWhere((element) => element.value == title));
+                    pop(
+                      widget.titles.firstWhere(
+                        (element) => element.value == title,
+                      ),
+                    );
                   },
             label: 'Select',
           ),
@@ -270,9 +260,7 @@ class _ChoiceBottomsheetState<T> extends State<ChoiceBottomsheet<T>> {
   }
 
   @widgetFactory
-  Widget _tile({
-    required Choice title,
-  }) {
+  Widget _tile({required Choice title}) {
     return InkWell(
       onTap: () {
         setState(() {
@@ -284,10 +272,7 @@ class _ChoiceBottomsheetState<T> extends State<ChoiceBottomsheet<T>> {
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                title.title,
-                style: CustomTextStyle.subtitleMedium,
-              ),
+              child: Text(title.title, style: CustomTextStyle.subtitleMedium),
             ),
             Radio<T>(
               value: title.value,

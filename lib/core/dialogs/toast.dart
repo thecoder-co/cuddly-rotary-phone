@@ -5,32 +5,19 @@ import "package:calorie_tracker/packages/packages.dart";
 import "package:flutter_svg/svg.dart";
 import 'package:flutter/material.dart';
 
-enum AppToastType {
-  success,
-  error,
-  info,
-}
+enum AppToastType { success, error, info }
 
 class AppToast {
   static void success(String? message) {
-    _show(
-      message,
-      type: AppToastType.success,
-    );
+    _show(message, type: AppToastType.success);
   }
 
   static void error(String? message) {
-    _show(
-      message,
-      type: AppToastType.error,
-    );
+    _show(message, type: AppToastType.error);
   }
 
   static void info(String? message) {
-    _show(
-      message,
-      type: AppToastType.info,
-    );
+    _show(message, type: AppToastType.info);
   }
 
   static void _show(String? message, {required AppToastType type}) {
@@ -112,10 +99,7 @@ class _TopNotificationBannerState extends State<_TopNotificationBanner>
     _offsetAnimation = Tween<Offset>(
       begin: const Offset(0.0, -1.0),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.dismissed) {
@@ -156,10 +140,7 @@ class _TopNotificationBannerState extends State<_TopNotificationBanner>
             if (_controller.isDismissed) {
               return const SizedBox.shrink();
             }
-            return SlideTransition(
-              position: _offsetAnimation,
-              child: child,
-            );
+            return SlideTransition(position: _offsetAnimation, child: child);
           },
           child: GestureDetector(
             onTap: _dismiss,
@@ -175,10 +156,7 @@ class _TopNotificationBannerState extends State<_TopNotificationBanner>
                   decoration: BoxDecoration(
                     color: widget.backgroundColor,
                     border: Border(
-                      bottom: BorderSide(
-                        color: widget.borderColor,
-                        width: .5,
-                      ),
+                      bottom: BorderSide(color: widget.borderColor, width: .5),
                     ),
                   ),
                   child: Row(

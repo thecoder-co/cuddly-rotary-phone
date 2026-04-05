@@ -30,6 +30,8 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
     }
   }
 
+  final otherExercises = <Exercise>[];
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -162,7 +164,9 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
                     ),
                     const SizedBox(height: 12),
                     exercisesAsync.when(
-                      data: (exercises) {
+                      data: (myExercises) {
+                        final exercises = [...myExercises, ...otherExercises];
+
                         return Container(
                           decoration: BoxDecoration(
                             color: const Color(0xFF1C1C1E),
@@ -260,11 +264,17 @@ class _AddProgramScreenState extends ConsumerState<AddProgramScreen> {
                                       );
                                   if (result != null) {
                                     setState(() {
+                                      final filtered = result.where(
+                                        (e) => !exercises
+                                            .map((e) => e.backendId)
+                                            .contains(e.backendId),
+                                      );
                                       for (var e in result) {
                                         _selectedExerciseIds.add(
                                           e.backendId ?? e.id.toString(),
                                         );
                                       }
+                                      otherExercises.addAll(filtered);
                                     });
                                   }
                                 },

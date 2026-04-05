@@ -5,10 +5,7 @@ import 'package:calorie_tracker/packages/packages.dart';
 
 class MealsPage extends ConsumerStatefulWidget {
   final bool shouldReturn;
-  const MealsPage({
-    super.key,
-    this.shouldReturn = false,
-  });
+  const MealsPage({super.key, this.shouldReturn = false});
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _HomePageState();
 }
@@ -22,6 +19,9 @@ class _HomePageState extends ConsumerState<MealsPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
+      backgroundColor: isDark
+          ? CupertinoColors.black
+          : CupertinoColors.systemGroupedBackground,
       child: Material(
         color: Colors.transparent,
         child: CustomScrollView(
@@ -83,9 +83,8 @@ class _HomePageState extends ConsumerState<MealsPage> {
               loading: () => const SliverFillRemaining(
                 child: Center(child: CupertinoActivityIndicator()),
               ),
-              error: (e, _) => SliverFillRemaining(
-                child: Center(child: Text('Error: $e')),
-              ),
+              error: (e, _) =>
+                  SliverFillRemaining(child: Center(child: Text('Error: $e'))),
               data: (data) {
                 final list = data.meals ?? [];
                 if (list.isEmpty) {

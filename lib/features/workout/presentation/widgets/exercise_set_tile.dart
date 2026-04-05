@@ -19,11 +19,11 @@ class ExerciseSetTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Default to a placeholder if date is null, but models usually have dates.
-    final timeStr = workoutSet.date != null 
-        ? DateFormat('HH:mm').format(workoutSet.date!) 
-        : DateFormat('HH:mm').format(DateTime.now());
+    final timeStr = workoutSet.date != null
+        ? DateFormat('h:mm a').format(workoutSet.date!)
+        : DateFormat('h:mm a').format(DateTime.now());
 
     return Slidable(
       key: ValueKey(workoutSet.id),
@@ -32,10 +32,10 @@ class ExerciseSetTile extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (_) => onEdit(),
-            backgroundColor: CupertinoColors.systemGreen,
+            backgroundColor: CupertinoColors.activeBlue,
             foregroundColor: Colors.white,
-            icon: CupertinoIcons.add_circled_solid, // "Fill/Duplicate" action
-            label: 'Fill',
+            icon: CupertinoIcons.pencil,
+            label: 'Edit',
           ),
         ],
       ),
@@ -51,33 +51,72 @@ class ExerciseSetTile extends StatelessWidget {
           ),
         ],
       ),
-      child: Container(
-        color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 50,
-              child: Text(
-                timeStr,
-                style: TextStyle(
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
+      child: InkWell(
+        onTap: onEdit,
+        child: Container(
+          color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 70,
+                child: Text(
+                  timeStr.toLowerCase(),
+                  style: TextStyle(
+                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                '${workoutSet.reps} rep',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              const Spacer(),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${workoutSet.reps} ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: CupertinoColors.systemGreen.resolveFrom(context),
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'rep',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Text(
-              '${workoutSet.weight} kg',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-          ],
+              const SizedBox(width: 32),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${workoutSet.weight?.toStringAsFixed(0)} ',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFFE5A13B), // Gold/Orange
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'kg',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

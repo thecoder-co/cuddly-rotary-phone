@@ -129,9 +129,7 @@ class _MealTileState extends ConsumerState<MealTile> {
               duration: duration,
               decoration: BoxDecoration(
                 color: isExpanded
-                    ? (isDark
-                          ? const Color(0xFF2C2C2E)
-                          : const Color(0xFFF2F2F7))
+                    ? (isDark ? const Color(0xFF2C2C2E) : Colors.white)
                     : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(

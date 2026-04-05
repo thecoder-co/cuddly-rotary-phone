@@ -15,6 +15,9 @@ class SettingsScreen extends ConsumerWidget {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
 
     return CupertinoPageScaffold(
+      backgroundColor: isDark
+          ? const Color(0xFF121212)
+          : CupertinoColors.systemGroupedBackground,
       child: Material(
         color: Colors.transparent,
         child: CustomScrollView(

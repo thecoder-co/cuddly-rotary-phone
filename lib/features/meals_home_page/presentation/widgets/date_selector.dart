@@ -6,11 +6,7 @@ import 'package:calorie_tracker/packages/packages.dart';
 class DateSelector extends StatefulWidget {
   final DateTime? initialDate;
   final Function(DateTime v)? onDateSelected;
-  const DateSelector({
-    super.key,
-    this.initialDate,
-    this.onDateSelected,
-  });
+  const DateSelector({super.key, this.initialDate, this.onDateSelected});
 
   @override
   State<DateSelector> createState() => _DateSelectorState();
@@ -74,16 +70,18 @@ class _DateSelectorState extends State<DateSelector> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Neutral surfaces — green only on the selected day
-    final containerColor =
-        isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7);
+    final containerColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final monthColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     final dayLabelColor = isDark
         ? Colors.white.withOpacity(0.4)
         : CupertinoColors.secondaryLabel;
-    final unselectedDayColor =
-        isDark ? Colors.white.withOpacity(0.85) : const Color(0xFF1C1C1E);
+    final unselectedDayColor = isDark
+        ? Colors.white.withOpacity(0.85)
+        : const Color(0xFF1C1C1E);
     final chevronBg = isDark ? const Color(0xFF2C2C2E) : Colors.white;
-    final chevronColor = isDark ? Colors.white.withOpacity(0.6) : const Color(0xFF3C3C43);
+    final chevronColor = isDark
+        ? Colors.white.withOpacity(0.6)
+        : const Color(0xFF3C3C43);
 
     return Container(
       decoration: BoxDecoration(
@@ -143,10 +141,12 @@ class _DateSelectorState extends State<DateSelector> {
                 return Row(
                   children: List.generate(_daysPerPage, (i) {
                     final day = first.add(Duration(days: i));
-                    final isSelected = day.year == _selected.year &&
+                    final isSelected =
+                        day.year == _selected.year &&
                         day.month == _selected.month &&
                         day.day == _selected.day;
-                    final isToday = day.year == DateTime.now().year &&
+                    final isToday =
+                        day.year == DateTime.now().year &&
                         day.month == DateTime.now().month &&
                         day.day == DateTime.now().day;
 
@@ -160,10 +160,10 @@ class _DateSelectorState extends State<DateSelector> {
                             color: isSelected
                                 ? AppColors.primary
                                 : isToday
-                                    ? (isDark
-                                        ? AppColors.primary.withOpacity(0.15)
-                                        : AppColors.primary100)
-                                    : Colors.transparent,
+                                ? (isDark
+                                      ? AppColors.primary.withOpacity(0.15)
+                                      : AppColors.primary100)
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Column(
@@ -188,8 +188,8 @@ class _DateSelectorState extends State<DateSelector> {
                                   color: isSelected
                                       ? Colors.white
                                       : isToday
-                                          ? AppColors.primary
-                                          : unselectedDayColor,
+                                      ? AppColors.primary
+                                      : unselectedDayColor,
                                 ),
                               ),
                             ],

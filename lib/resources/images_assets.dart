@@ -32,6 +32,6 @@ class ImagesAssets {
     quote,
     splash1,
     splash2,
-    splash3
+    splash3,
   ];
 }

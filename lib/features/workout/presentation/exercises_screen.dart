@@ -40,11 +40,8 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
             ? const Color(0xFF1C1C1E)
             : CupertinoColors.white,
         previousPageTitle: 'Back',
+
         middle: Text(widget.title),
-        trailing: const Icon(
-          CupertinoIcons.arrow_up_arrow_down,
-          color: CupertinoColors.systemGreen,
-        ),
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -186,9 +183,11 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                           ),
                                           title: Text(
                                             exercise.name ?? 'Unnamed',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              color: CupertinoColors.white,
+                                              color: isDark
+                                                  ? CupertinoColors.white
+                                                  : CupertinoColors.black,
                                             ),
                                           ),
                                           subtitle: exercise.description != null

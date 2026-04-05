@@ -5,14 +5,16 @@ extension StringExtensions on String {
   }
 
   bool get isValidName {
-    final nameRegExp =
-        RegExp(r"^\s*([A-Za-z]{1,}([\.,] |[-']| ))+[A-Za-z]+\.?\s*$");
+    final nameRegExp = RegExp(
+      r"^\s*([A-Za-z]{1,}([\.,] |[-']| ))+[A-Za-z]+\.?\s*$",
+    );
     return nameRegExp.hasMatch(this);
   }
 
   bool get isValidPassword {
     final passwordRegExp = RegExp(
-        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*.:;+=-?&])[A-Za-z\d@$!%*.?&]{8,}$');
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*.:;+=-?&])[A-Za-z\d@$!%*.?&]{8,}$',
+    );
     return passwordRegExp.hasMatch(this);
   }
 
@@ -53,7 +55,9 @@ extension MoneyExtensions on num {
 extension CartCodeExtensions on String {
   //
   String get formatReadable {
-    return replaceAllMapped(RegExp(r".{3}"), (match) => "${match.group(0)}-")
-        .substring(0, 11);
+    return replaceAllMapped(
+      RegExp(r".{3}"),
+      (match) => "${match.group(0)}-",
+    ).substring(0, 11);
   }
 }

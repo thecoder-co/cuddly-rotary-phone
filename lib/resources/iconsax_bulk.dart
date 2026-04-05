@@ -2262,6 +2262,6 @@ class IconsaxBulk {
     xrpXrp_,
     youtube,
     zelZel_,
-    zoom
+    zoom,
   ];
 }

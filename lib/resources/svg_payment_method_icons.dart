@@ -97,6 +97,6 @@ class SvgPaymentMethodIcons {
     weChat,
     webmoney,
     yandex,
-    giropay
+    giropay,
   ];
 }

@@ -159,6 +159,24 @@ class LocalWorkoutRepo {
     }
   }
 
+  Stream<List<WorkoutSet>> watchWorkoutSetsForDate(DateTime date) async* {
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
+    final stream = isar.workoutSets.watchLazy(fireImmediately: true);
+    await for (final _ in stream) {
+      yield await isar.workoutSets
+          .filter()
+          .dateGreaterThan(startOfDay.subtract(const Duration(milliseconds: 1)))
+          .and()
+          .dateLessThan(endOfDay)
+          .not()
+          .syncStatusEqualTo(SyncStatus.pendingDelete)
+          .sortByDate()
+          .findAll();
+    }
+  }
+
   Future<List<WorkoutSet>> getPendingWorkoutSets() async {
     return await isar.workoutSets
         .filter()

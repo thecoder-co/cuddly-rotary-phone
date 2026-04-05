@@ -4,10 +4,7 @@ class CreateUserDto {
 
   CreateUserDto({required this.email, required this.name});
 
-  Map<String, dynamic> toJson() => {
-        'email': email,
-        'name': name,
-      };
+  Map<String, dynamic> toJson() => {'email': email, 'name': name};
 }
 
 class SendLoginOtpDto {
@@ -15,9 +12,7 @@ class SendLoginOtpDto {
 
   SendLoginOtpDto({required this.email});
 
-  Map<String, dynamic> toJson() => {
-        'email': email,
-      };
+  Map<String, dynamic> toJson() => {'email': email};
 }
 
 class TokenDto {
@@ -26,10 +21,7 @@ class TokenDto {
 
   TokenDto({required this.email, required this.otp});
 
-  Map<String, dynamic> toJson() => {
-        'email': email,
-        'otp': otp,
-      };
+  Map<String, dynamic> toJson() => {'email': email, 'otp': otp};
 }
 
 class TokenResponseDto {

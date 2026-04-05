@@ -57,11 +57,7 @@ class ProgramExercise {
   String? exerciseId;
   int? order;
 
-  ProgramExercise({
-    this.backendId,
-    this.exerciseId,
-    this.order,
-  });
+  ProgramExercise({this.backendId, this.exerciseId, this.order});
 
   ProgramExercise copyWith({
     String? backendId,

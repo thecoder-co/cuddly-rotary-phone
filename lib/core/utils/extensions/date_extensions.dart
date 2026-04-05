@@ -6,8 +6,9 @@ DateTime firstDayInDateMonth(DateTime date) {
 
 DateTime lastDayInDateMonth(DateTime date) {
   final firstDayOfNextMonth = DateTime(date.year, date.month + 1, 1);
-  final lastDayOfThisMonth =
-      firstDayOfNextMonth.subtract(const Duration(days: 1));
+  final lastDayOfThisMonth = firstDayOfNextMonth.subtract(
+    const Duration(days: 1),
+  );
   return lastDayOfThisMonth;
 }
 

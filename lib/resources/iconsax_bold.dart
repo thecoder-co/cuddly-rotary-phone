@@ -2276,6 +2276,6 @@ class IconsaxBold {
     xrpXrp_,
     youtube,
     zelZel_,
-    zoom
+    zoom,
   ];
 }

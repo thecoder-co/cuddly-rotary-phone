@@ -99,6 +99,6 @@ class HomeIcons {
     upDown,
     user,
     walletAdd,
-    walletMinus
+    walletMinus,
   ];
 }

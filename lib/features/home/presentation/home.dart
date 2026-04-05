@@ -129,7 +129,6 @@ class _HomeState extends ConsumerState<Home> {
                         onTap: () {
                           pushTo(const WorkoutHome());
                         },
-                        comingSoon: true,
                       ),
                       _CategoryCard(
                         label: 'Spending',

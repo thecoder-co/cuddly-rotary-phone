@@ -315,18 +315,20 @@ class PaginatedSetsDto {
     this.totalPages,
   });
 
-  factory PaginatedSetsDto.fromJson(Map<String, dynamic> json) =>
-      PaginatedSetsDto(
-        data: json["data"] == null
-            ? []
-            : List<WorkoutSetDto>.from(
-                json["data"].map((x) => WorkoutSetDto.fromJson(x)),
-              ),
-        total: json["total"],
-        page: json["page"],
-        limit: json["limit"],
-        totalPages: json["totalPages"],
-      );
+  factory PaginatedSetsDto.fromJson(Map<String, dynamic> json) {
+    final meta = json["meta"] ?? {};
+    return PaginatedSetsDto(
+      data: json["data"] == null
+          ? []
+          : List<WorkoutSetDto>.from(
+              json["data"].map((x) => WorkoutSetDto.fromJson(x)),
+            ),
+      total: meta["total"] ?? json["total"],
+      page: meta["currentPage"] ?? json["page"],
+      limit: meta["perPage"] ?? json["limit"],
+      totalPages: meta["lastPage"] ?? json["totalPages"],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "data": data == null
@@ -349,6 +351,9 @@ class WorkoutSetDto {
   String? comment;
   DateTime? createdAt;
   DateTime? updatedAt;
+  DateTime? date;
+
+  ExerciseDto? exercise;
 
   WorkoutSetDto({
     this.id,
@@ -358,6 +363,8 @@ class WorkoutSetDto {
     this.comment,
     this.createdAt,
     this.updatedAt,
+    this.exercise,
+    this.date,
   });
 
   factory WorkoutSetDto.fromJson(Map<String, dynamic> json) => WorkoutSetDto(
@@ -369,9 +376,13 @@ class WorkoutSetDto {
     createdAt: json["createdAt"] == null
         ? null
         : DateTime.parse(json["createdAt"]),
+    date: json["date"] == null ? null : DateTime.parse(json["date"]),
     updatedAt: json["updatedAt"] == null
         ? null
         : DateTime.parse(json["updatedAt"]),
+    exercise: json["exercise"] == null
+        ? null
+        : ExerciseDto.fromJson(json["exercise"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -380,8 +391,10 @@ class WorkoutSetDto {
     "reps": reps,
     "weight": weight,
     "comment": comment,
+    "date": date?.toIso8601String(),
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
+    "exercise": exercise?.toJson(),
   };
 }
 
@@ -390,13 +403,21 @@ class CreateWorkoutSetDto {
   int? reps;
   double? weight;
   String? comment;
+  DateTime? date;
 
-  CreateWorkoutSetDto({this.exerciseId, this.reps, this.weight, this.comment});
+  CreateWorkoutSetDto({
+    this.date,
+    this.exerciseId,
+    this.reps,
+    this.weight,
+    this.comment,
+  });
 
   Map<String, dynamic> toJson() => {
     "exerciseId": exerciseId,
     "reps": reps,
     "weight": weight,
+    "date": date?.toIso8601String(),
     "comment": comment,
   };
 }
@@ -404,13 +425,15 @@ class CreateWorkoutSetDto {
 class UpdateWorkoutSetDto {
   int? reps;
   double? weight;
+  DateTime? date;
   String? comment;
 
-  UpdateWorkoutSetDto({this.reps, this.weight, this.comment});
+  UpdateWorkoutSetDto({this.date, this.reps, this.weight, this.comment});
 
   Map<String, dynamic> toJson() => {
     "reps": reps,
     "weight": weight,
+    "date": date?.toIso8601String(),
     "comment": comment,
   };
 }
@@ -446,10 +469,12 @@ class PaginatedExercisesDto {
   }
 
   Map<String, dynamic> toJson() => {
-        "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
-        "total": total,
-        "page": page,
-        "limit": limit,
-        "totalPages": totalPages,
-      };
+    "data": data == null
+        ? []
+        : List<dynamic>.from(data!.map((x) => x.toJson())),
+    "total": total,
+    "page": page,
+    "limit": limit,
+    "totalPages": totalPages,
+  };
 }

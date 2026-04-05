@@ -35,7 +35,7 @@ class LocalData {
 
   static String? get token => prefs.getString('token');
   static String? get refreshToken => prefs.getString('refreshToken');
-  
+
   static String? get userId => prefs.getString('userId');
   static String? get userEmail => prefs.getString('userEmail');
   static String? get userName => prefs.getString('userName');

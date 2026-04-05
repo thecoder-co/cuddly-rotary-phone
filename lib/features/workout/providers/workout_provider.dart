@@ -44,9 +44,40 @@ final isarWorkoutSetsStreamProvider =
 
       Future(() async {
         await syncService.syncPendingWorkoutSets();
+        Future.microtask(() {
+          syncService.syncWorkoutSets(exerciseId: exerciseBackendId);
+        });
       });
 
       return localRepo.watchWorkoutSetsForExercise(exerciseBackendId);
+    });
+
+final workoutSelectedDateProvider =
+    NotifierProvider<WorkoutSelectedDateNotifier, DateTime>(
+  WorkoutSelectedDateNotifier.new,
+);
+
+class WorkoutSelectedDateNotifier extends Notifier<DateTime> {
+  @override
+  DateTime build() => DateTime.now();
+
+  void setDate(DateTime date) => state = date;
+
+  set state(DateTime value) => super.state = value;
+}
+
+final isarWorkoutSetsByDateStreamProvider =
+    StreamProvider.family<List<WorkoutSet>, DateTime>((ref, date) {
+      final localRepo = ref.watch(localWorkoutRepoProvider);
+      final syncService = ref.read(workoutSyncServiceProvider);
+
+      Future(() async {
+        await syncService.syncPendingWorkoutSets();
+        // Sync all sets globally to ensure we have data for the selected date
+        syncService.syncWorkoutSets();
+      });
+
+      return localRepo.watchWorkoutSetsForDate(date);
     });
 
 // ----- Notifiers -----

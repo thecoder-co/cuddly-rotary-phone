@@ -16,6 +16,7 @@ class WorkoutSet {
   int? reps;
   double? weight;
   String? comment;
+  @Index()
   DateTime? date;
 
   @enumerated

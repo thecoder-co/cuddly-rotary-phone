@@ -42,14 +42,16 @@ class Validator {
     return addValidator((value) => value.isEmail, message);
   }
 
-  Validator isFullName(
-      [String message = 'Please enter your full name, separated by a space']) {
+  Validator isFullName([
+    String message = 'Please enter your full name, separated by a space',
+  ]) {
     return addValidator((value) => value.split(' ').length >= 2, message);
   }
 
-  Validator isPassword(
-      [String message =
-          'Password must be at least 8 characters and contain at least one letter and one number']) {
+  Validator isPassword([
+    String message =
+        'Password must be at least 8 characters and contain at least one letter and one number',
+  ]) {
     return addValidator((value) => value.isPassword, message);
   }
 
@@ -62,8 +64,10 @@ class Validator {
   }
 
   Validator minLength(int length, [String? message]) {
-    return addValidator((value) => value.length >= length,
-        message ?? 'This field must be at least $length characters');
+    return addValidator(
+      (value) => value.length >= length,
+      message ?? 'This field must be at least $length characters',
+    );
   }
 
   Validator custom(bool Function(String) condition, String message) {

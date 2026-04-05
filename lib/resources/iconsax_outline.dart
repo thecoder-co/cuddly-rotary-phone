@@ -2456,6 +2456,6 @@ class IconsaxOutline {
     xrpXrp_,
     youtube,
     zelZel_,
-    zoom
+    zoom,
   ];
 }

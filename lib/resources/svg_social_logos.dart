@@ -50,6 +50,6 @@ class SvgSocialLogos {
     twitter,
     youtube,
     facebookGray,
-    facebookWhite
+    facebookWhite,
   ];
 }

@@ -5,20 +5,18 @@ class AnalyticsPlaceholderScreen extends ConsumerStatefulWidget {
   const AnalyticsPlaceholderScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _AnalyticsPlaceholderScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _AnalyticsPlaceholderScreenState();
 }
 
-class _AnalyticsPlaceholderScreenState extends ConsumerState<AnalyticsPlaceholderScreen> {
+class _AnalyticsPlaceholderScreenState
+    extends ConsumerState<AnalyticsPlaceholderScreen> {
   @override
   Widget build(BuildContext context) {
     return const CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text('Analytics'),
-      ),
+      navigationBar: CupertinoNavigationBar(middle: Text('Analytics')),
       child: SafeArea(
-        child: Center(
-          child: Text('Global Analytics Placeholder'),
-        ),
+        child: Center(child: Text('Global Analytics Placeholder')),
       ),
     );
   }

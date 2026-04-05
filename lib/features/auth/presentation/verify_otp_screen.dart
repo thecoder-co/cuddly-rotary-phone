@@ -60,7 +60,9 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                     label: 'Verify OTP',
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        ref.read(authProvider.notifier).verifyToken(
+                        ref
+                            .read(authProvider.notifier)
+                            .verifyToken(
                               model: TokenDto(
                                 email: widget.email,
                                 otp: _otpController.text.trim(),
@@ -72,14 +74,17 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                   20.spacingH,
                   CupertinoButton(
                     onPressed: () {
-                      ref.read(authProvider.notifier).sendLoginOtp(
+                      ref
+                          .read(authProvider.notifier)
+                          .sendLoginOtp(
                             model: SendLoginOtpDto(email: widget.email),
                           );
                     },
                     child: Text(
                       'Didn\'t receive it? Resend',
-                      style: CustomTextStyle.textmedium16.w600
-                          .withColor(AppColors.primary),
+                      style: CustomTextStyle.textmedium16.w600.withColor(
+                        AppColors.primary,
+                      ),
                     ),
                   ),
                 ],

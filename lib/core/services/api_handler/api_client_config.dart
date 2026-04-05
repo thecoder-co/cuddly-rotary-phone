@@ -53,11 +53,7 @@ class BackendService {
 
     _dio.options.baseUrl = otherBaseUrl ?? AppEndpoints.baseUrl;
 
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: executeCustomHeaders,
-      ),
-    );
+    dio.interceptors.add(InterceptorsWrapper(onRequest: executeCustomHeaders));
 
     _dio.interceptors.addAll([
       // DefaultAPIInterceptor(dio: _dio),
@@ -75,9 +71,7 @@ class BackendService {
     fixBadCertificate(dio: dio);
 
     dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: authRequestInterceptors,
-      ),
+      InterceptorsWrapper(onRequest: authRequestInterceptors),
     );
     if (kDebugMode) {
       _dio.interceptors.add(TimeResponseInterceptor());
@@ -96,9 +90,7 @@ class BackendService {
       );
     }
     dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: jsonRequestInterceptor,
-      ),
+      InterceptorsWrapper(onRequest: jsonRequestInterceptor),
     );
   }
 
@@ -132,23 +124,27 @@ class BackendService {
 
     if (options.headers.containsKey(CustomHeaders.removeEmptyLists)) {
       if (options.data != null && options.data is Map) {
-        options.data
-            .removeWhere((key, value) => value is List && value.isEmpty);
+        options.data.removeWhere(
+          (key, value) => value is List && value.isEmpty,
+        );
       }
     }
 
     if (options.headers.containsKey(CustomHeaders.removeEmptyStrings)) {
       if (options.data != null && options.data is Map) {
-        options.data
-            .removeWhere((key, value) => value is String && value.isEmpty);
+        options.data.removeWhere(
+          (key, value) => value is String && value.isEmpty,
+        );
       }
     }
 
     if (options.headers.containsKey(CustomHeaders.removeEmptyStringsList)) {
       if (options.data != null && options.data is Map) {
-        options.data.removeWhere((key, value) =>
-            value is List &&
-            value.every((element) => element is String && element.isEmpty));
+        options.data.removeWhere(
+          (key, value) =>
+              value is List &&
+              value.every((element) => element is String && element.isEmpty),
+        );
       }
     }
 

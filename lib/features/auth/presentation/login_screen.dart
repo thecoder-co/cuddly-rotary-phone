@@ -56,9 +56,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     label: 'Send OTP',
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        ref.read(authProvider.notifier).sendLoginOtp(
+                        ref
+                            .read(authProvider.notifier)
+                            .sendLoginOtp(
                               model: SendLoginOtpDto(
-                                  email: _emailController.text.trim()),
+                                email: _emailController.text.trim(),
+                              ),
                             );
                       }
                     },
@@ -68,8 +71,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: () => pushReplacementTo(const RegisterScreen()),
                     child: Text(
                       'Don\'t have an account? Register',
-                      style: CustomTextStyle.textmedium16.w600
-                          .withColor(AppColors.primary),
+                      style: CustomTextStyle.textmedium16.w600.withColor(
+                        AppColors.primary,
+                      ),
                     ),
                   ),
                 ],

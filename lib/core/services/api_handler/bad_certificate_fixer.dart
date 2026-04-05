@@ -12,8 +12,9 @@ void fixBadCertificate({required Dio dio}) {
     dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
         // Don't trust any certificate just because their root cert is trusted.
-        final HttpClient client =
-            HttpClient(context: SecurityContext(withTrustedRoots: false));
+        final HttpClient client = HttpClient(
+          context: SecurityContext(withTrustedRoots: false),
+        );
         // You can test the intermediate / root cert here. We just ignore it.
         client.badCertificateCallback = (cert, host, port) => true;
         return client;

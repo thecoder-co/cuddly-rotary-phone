@@ -4,13 +4,13 @@ class AppShadows {
   AppShadows._();
 
   static List<BoxShadow> focusShadow(Color color) => [
-        BoxShadow(
-          color: color,
-          spreadRadius: 4,
-          blurRadius: 0,
-          offset: const Offset(0, 0),
-        ),
-      ];
+    BoxShadow(
+      color: color,
+      spreadRadius: 4,
+      blurRadius: 0,
+      offset: const Offset(0, 0),
+    ),
+  ];
 
   static const def = [
     BoxShadow(

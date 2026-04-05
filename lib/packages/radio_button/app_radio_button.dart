@@ -78,8 +78,8 @@ class AppRadio<T> extends StatefulWidget {
     this.canToggle = true,
     this.size = RadioSize.sm,
     required this.onToggle,
-  })  : assert(onToggle != null),
-        isDisabled = false;
+  }) : assert(onToggle != null),
+       isDisabled = false;
 
   const AppRadio.disabled({
     super.key,
@@ -93,8 +93,8 @@ class AppRadio<T> extends StatefulWidget {
     this.canToggle = false,
     this.subText,
     this.size = RadioSize.sm,
-  })  : isDisabled = true,
-        onToggle = null;
+  }) : isDisabled = true,
+       onToggle = null;
 
   @override
   State<AppRadio> createState() => _AppRadioState();
@@ -143,11 +143,13 @@ class _AppRadioState extends State<AppRadio> {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  boxShadow: AppShadows.focusShadow(widget.isDisabled
-                      ? Colors.transparent
-                      : isFocused
-                          ? AppColors.primary100
-                          : Colors.transparent),
+                  boxShadow: AppShadows.focusShadow(
+                    widget.isDisabled
+                        ? Colors.transparent
+                        : isFocused
+                        ? AppColors.primary100
+                        : Colors.transparent,
+                  ),
                 ),
                 child: InkWell(
                   canRequestFocus: false,
@@ -168,18 +170,18 @@ class _AppRadioState extends State<AppRadio> {
                       color: widget.isDisabled
                           ? AppColors.greyTertiary
                           : onHover || toggleValue
-                              ? AppColors.primary100
-                              : Colors.white,
+                          ? AppColors.primary100
+                          : Colors.white,
                       shape: BoxShape.circle,
                       border: Border.all(
                         width: 1,
                         color: widget.isDisabled
                             ? AppColors.greyTertiary
                             : toggleValue || onHover
-                                ? AppColors.primary600
-                                : isFocused
-                                    ? AppColors.primary200
-                                    : AppColors.greyTertiary,
+                            ? AppColors.primary600
+                            : isFocused
+                            ? AppColors.primary200
+                            : AppColors.greyTertiary,
                       ),
                     ),
                     alignment: Alignment.center,
@@ -201,9 +203,11 @@ class _AppRadioState extends State<AppRadio> {
                 Expanded(
                   child: Text(
                     widget.mainText ?? '',
-                    style: widget.mainTextStyle ??
+                    style:
+                        widget.mainTextStyle ??
                         widget.size.mainTextStyle.withColor(
-                            widget.mainTextColor ?? AppColors.greyTertiary),
+                          widget.mainTextColor ?? AppColors.greyTertiary,
+                        ),
                   ),
                 ),
               ],

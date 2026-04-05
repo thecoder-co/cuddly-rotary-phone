@@ -41,9 +41,9 @@ class AppButton extends StatelessWidget {
     this.child,
     this.width = double.infinity,
     this.radius = 16,
-  })  : assert(label != null || child != null),
-        isText = false,
-        isOutline = false;
+  }) : assert(label != null || child != null),
+       isText = false,
+       isOutline = false;
 
   const AppButton.outline({
     super.key,
@@ -61,43 +61,58 @@ class AppButton extends StatelessWidget {
     this.child,
     this.width = double.infinity,
     this.radius = 16,
-  })  : assert(label != null || child != null),
-        isText = true,
-        textColor = null,
-        backgroundColor = null,
-        isOutline = true;
+  }) : assert(label != null || child != null),
+       isText = true,
+       textColor = null,
+       backgroundColor = null,
+       isOutline = true;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Resolved colours
-    final resolvedBg = backgroundColor ??
-        (isOutline ? Colors.transparent : AppColors.primary);
-    final resolvedFg = textColor ??
+    final resolvedBg =
+        backgroundColor ?? (isOutline ? Colors.transparent : AppColors.primary);
+    final resolvedFg =
+        textColor ??
         (isOutline
             ? (isDark ? Colors.white : AppColors.primary)
             : Colors.white);
     final disabledBg = isOutline ? Colors.transparent : const Color(0xFFE2E2E2);
     final disabledFg = AppColors.greyQuatinary;
 
-    final buttonChild = child ??
+    final buttonChild =
+        child ??
         Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (preIcon != null) ...[
-              SvgPicture.asset(preIcon!, colorFilter: ColorFilter.mode(iconColor ?? resolvedFg, BlendMode.srcIn)),
+              SvgPicture.asset(
+                preIcon!,
+                colorFilter: ColorFilter.mode(
+                  iconColor ?? resolvedFg,
+                  BlendMode.srcIn,
+                ),
+              ),
               preIconSpace.spacingW,
             ],
             Text(
               label!,
-              style: CustomTextStyle.textmedium16.w700
-                  .withColor(onPressed == null ? disabledFg : resolvedFg),
+              style: CustomTextStyle.textmedium16.w700.withColor(
+                onPressed == null ? disabledFg : resolvedFg,
+              ),
             ),
             if (postIcon != null) ...[
               postIconSpace.spacingW,
-              SvgPicture.asset(postIcon!, colorFilter: ColorFilter.mode(iconColor ?? resolvedFg, BlendMode.srcIn)),
+              SvgPicture.asset(
+                postIcon!,
+                colorFilter: ColorFilter.mode(
+                  iconColor ?? resolvedFg,
+                  BlendMode.srcIn,
+                ),
+              ),
             ],
           ],
         );

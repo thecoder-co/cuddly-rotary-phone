@@ -12,7 +12,8 @@ class MealCloudRepo {
   Future<ResponseModel<MealResponseDto>> createMeal(CreateMealDto model) async {
     Response response = await _apiService.runCall(
       _apiService.dio.post(
-        '${AppEndpoints.baseUrl}' '/meals',
+        '${AppEndpoints.baseUrl}'
+        '/meals',
         data: model.toJson(),
       ),
     );
@@ -36,10 +37,14 @@ class MealCloudRepo {
   }
 
   Future<ResponseModel<MealResponseDto>> updateMeal(
-      String id, UpdateMealDto model) async {
+    String id,
+    UpdateMealDto model,
+  ) async {
     Response response = await _apiService.runCall(
-      _apiService.dio
-          .patch('${AppEndpoints.baseUrl}/meals/$id', data: model.toJson()),
+      _apiService.dio.patch(
+        '${AppEndpoints.baseUrl}/meals/$id',
+        data: model.toJson(),
+      ),
     );
 
     final int statusCode = response.statusCode ?? 000;
@@ -62,7 +67,10 @@ class MealCloudRepo {
 
   Future<ResponseModel> deleteMeal(String id) async {
     Response response = await _apiService.runCall(
-      _apiService.dio.delete('${AppEndpoints.baseUrl}' '/meals/$id'),
+      _apiService.dio.delete(
+        '${AppEndpoints.baseUrl}'
+        '/meals/$id',
+      ),
     );
 
     final int statusCode = response.statusCode ?? 000;
@@ -127,28 +135,32 @@ class MealCloudRepo {
     double? fibrePerGramEq,
   }) async {
     Response response = await _apiService.runCall(
-      _apiService.dio.get('${AppEndpoints.baseUrl}' '/meals', queryParameters: {
-        'page': 1,
-        'limit': 100,
-        if (name != null) 'name': name,
-        if (type != null) 'type': type,
-        if (caloriesPerGramLt != null) 'caloriesPerGramLt': caloriesPerGramLt,
-        if (caloriesPerGramGte != null)
-          'caloriesPerGramGte': caloriesPerGramGte,
-        if (caloriesPerGramEq != null) 'caloriesPerGramEq': caloriesPerGramEq,
-        if (proteinPerGramLt != null) 'proteinPerGramLt': proteinPerGramLt,
-        if (proteinPerGramGte != null) 'proteinPerGramGte': proteinPerGramGte,
-        if (proteinPerGramEq != null) 'proteinPerGramEq': proteinPerGramEq,
-        if (fatPerGramLt != null) 'fatPerGramLt': fatPerGramLt,
-        if (fatPerGramGte != null) 'fatPerGramGte': fatPerGramGte,
-        if (fatPerGramEq != null) 'fatPerGramEq': fatPerGramEq,
-        if (carbsPerGramLt != null) 'carbsPerGramLt': carbsPerGramLt,
-        if (carbsPerGramGte != null) 'carbsPerGramGte': carbsPerGramGte,
-        if (carbsPerGramEq != null) 'carbsPerGramEq': carbsPerGramEq,
-        if (fibrePerGramLt != null) 'fibrePerGramLt': fibrePerGramLt,
-        if (fibrePerGramGte != null) 'fibrePerGramGte': fibrePerGramGte,
-        if (fibrePerGramEq != null) 'fibrePerGramEq': fibrePerGramEq,
-      }),
+      _apiService.dio.get(
+        '${AppEndpoints.baseUrl}'
+        '/meals',
+        queryParameters: {
+          'page': 1,
+          'limit': 100,
+          if (name != null) 'name': name,
+          if (type != null) 'type': type,
+          if (caloriesPerGramLt != null) 'caloriesPerGramLt': caloriesPerGramLt,
+          if (caloriesPerGramGte != null)
+            'caloriesPerGramGte': caloriesPerGramGte,
+          if (caloriesPerGramEq != null) 'caloriesPerGramEq': caloriesPerGramEq,
+          if (proteinPerGramLt != null) 'proteinPerGramLt': proteinPerGramLt,
+          if (proteinPerGramGte != null) 'proteinPerGramGte': proteinPerGramGte,
+          if (proteinPerGramEq != null) 'proteinPerGramEq': proteinPerGramEq,
+          if (fatPerGramLt != null) 'fatPerGramLt': fatPerGramLt,
+          if (fatPerGramGte != null) 'fatPerGramGte': fatPerGramGte,
+          if (fatPerGramEq != null) 'fatPerGramEq': fatPerGramEq,
+          if (carbsPerGramLt != null) 'carbsPerGramLt': carbsPerGramLt,
+          if (carbsPerGramGte != null) 'carbsPerGramGte': carbsPerGramGte,
+          if (carbsPerGramEq != null) 'carbsPerGramEq': carbsPerGramEq,
+          if (fibrePerGramLt != null) 'fibrePerGramLt': fibrePerGramLt,
+          if (fibrePerGramGte != null) 'fibrePerGramGte': fibrePerGramGte,
+          if (fibrePerGramEq != null) 'fibrePerGramEq': fibrePerGramEq,
+        },
+      ),
     );
 
     final int statusCode = response.statusCode ?? 000;
@@ -170,16 +182,21 @@ class MealCloudRepo {
     );
   }
 
-  Future<ResponseModel<MealAnalyticsDto>> getAnalytics(
-      {String? date, String? dateGte, String? dateLt}) async {
+  Future<ResponseModel<MealAnalyticsDto>> getAnalytics({
+    String? date,
+    String? dateGte,
+    String? dateLt,
+  }) async {
     final queryParams = <String, dynamic>{};
     if (date != null) queryParams['date'] = date;
     if (dateGte != null) queryParams['dateGte'] = dateGte;
     if (dateLt != null) queryParams['dateLt'] = dateLt;
 
     Response response = await _apiService.runCall(
-      _apiService.dio.get('${AppEndpoints.baseUrl}/meals/analytics',
-          queryParameters: queryParams),
+      _apiService.dio.get(
+        '${AppEndpoints.baseUrl}/meals/analytics',
+        queryParameters: queryParams,
+      ),
     );
 
     final int statusCode = response.statusCode ?? 000;
@@ -199,6 +216,4 @@ class MealCloudRepo {
       message: response.data?['message'] ?? 'Something went wrong',
     );
   }
-
-
 }

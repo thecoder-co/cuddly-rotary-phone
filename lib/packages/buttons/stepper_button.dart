@@ -42,13 +42,11 @@ class _StepperButtonState extends State<StepperButton> {
           icon: Icons.remove,
         ),
         8.gap,
-        Text(
-          step.toString(),
-          style: CustomTextStyle.label2XLBold,
-        ),
+        Text(step.toString(), style: CustomTextStyle.label2XLBold),
         8.gap,
         StepButton(
-          onPressed: widget.isDisabled ||
+          onPressed:
+              widget.isDisabled ||
                   (widget.maxStep != null && step >= widget.maxStep!)
               ? null
               : () {
@@ -80,15 +78,17 @@ class StepButton extends StatelessWidget {
         height: 32,
         decoration: BoxDecoration(
           border: Border.all(
-            color:
-                onPressed == null ? AppColors.bordersDark : AppColors.primary,
+            color: onPressed == null
+                ? AppColors.bordersDark
+                : AppColors.primary,
             width: 1,
           ),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon,
-            color:
-                onPressed == null ? AppColors.bordersDark : AppColors.primary),
+        child: Icon(
+          icon,
+          color: onPressed == null ? AppColors.bordersDark : AppColors.primary,
+        ),
       ),
     );
   }

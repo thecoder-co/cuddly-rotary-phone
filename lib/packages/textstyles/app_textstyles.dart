@@ -1,30 +1,14 @@
 import 'package:calorie_tracker/packages/packages.dart';
 
 class CustomTextStyle {
-  static const TextStyle textextraBold24 = TextStyle(
-    fontSize: 24,
-  );
-  static const TextStyle textbold24 = TextStyle(
-    fontSize: 24,
-  );
-  static const TextStyle textxLarge20 = TextStyle(
-    fontSize: 20,
-  );
-  static const TextStyle textlarge18 = TextStyle(
-    fontSize: 18,
-  );
-  static const TextStyle textmedium16 = TextStyle(
-    fontSize: 16,
-  );
-  static const TextStyle textsmall14 = TextStyle(
-    fontSize: 14,
-  );
-  static const TextStyle textxSmall12 = TextStyle(
-    fontSize: 12,
-  );
-  static const TextStyle texttiny10 = TextStyle(
-    fontSize: 10,
-  );
+  static const TextStyle textextraBold24 = TextStyle(fontSize: 24);
+  static const TextStyle textbold24 = TextStyle(fontSize: 24);
+  static const TextStyle textxLarge20 = TextStyle(fontSize: 20);
+  static const TextStyle textlarge18 = TextStyle(fontSize: 18);
+  static const TextStyle textmedium16 = TextStyle(fontSize: 16);
+  static const TextStyle textsmall14 = TextStyle(fontSize: 14);
+  static const TextStyle textxSmall12 = TextStyle(fontSize: 12);
+  static const TextStyle texttiny10 = TextStyle(fontSize: 10);
 
   static const TextStyle label2XLXBold = TextStyle(
     fontSize: 24,
@@ -49,9 +33,7 @@ class CustomTextStyle {
     fontWeight: FontWeight.w700,
   );
 
-  static const TextStyle base = TextStyle(
-    fontSize: 14,
-  );
+  static const TextStyle base = TextStyle(fontSize: 14);
 
   static const TextStyle labelXLBold = TextStyle(
     fontSize: 20,

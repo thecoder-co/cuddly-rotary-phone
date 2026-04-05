@@ -1219,54 +1219,47 @@ CountryModel countryModelFromJson(String str) =>
 String countryModelToJson(CountryModel data) => json.encode(data.toJson());
 
 class CountryModel {
-  CountryModel({
-    this.error,
-    this.message,
-    this.data,
-  });
+  CountryModel({this.error, this.message, this.data});
 
   bool? error;
   String? message;
   List<CountryCode>? data;
 
   factory CountryModel.fromJson(Map<String, dynamic> json) => CountryModel(
-        error: json["error"],
-        message: json["message"],
-        data: json["data"] == null
-            ? null
-            : List<CountryCode>.from(
-                json["data"].map((x) => CountryCode.fromJson(x))),
-      );
+    error: json["error"],
+    message: json["message"],
+    data: json["data"] == null
+        ? null
+        : List<CountryCode>.from(
+            json["data"].map((x) => CountryCode.fromJson(x)),
+          ),
+  );
 
   Map<String, dynamic> toJson() => {
-        "error": error,
-        "message": message,
-        "data": data == null
-            ? null
-            : List<dynamic>.from(data!.map((x) => x.toJson())),
-      };
+    "error": error,
+    "message": message,
+    "data": data == null
+        ? null
+        : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
 }
 
 class CountryCode {
-  CountryCode({
-    this.country,
-    this.dialCode,
-    this.shortCode,
-  });
+  CountryCode({this.country, this.dialCode, this.shortCode});
 
   String? country;
   String? dialCode;
   String? shortCode;
 
   factory CountryCode.fromJson(Map<String, dynamic> json) => CountryCode(
-        country: json["country"],
-        dialCode: json["dial_code"],
-        shortCode: json["short_code"],
-      );
+    country: json["country"],
+    dialCode: json["dial_code"],
+    shortCode: json["short_code"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "country": country,
-        "dial_code": dialCode,
-        "short_code": shortCode,
-      };
+    "country": country,
+    "dial_code": dialCode,
+    "short_code": shortCode,
+  };
 }

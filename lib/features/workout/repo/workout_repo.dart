@@ -143,10 +143,7 @@ class WorkoutCloudRepo {
     int page = 1,
     int limit = 20,
   }) async {
-    final queryParams = <String, dynamic>{
-      'page': page,
-      'limit': limit,
-    };
+    final queryParams = <String, dynamic>{'page': page, 'limit': limit};
     if (name != null && name.isNotEmpty) {
       queryParams['name'] = name;
     }
@@ -258,6 +255,7 @@ class WorkoutCloudRepo {
       message: response.data?['message'] ?? 'Something went wrong',
     );
   }
+
   Future<ResponseModel<List<ExerciseDto>>> addExercisesFromParent(
     AddExercisesDto model,
   ) async {
@@ -288,6 +286,39 @@ class WorkoutCloudRepo {
   }
 
   // ----- Sets -----
+  Future<ResponseModel<PaginatedSetsDto>> getSets({
+    String? exerciseId,
+    int page = 1,
+    int limit = 100,
+  }) async {
+    final queryParams = <String, dynamic>{'page': page, 'limit': limit};
+    if (exerciseId != null) {
+      queryParams['exerciseId'] = exerciseId;
+    }
+
+    Response response = await _apiService.runCall(
+      _apiService.dio.get(
+        '${AppEndpoints.baseUrl}/sets',
+        queryParameters: queryParams,
+      ),
+    );
+
+    final statusCode = response.statusCode ?? 000;
+    if (statusCode >= 200 && statusCode <= 300) {
+      return ResponseModel(
+        valid: true,
+        statusCode: statusCode,
+        message: response.statusMessage,
+        data: PaginatedSetsDto.fromJson(response.data),
+      );
+    }
+
+    return ResponseModel(
+      error: ErrorModel.fromJson(response.data ?? {}),
+      statusCode: statusCode,
+      message: response.data?['message'] ?? 'Something went wrong',
+    );
+  }
 
   Future<ResponseModel<WorkoutSetDto>> createSet(
     CreateWorkoutSetDto model,

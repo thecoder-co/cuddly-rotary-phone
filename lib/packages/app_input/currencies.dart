@@ -1076,11 +1076,13 @@ const currienciesJson = '''{
 
 final curriencies = currencyFromJson(currienciesJson);
 
-Map<String, Currency> currencyFromJson(String str) => Map.from(json.decode(str))
-    .map((k, v) => MapEntry<String, Currency>(k, Currency.fromJson(v)));
+Map<String, Currency> currencyFromJson(String str) => Map.from(
+  json.decode(str),
+).map((k, v) => MapEntry<String, Currency>(k, Currency.fromJson(v)));
 
 String currencyToJson(Map<String, Currency> data) => json.encode(
-    Map.from(data).map((k, v) => MapEntry<String, dynamic>(k, v.toJson())));
+  Map.from(data).map((k, v) => MapEntry<String, dynamic>(k, v.toJson())),
+);
 
 class Currency {
   Currency({
@@ -1109,34 +1111,33 @@ class Currency {
     double? rounding,
     String? code,
     String? namePlural,
-  }) =>
-      Currency(
-        symbol: symbol ?? this.symbol,
-        name: name ?? this.name,
-        symbolNative: symbolNative ?? this.symbolNative,
-        decimalDigits: decimalDigits ?? this.decimalDigits,
-        rounding: rounding ?? this.rounding,
-        code: code ?? this.code,
-        namePlural: namePlural ?? this.namePlural,
-      );
+  }) => Currency(
+    symbol: symbol ?? this.symbol,
+    name: name ?? this.name,
+    symbolNative: symbolNative ?? this.symbolNative,
+    decimalDigits: decimalDigits ?? this.decimalDigits,
+    rounding: rounding ?? this.rounding,
+    code: code ?? this.code,
+    namePlural: namePlural ?? this.namePlural,
+  );
 
   factory Currency.fromJson(Map<String, dynamic> json) => Currency(
-        symbol: json["symbol"],
-        name: json["name"],
-        symbolNative: json["symbol_native"],
-        decimalDigits: json["decimal_digits"],
-        rounding: json["rounding"]?.toDouble(),
-        code: json["code"],
-        namePlural: json["name_plural"],
-      );
+    symbol: json["symbol"],
+    name: json["name"],
+    symbolNative: json["symbol_native"],
+    decimalDigits: json["decimal_digits"],
+    rounding: json["rounding"]?.toDouble(),
+    code: json["code"],
+    namePlural: json["name_plural"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "symbol": symbol,
-        "name": name,
-        "symbol_native": symbolNative,
-        "decimal_digits": decimalDigits,
-        "rounding": rounding,
-        "code": code,
-        "name_plural": namePlural,
-      };
+    "symbol": symbol,
+    "name": name,
+    "symbol_native": symbolNative,
+    "decimal_digits": decimalDigits,
+    "rounding": rounding,
+    "code": code,
+    "name_plural": namePlural,
+  };
 }

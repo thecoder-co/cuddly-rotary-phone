@@ -30,17 +30,16 @@ class MealComponentDto {
     int? carbsPerGram,
     int? fibrePerGram,
     int? weightUsed,
-  }) =>
-      MealComponentDto(
-        subMealId: subMealId ?? this.subMealId,
-        name: name ?? this.name,
-        caloriePerGram: caloriePerGram ?? this.caloriePerGram,
-        protienPerGram: protienPerGram ?? this.protienPerGram,
-        fatPerGram: fatPerGram ?? this.fatPerGram,
-        carbsPerGram: carbsPerGram ?? this.carbsPerGram,
-        fibrePerGram: fibrePerGram ?? this.fibrePerGram,
-        weightUsed: weightUsed ?? this.weightUsed,
-      );
+  }) => MealComponentDto(
+    subMealId: subMealId ?? this.subMealId,
+    name: name ?? this.name,
+    caloriePerGram: caloriePerGram ?? this.caloriePerGram,
+    protienPerGram: protienPerGram ?? this.protienPerGram,
+    fatPerGram: fatPerGram ?? this.fatPerGram,
+    carbsPerGram: carbsPerGram ?? this.carbsPerGram,
+    fibrePerGram: fibrePerGram ?? this.fibrePerGram,
+    weightUsed: weightUsed ?? this.weightUsed,
+  );
 
   factory MealComponentDto.fromJson(Map<String, dynamic> json) =>
       MealComponentDto(
@@ -55,15 +54,15 @@ class MealComponentDto {
       );
 
   Map<String, dynamic> toJson() => {
-        "subMealId": subMealId,
-        "name": name,
-        "caloriePerGram": caloriePerGram,
-        "protienPerGram": protienPerGram,
-        "fatPerGram": fatPerGram,
-        "carbsPerGram": carbsPerGram,
-        "fibrePerGram": fibrePerGram,
-        "weightUsed": weightUsed,
-      };
+    "subMealId": subMealId,
+    "name": name,
+    "caloriePerGram": caloriePerGram,
+    "protienPerGram": protienPerGram,
+    "fatPerGram": fatPerGram,
+    "carbsPerGram": carbsPerGram,
+    "fibrePerGram": fibrePerGram,
+    "weightUsed": weightUsed,
+  };
 }
 
 class CreateMealDto {
@@ -98,20 +97,20 @@ class CreateMealDto {
   });
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'description': description,
-        'type': type,
-        'saveAsTemplate': saveAsTemplate,
-        'consumedDate': consumedDate,
-        'caloriePerGram': caloriePerGram,
-        'protienPerGram': protienPerGram,
-        'fatPerGram': fatPerGram,
-        'carbsPerGram': carbsPerGram,
-        'fibrePerGram': fibrePerGram,
-        'weight': weight,
-        'components': components?.map((e) => e.toJson()).toList(),
-        'originalMealId': originalMealId,
-      };
+    'name': name,
+    'description': description,
+    'type': type,
+    'saveAsTemplate': saveAsTemplate,
+    'consumedDate': consumedDate,
+    'caloriePerGram': caloriePerGram,
+    'protienPerGram': protienPerGram,
+    'fatPerGram': fatPerGram,
+    'carbsPerGram': carbsPerGram,
+    'fibrePerGram': fibrePerGram,
+    'weight': weight,
+    'components': components?.map((e) => e.toJson()).toList(),
+    'originalMealId': originalMealId,
+  };
 }
 
 class UpdateMealDto extends CreateMealDto {
@@ -211,30 +210,29 @@ class MealResponseDto {
     num? fat,
     num? carbs,
     num? fibre,
-  }) =>
-      MealResponseDto(
-        id: id ?? this.id,
-        creatorId: creatorId ?? this.creatorId,
-        name: name ?? this.name,
-        slug: slug ?? this.slug,
-        description: description ?? this.description,
-        type: type ?? this.type,
-        consumedDate: consumedDate ?? this.consumedDate,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        caloriePerGram: caloriePerGram ?? this.caloriePerGram,
-        protienPerGram: protienPerGram ?? this.protienPerGram,
-        fatPerGram: fatPerGram ?? this.fatPerGram,
-        carbsPerGram: carbsPerGram ?? this.carbsPerGram,
-        fibrePerGram: fibrePerGram ?? this.fibrePerGram,
-        weight: weight ?? this.weight,
-        subMeals: subMeals ?? this.subMeals,
-        calories: calories ?? this.calories,
-        protein: protein ?? this.protein,
-        fat: fat ?? this.fat,
-        carbs: carbs ?? this.carbs,
-        fibre: fibre ?? this.fibre,
-      );
+  }) => MealResponseDto(
+    id: id ?? this.id,
+    creatorId: creatorId ?? this.creatorId,
+    name: name ?? this.name,
+    slug: slug ?? this.slug,
+    description: description ?? this.description,
+    type: type ?? this.type,
+    consumedDate: consumedDate ?? this.consumedDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    caloriePerGram: caloriePerGram ?? this.caloriePerGram,
+    protienPerGram: protienPerGram ?? this.protienPerGram,
+    fatPerGram: fatPerGram ?? this.fatPerGram,
+    carbsPerGram: carbsPerGram ?? this.carbsPerGram,
+    fibrePerGram: fibrePerGram ?? this.fibrePerGram,
+    weight: weight ?? this.weight,
+    subMeals: subMeals ?? this.subMeals,
+    calories: calories ?? this.calories,
+    protein: protein ?? this.protein,
+    fat: fat ?? this.fat,
+    carbs: carbs ?? this.carbs,
+    fibre: fibre ?? this.fibre,
+  );
 
   factory MealResponseDto.fromJson(Map<String, dynamic> json) =>
       MealResponseDto(
@@ -262,7 +260,8 @@ class MealResponseDto {
         subMeals: json["subMeals"] == null
             ? []
             : List<BackendSubMeal>.from(
-                json["subMeals"]!.map((x) => BackendSubMeal.fromJson(x))),
+                json["subMeals"]!.map((x) => BackendSubMeal.fromJson(x)),
+              ),
         calories: json["calories"],
         protein: json["protein"],
         fat: json["fat"],
@@ -271,29 +270,30 @@ class MealResponseDto {
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "creatorId": creatorId,
-        "name": name,
-        "slug": slug,
-        "description": description,
-        "type": type,
-        "consumedDate": consumedDate,
-        "createdAt": createdAt?.toIso8601String(),
-        "updatedAt": updatedAt?.toIso8601String(),
-        "caloriePerGram": caloriePerGram,
-        "protienPerGram": protienPerGram,
-        "fatPerGram": fatPerGram,
-        "carbsPerGram": carbsPerGram,
-        "fibrePerGram": fibrePerGram,
-        "weight": weight,
-        "subMeals":
-            subMeals == null ? [] : List<dynamic>.from(subMeals!.map((x) => x)),
-        "calories": calories,
-        "protein": protein,
-        "fat": fat,
-        "carbs": carbs,
-        "fibre": fibre,
-      };
+    "id": id,
+    "creatorId": creatorId,
+    "name": name,
+    "slug": slug,
+    "description": description,
+    "type": type,
+    "consumedDate": consumedDate,
+    "createdAt": createdAt?.toIso8601String(),
+    "updatedAt": updatedAt?.toIso8601String(),
+    "caloriePerGram": caloriePerGram,
+    "protienPerGram": protienPerGram,
+    "fatPerGram": fatPerGram,
+    "carbsPerGram": carbsPerGram,
+    "fibrePerGram": fibrePerGram,
+    "weight": weight,
+    "subMeals": subMeals == null
+        ? []
+        : List<dynamic>.from(subMeals!.map((x) => x)),
+    "calories": calories,
+    "protein": protein,
+    "fat": fat,
+    "carbs": carbs,
+    "fibre": fibre,
+  };
 }
 
 AllMealResponseDto allMealResponseDtoFromJson(String str) =>
@@ -323,21 +323,21 @@ class AllMealResponseDto {
     int? page,
     int? limit,
     int? totalPages,
-  }) =>
-      AllMealResponseDto(
-        data: data ?? this.data,
-        total: total ?? this.total,
-        page: page ?? this.page,
-        limit: limit ?? this.limit,
-        totalPages: totalPages ?? this.totalPages,
-      );
+  }) => AllMealResponseDto(
+    data: data ?? this.data,
+    total: total ?? this.total,
+    page: page ?? this.page,
+    limit: limit ?? this.limit,
+    totalPages: totalPages ?? this.totalPages,
+  );
 
   factory AllMealResponseDto.fromJson(Map<String, dynamic> json) =>
       AllMealResponseDto(
         data: json["data"] == null
             ? []
             : List<MealResponseDto>.from(
-                json["data"]!.map((x) => MealResponseDto.fromJson(x))),
+                json["data"]!.map((x) => MealResponseDto.fromJson(x)),
+              ),
         total: json["total"],
         page: json["page"],
         limit: json["limit"],
@@ -345,14 +345,14 @@ class AllMealResponseDto {
       );
 
   Map<String, dynamic> toJson() => {
-        "data": data == null
-            ? []
-            : List<dynamic>.from(data!.map((x) => x.toJson())),
-        "total": total,
-        "page": page,
-        "limit": limit,
-        "totalPages": totalPages,
-      };
+    "data": data == null
+        ? []
+        : List<dynamic>.from(data!.map((x) => x.toJson())),
+    "total": total,
+    "page": page,
+    "limit": limit,
+    "totalPages": totalPages,
+  };
 }
 
 class BackendSubMeal {
@@ -376,32 +376,31 @@ class BackendSubMeal {
     String? parentMealId,
     String? subMealId,
     MealResponseDto? subMeal,
-  }) =>
-      BackendSubMeal(
-        id: id ?? this.id,
-        weightUsed: weightUsed ?? this.weightUsed,
-        parentMealId: parentMealId ?? this.parentMealId,
-        subMealId: subMealId ?? this.subMealId,
-        subMeal: subMeal ?? this.subMeal,
-      );
+  }) => BackendSubMeal(
+    id: id ?? this.id,
+    weightUsed: weightUsed ?? this.weightUsed,
+    parentMealId: parentMealId ?? this.parentMealId,
+    subMealId: subMealId ?? this.subMealId,
+    subMeal: subMeal ?? this.subMeal,
+  );
 
   factory BackendSubMeal.fromJson(Map<String, dynamic> json) => BackendSubMeal(
-        id: json["id"],
-        weightUsed: json["weightUsed"],
-        parentMealId: json["parentMealId"],
-        subMealId: json["subMealId"],
-        subMeal: json["subMeal"] == null
-            ? null
-            : MealResponseDto.fromJson(json["subMeal"]),
-      );
+    id: json["id"],
+    weightUsed: json["weightUsed"],
+    parentMealId: json["parentMealId"],
+    subMealId: json["subMealId"],
+    subMeal: json["subMeal"] == null
+        ? null
+        : MealResponseDto.fromJson(json["subMeal"]),
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "weightUsed": weightUsed,
-        "parentMealId": parentMealId,
-        "subMealId": subMealId,
-        "subMeal": subMeal?.toJson(),
-      };
+    "id": id,
+    "weightUsed": weightUsed,
+    "parentMealId": parentMealId,
+    "subMealId": subMealId,
+    "subMeal": subMeal?.toJson(),
+  };
 }
 
 DailyMealDto dailyMealDtoFromJson(String str) =>
@@ -413,35 +412,29 @@ class DailyMealDto {
   Summary? summary;
   List<MealResponseDto>? meals;
 
-  DailyMealDto({
-    this.summary,
-    this.meals,
-  });
+  DailyMealDto({this.summary, this.meals});
 
-  DailyMealDto copyWith({
-    Summary? summary,
-    List<MealResponseDto>? meals,
-  }) =>
+  DailyMealDto copyWith({Summary? summary, List<MealResponseDto>? meals}) =>
       DailyMealDto(
         summary: summary ?? this.summary,
         meals: meals ?? this.meals,
       );
 
   factory DailyMealDto.fromJson(Map<String, dynamic> json) => DailyMealDto(
-        summary:
-            json["summary"] == null ? null : Summary.fromJson(json["summary"]),
-        meals: json["meals"] == null
-            ? []
-            : List<MealResponseDto>.from(
-                json["meals"]!.map((x) => MealResponseDto.fromJson(x))),
-      );
+    summary: json["summary"] == null ? null : Summary.fromJson(json["summary"]),
+    meals: json["meals"] == null
+        ? []
+        : List<MealResponseDto>.from(
+            json["meals"]!.map((x) => MealResponseDto.fromJson(x)),
+          ),
+  );
 
   Map<String, dynamic> toJson() => {
-        "summary": summary?.toJson(),
-        "meals": meals == null
-            ? []
-            : List<dynamic>.from(meals!.map((x) => x.toJson())),
-      };
+    "summary": summary?.toJson(),
+    "meals": meals == null
+        ? []
+        : List<dynamic>.from(meals!.map((x) => x.toJson())),
+  };
 }
 
 class Summary {
@@ -451,13 +444,7 @@ class Summary {
   int? carbs;
   int? fibre;
 
-  Summary({
-    this.calories,
-    this.protein,
-    this.fat,
-    this.carbs,
-    this.fibre,
-  });
+  Summary({this.calories, this.protein, this.fat, this.carbs, this.fibre});
 
   Summary copyWith({
     double? calories,
@@ -465,28 +452,27 @@ class Summary {
     int? fat,
     int? carbs,
     int? fibre,
-  }) =>
-      Summary(
-        calories: calories ?? this.calories,
-        protein: protein ?? this.protein,
-        fat: fat ?? this.fat,
-        carbs: carbs ?? this.carbs,
-        fibre: fibre ?? this.fibre,
-      );
+  }) => Summary(
+    calories: calories ?? this.calories,
+    protein: protein ?? this.protein,
+    fat: fat ?? this.fat,
+    carbs: carbs ?? this.carbs,
+    fibre: fibre ?? this.fibre,
+  );
 
   factory Summary.fromJson(Map<String, dynamic> json) => Summary(
-        calories: json["calories"]?.toDouble(),
-        protein: json["protein"],
-        fat: json["fat"],
-        carbs: json["carbs"],
-        fibre: json["fibre"],
-      );
+    calories: json["calories"]?.toDouble(),
+    protein: json["protein"],
+    fat: json["fat"],
+    carbs: json["carbs"],
+    fibre: json["fibre"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "calories": calories,
-        "protein": protein,
-        "fat": fat,
-        "carbs": carbs,
-        "fibre": fibre,
-      };
+    "calories": calories,
+    "protein": protein,
+    "fat": fat,
+    "carbs": carbs,
+    "fibre": fibre,
+  };
 }

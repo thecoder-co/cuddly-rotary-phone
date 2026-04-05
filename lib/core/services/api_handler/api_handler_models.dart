@@ -36,12 +36,17 @@ class ErrorModel {
   factory ErrorModel.fromJson(dynamic data) {
     if (data is String) {
       return ErrorModel(
-          errorCode: '', message: data, errorField: '', token: '');
+        errorCode: '',
+        message: data,
+        errorField: '',
+        token: '',
+      );
     }
     return ErrorModel(
-        errorCode: data['errorCode'] ?? '',
-        message: data['message'] ?? '',
-        errorField: data['errorField'] ?? '',
-        token: data['token'] ?? '');
+      errorCode: data['errorCode'] ?? '',
+      message: data['message'] ?? '',
+      errorField: data['errorField'] ?? '',
+      token: data['token'] ?? '',
+    );
   }
 }

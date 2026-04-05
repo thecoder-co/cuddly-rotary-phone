@@ -43,10 +43,7 @@ class _AppIconButtonState extends State<AppIconButton> {
           shape: BoxShape.circle,
           color: Colors.white,
         ),
-        child: SvgPicture.asset(
-          widget.svgPath,
-          color: Colors.white,
-        ),
+        child: SvgPicture.asset(widget.svgPath, color: Colors.white),
       ),
     );
   }

@@ -32,35 +32,32 @@ class _RatingBarState extends State<RatingBar> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(
-        widget.length,
-        (index) {
-          return Padding(
-            padding: index != widget.length - 1 && widget.spacing != null
-                ? EdgeInsets.only(right: widget.spacing ?? 4)
-                : const EdgeInsets.only(),
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  value = index + 1;
-                });
-                widget.onRatingChange(value);
-              },
-              child: value > index
-                  ? Icon(
-                      Icons.star_rounded,
-                      color: AppColors.primary,
-                      size: widget.size,
-                    )
-                  : Icon(
-                      Icons.star_outline_rounded,
-                      color: AppColors.greyQuatinary,
-                      size: widget.size,
-                    ),
-            ),
-          );
-        },
-      ),
+      children: List.generate(widget.length, (index) {
+        return Padding(
+          padding: index != widget.length - 1 && widget.spacing != null
+              ? EdgeInsets.only(right: widget.spacing ?? 4)
+              : const EdgeInsets.only(),
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                value = index + 1;
+              });
+              widget.onRatingChange(value);
+            },
+            child: value > index
+                ? Icon(
+                    Icons.star_rounded,
+                    color: AppColors.primary,
+                    size: widget.size,
+                  )
+                : Icon(
+                    Icons.star_outline_rounded,
+                    color: AppColors.greyQuatinary,
+                    size: widget.size,
+                  ),
+          ),
+        );
+      }),
     );
     // return SizedBox(
     //   height: widget.size,

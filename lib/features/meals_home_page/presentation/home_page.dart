@@ -20,6 +20,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
+      backgroundColor: isDark
+          ? CupertinoColors.black
+          : CupertinoColors.systemGroupedBackground,
       navigationBar: CupertinoNavigationBar(
         backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
         border: Border(

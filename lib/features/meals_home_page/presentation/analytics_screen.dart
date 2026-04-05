@@ -24,6 +24,9 @@ class _MealAnalyticsScreenState extends ConsumerState<MealAnalyticsScreen> {
     final analytics = ref.watch(analyticsProvider(_period));
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return CupertinoPageScaffold(
+      backgroundColor: isDark
+          ? CupertinoColors.black
+          : CupertinoColors.systemGroupedBackground,
       child: Material(
         color: Colors.transparent,
         child: CustomScrollView(
@@ -47,12 +50,18 @@ class _MealAnalyticsScreenState extends ConsumerState<MealAnalyticsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(CupertinoIcons.wifi_slash,
-                          size: 48, color: Color(0xFF91BF91)),
+                      const Icon(
+                        CupertinoIcons.wifi_slash,
+                        size: 48,
+                        color: Color(0xFF91BF91),
+                      ),
                       const SizedBox(height: 12),
-                      Text('Could not load analytics',
-                          style: CustomTextStyle.textmedium16.withColor(
-                              isDark ? Colors.white : AppColors.primary700)),
+                      Text(
+                        'Could not load analytics',
+                        style: CustomTextStyle.textmedium16.withColor(
+                          isDark ? Colors.white : AppColors.primary700,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -92,7 +101,7 @@ class _AnalyticsAppBar extends StatelessWidget {
       elevation: 0,
       expandedHeight: 0,
       toolbarHeight: 56,
-      automaticallyImplyLeading: false,
+      // automaticallyImplyLeading: false,
       title: Text(
         'Analytics',
         style: TextStyle(
@@ -111,14 +120,17 @@ class _AnalyticsAppBar extends StatelessWidget {
             onValueChanged: (v) {
               if (v != null) onPeriodChanged(v);
             },
-            backgroundColor:
-                isDark ? const Color(0xFF2C2C2E) : CupertinoColors.systemFill,
+            backgroundColor: isDark
+                ? const Color(0xFF2C2C2E)
+                : CupertinoColors.systemFill,
             thumbColor: AppColors.primary,
             children: {
               for (final p in AnalyticsPeriod.values)
                 p: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 4,
+                  ),
                   child: Text(
                     _labels[p]!,
                     style: TextStyle(
@@ -127,8 +139,8 @@ class _AnalyticsAppBar extends StatelessWidget {
                       color: period == p
                           ? Colors.white
                           : (isDark
-                              ? Colors.white.withOpacity(0.65)
-                              : AppColors.primary700),
+                                ? Colors.white.withOpacity(0.65)
+                                : AppColors.primary700),
                     ),
                   ),
                 ),
@@ -241,10 +253,12 @@ class _AnalyticsBody extends StatelessWidget {
             ...topMeals.asMap().entries.map((e) {
               final rank = e.key + 1;
               final meal = e.value;
-              final maxCount =
-                  topMeals.map((m) => m.count ?? 0).reduce(math.max);
-              final fraction =
-                  maxCount > 0 ? (meal.count ?? 0) / maxCount : 0.0;
+              final maxCount = topMeals
+                  .map((m) => m.count ?? 0)
+                  .reduce(math.max);
+              final fraction = maxCount > 0
+                  ? (meal.count ?? 0) / maxCount
+                  : 0.0;
               return _TopMealRow(rank: rank, meal: meal, fraction: fraction);
             }),
           ],
@@ -267,9 +281,12 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Text(title,
-        style: CustomTextStyle.textmedium16.w700
-            .withColor(isDark ? Colors.white : AppColors.primary900));
+    return Text(
+      title,
+      style: CustomTextStyle.textmedium16.w700.withColor(
+        isDark ? Colors.white : AppColors.primary900,
+      ),
+    );
   }
 }
 
@@ -315,17 +332,24 @@ class _StatCard extends StatelessWidget {
             child: Icon(icon, color: color, size: 18),
           ),
           const SizedBox(height: 12),
-          Text(value,
-              style: CustomTextStyle.textxLarge20.w700.withColor(color)),
+          Text(
+            value,
+            style: CustomTextStyle.textxLarge20.w700.withColor(color),
+          ),
           const SizedBox(height: 2),
-          Text(unit,
-              style: CustomTextStyle.textsmall14
-                  .withColor(AppColors.greyTertiary)),
+          Text(
+            unit,
+            style: CustomTextStyle.textsmall14.withColor(
+              AppColors.greyTertiary,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(label,
-              style: CustomTextStyle.textsmall14
-                  .withColor(AppColors.greySecondary)
-                  .copyWith(fontSize: 11)),
+          Text(
+            label,
+            style: CustomTextStyle.textsmall14
+                .withColor(AppColors.greySecondary)
+                .copyWith(fontSize: 11),
+          ),
         ],
       ),
     );
@@ -337,8 +361,11 @@ class _TopMealRow extends StatelessWidget {
   final TopMeal meal;
   final double fraction;
 
-  const _TopMealRow(
-      {required this.rank, required this.meal, required this.fraction});
+  const _TopMealRow({
+    required this.rank,
+    required this.meal,
+    required this.fraction,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -374,8 +401,10 @@ class _TopMealRow extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: Text('$rank',
-                  style: CustomTextStyle.textsmall14.w700.withColor(rankColor)),
+              child: Text(
+                '$rank',
+                style: CustomTextStyle.textsmall14.w700.withColor(rankColor),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -383,9 +412,12 @@ class _TopMealRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(meal.name ?? '—',
-                    style: CustomTextStyle.textsmall14.w600.withColor(
-                        isDark ? Colors.white : AppColors.primary900)),
+                Text(
+                  meal.name ?? '—',
+                  style: CustomTextStyle.textsmall14.w600.withColor(
+                    isDark ? Colors.white : AppColors.primary900,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
@@ -400,9 +432,12 @@ class _TopMealRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text('×${meal.count}',
-              style: CustomTextStyle.textsmall14.w700
-                  .withColor(AppColors.primary600)),
+          Text(
+            '×${meal.count}',
+            style: CustomTextStyle.textsmall14.w700.withColor(
+              AppColors.primary600,
+            ),
+          ),
         ],
       ),
     );
@@ -420,14 +455,14 @@ class _TrendChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (trends.isEmpty) return const SizedBox();
-    
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final values = trends.map((t) => t.calories ?? 0).toList();
     final maxVal = values.isNotEmpty ? values.reduce(math.max) : 0;
-    
+
     return Container(
-      height: 240, 
+      height: 240,
       padding: const EdgeInsets.only(top: 16, right: 24, left: 16, bottom: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -445,9 +480,18 @@ class _TrendChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.show_chart_rounded, color: AppColors.primary, size: 16),
+              const Icon(
+                Icons.show_chart_rounded,
+                color: AppColors.primary,
+                size: 16,
+              ),
               const SizedBox(width: 6),
-              Text('Calories over time', style: CustomTextStyle.textsmall14.withColor(AppColors.primary700)),
+              Text(
+                'Calories over time',
+                style: CustomTextStyle.textsmall14.withColor(
+                  AppColors.primary700,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -467,23 +511,35 @@ class _TrendChart extends StatelessWidget {
                 ),
                 titlesData: FlTitlesData(
                   show: true,
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 22,
-                      interval: (trends.length > 5) ? (trends.length / 5).floorToDouble().clamp(1.0, double.infinity) : 1.0,
+                      interval: (trends.length > 5)
+                          ? (trends.length / 5).floorToDouble().clamp(
+                              1.0,
+                              double.infinity,
+                            )
+                          : 1.0,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (index < 0 || index >= trends.length) return const SizedBox.shrink();
+                        if (index < 0 || index >= trends.length)
+                          return const SizedBox.shrink();
                         final date = trends[index].date;
                         if (date == null) return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
                             '${date.month}/${date.day}',
-                            style: CustomTextStyle.textsmall14.withColor(AppColors.greyTertiary).copyWith(fontSize: 10),
+                            style: CustomTextStyle.textsmall14
+                                .withColor(AppColors.greyTertiary)
+                                .copyWith(fontSize: 10),
                           ),
                         );
                       },
@@ -496,7 +552,9 @@ class _TrendChart extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           value.toInt().toString(),
-                          style: CustomTextStyle.textsmall14.withColor(AppColors.greyTertiary).copyWith(fontSize: 10),
+                          style: CustomTextStyle.textsmall14
+                              .withColor(AppColors.greyTertiary)
+                              .copyWith(fontSize: 10),
                           textAlign: TextAlign.right,
                         );
                       },
@@ -507,7 +565,10 @@ class _TrendChart extends StatelessWidget {
                 lineBarsData: [
                   LineChartBarData(
                     spots: trends.asMap().entries.map((e) {
-                      return FlSpot(e.key.toDouble(), (e.value.calories ?? 0).toDouble());
+                      return FlSpot(
+                        e.key.toDouble(),
+                        (e.value.calories ?? 0).toDouble(),
+                      );
                     }).toList(),
                     isCurved: true,
                     color: AppColors.primary,
@@ -524,7 +585,11 @@ class _TrendChart extends StatelessWidget {
                             strokeColor: AppColors.primary,
                           );
                         }
-                        return FlDotCirclePainter(radius: 0, color: Colors.transparent, strokeWidth: 0);
+                        return FlDotCirclePainter(
+                          radius: 0,
+                          color: Colors.transparent,
+                          strokeWidth: 0,
+                        );
                       },
                     ),
                     belowBarData: BarAreaData(
@@ -542,13 +607,16 @@ class _TrendChart extends StatelessWidget {
                 ],
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (_) => isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                    getTooltipColor: (_) =>
+                        isDark ? const Color(0xFF2C2C2E) : Colors.white,
                     tooltipRoundedRadius: 8,
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
                         return LineTooltipItem(
                           '${spot.y.toInt()} kcal',
-                          CustomTextStyle.textsmall14.w700.withColor(AppColors.primary),
+                          CustomTextStyle.textsmall14.w700.withColor(
+                            AppColors.primary,
+                          ),
                         );
                       }).toList();
                     },

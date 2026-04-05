@@ -4,7 +4,7 @@ class PythonList<T> extends ListBase<T> {
   final List<T> _list;
 
   PythonList([int? length, T? fill])
-      : _list = List<T>.filled(length ?? 0, fill as T);
+    : _list = List<T>.filled(length ?? 0, fill as T);
 
   @override
   int get length => _list.length;
