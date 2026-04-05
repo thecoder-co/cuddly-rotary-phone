@@ -1,4 +1,5 @@
 import 'package:calorie_tracker/core/providers/theme_provider.dart';
+import 'package:calorie_tracker/features/workout/providers/search_exercises_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:calorie_tracker/features/workout/models/exercise.dart';
 import 'package:flutter/cupertino.dart';

@@ -6,6 +6,7 @@ import 'package:calorie_tracker/features/workout/presentation/exercise_analytics
 import 'package:calorie_tracker/features/workout/presentation/widgets/exercise_set_tile.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_analytics_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
+import 'package:calorie_tracker/features/workout/providers/workout_set_provider.dart';
 import 'package:calorie_tracker/packages/buttons/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

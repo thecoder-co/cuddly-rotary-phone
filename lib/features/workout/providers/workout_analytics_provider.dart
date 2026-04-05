@@ -1,5 +1,6 @@
 import 'package:calorie_tracker/features/workout/models/workout_set.dart';
 import 'package:calorie_tracker/features/workout/models/workout_analytics_dto.dart';
+import 'package:calorie_tracker/features/workout/providers/workout_set_provider.dart';
 import 'package:calorie_tracker/features/workout/repo/workout_repo.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

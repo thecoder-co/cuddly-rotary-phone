@@ -2,6 +2,7 @@ import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/features/workout/models/exercise.dart';
 import 'package:calorie_tracker/features/workout/models/program.dart';
 import 'package:calorie_tracker/features/workout/presentation/add_exercise_screen.dart';
+import 'package:calorie_tracker/features/workout/providers/program_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 

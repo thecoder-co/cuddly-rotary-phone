@@ -1,5 +1,6 @@
 import 'package:calorie_tracker/features/workout/presentation/exercises_screen.dart';
 import 'package:calorie_tracker/features/workout/presentation/add_program_screen.dart';
+import 'package:calorie_tracker/features/workout/providers/program_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 
 import 'package:calorie_tracker/packages/packages.dart';
@@ -27,9 +28,7 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
         color: Colors.transparent,
         child: CustomScrollView(
           slivers: [
-            const CupertinoSliverNavigationBar(
-              largeTitle: Text('My Workouts'),
-            ),
+            const CupertinoSliverNavigationBar(largeTitle: Text('My Workouts')),
             SliverSafeArea(
               top: false,
               sliver: SliverToBoxAdapter(
@@ -50,7 +49,10 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                             horizontal: 16,
                             vertical: 12,
                           ),
-                          leading: Icon(CupertinoIcons.add, color: primaryColor),
+                          leading: Icon(
+                            CupertinoIcons.add,
+                            color: primaryColor,
+                          ),
                           title: Text(
                             'New Workout...',
                             style: TextStyle(
@@ -100,8 +102,9 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                             Navigator.push(
                               context,
                               CupertinoPageRoute(
-                                builder: (context) =>
-                                    const ExercisesScreen(title: 'My Exercises'),
+                                builder: (context) => const ExercisesScreen(
+                                  title: 'My Exercises',
+                                ),
                               ),
                             );
                           },
@@ -124,7 +127,9 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                                           context,
                                           CupertinoPageRoute(
                                             builder: (context) =>
-                                                AddProgramScreen(program: program),
+                                                AddProgramScreen(
+                                                  program: program,
+                                                ),
                                           ),
                                         );
                                       },
@@ -146,15 +151,19 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                                         additionalInfo: Text(
                                           '${program.exercises.length}',
                                         ),
-                                        trailing: const CupertinoListTileChevron(),
+                                        trailing:
+                                            const CupertinoListTileChevron(),
                                         onTap: () {
                                           Navigator.push(
                                             context,
                                             CupertinoPageRoute(
-                                              builder: (context) => ExercisesScreen(
-                                                title: program.name ?? 'Program',
-                                                program: program,
-                                              ),
+                                              builder: (context) =>
+                                                  ExercisesScreen(
+                                                    title:
+                                                        program.name ??
+                                                        'Program',
+                                                    program: program,
+                                                  ),
                                             ),
                                           );
                                         },

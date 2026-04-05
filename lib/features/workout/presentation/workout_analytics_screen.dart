@@ -4,6 +4,7 @@ import 'package:calorie_tracker/features/workout/presentation/edit_set_screen.da
 import 'package:calorie_tracker/features/workout/presentation/widgets/exercise_set_tile.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:calorie_tracker/features/meals_home_page/presentation/widgets/date_selector.dart';
+import 'package:calorie_tracker/features/workout/providers/workout_set_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

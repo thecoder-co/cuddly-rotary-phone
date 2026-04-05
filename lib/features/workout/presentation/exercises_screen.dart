@@ -2,8 +2,10 @@ import 'package:calorie_tracker/features/workout/models/program.dart';
 import 'package:calorie_tracker/features/workout/presentation/add_exercise_screen.dart';
 import 'package:calorie_tracker/features/workout/presentation/add_program_screen.dart';
 import 'package:calorie_tracker/features/workout/presentation/exercise_details_screen.dart';
+import 'package:calorie_tracker/features/workout/providers/program_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:calorie_tracker/features/workout/models/exercise.dart';
+import 'package:calorie_tracker/features/workout/providers/workout_set_provider.dart';
 import 'package:calorie_tracker/features/workout/services/workout_sync_service.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -53,7 +55,9 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                       child: CupertinoSearchTextField(
                         controller: _searchController,
                         placeholder: 'Search',
-                        style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
                         onChanged: (value) {
                           setState(() {});
                         },
@@ -65,7 +69,9 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                           final query = _searchController.text.toLowerCase();
                           final filtered = exerciseList
                               .where(
-                                (e) => (e.name ?? '').toLowerCase().contains(query),
+                                (e) => (e.name ?? '').toLowerCase().contains(
+                                  query,
+                                ),
                               )
                               .toList();
 
@@ -114,11 +120,15 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                                   onPressed: (_) {},
                                                   backgroundColor: isDark
                                                       ? Colors.green.shade900
-                                                            .withValues(alpha: 0.5)
+                                                            .withValues(
+                                                              alpha: 0.5,
+                                                            )
                                                       : Colors.green.shade100,
                                                   foregroundColor:
-                                                      CupertinoColors.systemGreen,
-                                                  icon: CupertinoIcons.circle_fill,
+                                                      CupertinoColors
+                                                          .systemGreen,
+                                                  icon: CupertinoIcons
+                                                      .circle_fill,
                                                   label: 'Record',
                                                 ),
                                               ],
@@ -128,19 +138,25 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                               children: [
                                                 SlidableAction(
                                                   onPressed: (_) {
-                                                    if (widget.program != null) {
+                                                    if (widget.program !=
+                                                        null) {
                                                       final idToRemove =
                                                           exercise.backendId ??
-                                                          exercise.id.toString();
+                                                          exercise.id
+                                                              .toString();
                                                       final updatedExercises =
-                                                          widget.program!.exercises
+                                                          widget
+                                                              .program!
+                                                              .exercises
                                                               .where(
                                                                 (pe) =>
                                                                     pe.exerciseId !=
                                                                     idToRemove,
                                                               )
                                                               .toList();
-                                                      widget.program!.exercises =
+                                                      widget
+                                                              .program!
+                                                              .exercises =
                                                           updatedExercises;
                                                       ref
                                                           .read(
@@ -168,20 +184,24 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                                   },
                                                   backgroundColor: isDark
                                                       ? Colors.red.shade900
-                                                            .withValues(alpha: 0.5)
+                                                            .withValues(
+                                                              alpha: 0.5,
+                                                            )
                                                       : Colors.red.shade100,
-                                                  foregroundColor: CupertinoColors
-                                                      .destructiveRed,
+                                                  foregroundColor:
+                                                      CupertinoColors
+                                                          .destructiveRed,
                                                   icon: CupertinoIcons.delete,
                                                   label: 'Delete',
                                                 ),
                                               ],
                                             ),
                                             child: CupertinoListTile(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 16,
-                                                vertical: 12,
-                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 12,
+                                                  ),
                                               title: Text(
                                                 exercise.name ?? 'Unnamed',
                                                 style: TextStyle(
@@ -191,7 +211,8 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                                       : CupertinoColors.black,
                                                 ),
                                               ),
-                                              subtitle: exercise.description != null
+                                              subtitle:
+                                                  exercise.description != null
                                                   ? Text(
                                                       exercise.description!,
                                                       style: const TextStyle(
@@ -205,7 +226,8 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                                     ? _formatDate(lastUsed)
                                                     : '',
                                                 style: const TextStyle(
-                                                  color: CupertinoColors.systemGrey,
+                                                  color: CupertinoColors
+                                                      .systemGrey,
                                                 ),
                                               ),
                                               trailing:
@@ -239,7 +261,8 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                         vertical: 16,
                                       ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Icon(
                                             CupertinoIcons.add,
@@ -270,18 +293,24 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                           );
                                         } else {
                                           List<Exercise>? selected =
-                                              await Navigator.push<List<Exercise>?>(
+                                              await Navigator.push<
+                                                List<Exercise>?
+                                              >(
                                                 context,
                                                 CupertinoPageRoute(
                                                   builder: (_) => AddExerciseScreen(
-                                                    initialSelectedIds: exerciseList
-                                                        .map(
-                                                          (e) => e.backendId ?? '',
-                                                        )
-                                                        .where(
-                                                          (id) => id.isNotEmpty,
-                                                        )
-                                                        .toList(),
+                                                    initialSelectedIds:
+                                                        exerciseList
+                                                            .map(
+                                                              (e) =>
+                                                                  e.backendId ??
+                                                                  '',
+                                                            )
+                                                            .where(
+                                                              (id) =>
+                                                                  id.isNotEmpty,
+                                                            )
+                                                            .toList(),
                                                   ),
                                                 ),
                                               );
