@@ -28,6 +28,7 @@ class Meal {
   double? caloriePerGram;
   double? weight;
   Macros? macros;
+  String? image;
 
   @ignore
   bool withoutWeight = false;
@@ -110,6 +111,7 @@ class Meal {
     this.backendId,
     this.syncStatus = SyncStatus.pendingCreate,
     this.type = 'LOGENTRY',
+    this.image,
   });
 
   Meal copyWith({
@@ -124,6 +126,7 @@ class Meal {
     String? backendId,
     SyncStatus? syncStatus,
     String? type,
+    String? image,
   }) {
     return Meal(
       date: date ?? this.date,
@@ -137,6 +140,7 @@ class Meal {
       backendId: backendId ?? this.backendId,
       syncStatus: syncStatus ?? this.syncStatus,
       type: type ?? this.type,
+      image: image ?? this.image,
     );
   }
 }

@@ -32,36 +32,41 @@ const ExerciseSchema = CollectionSchema(
       name: r'description',
       type: IsarType.string,
     ),
-    r'jsonDesc': PropertySchema(
+    r'images': PropertySchema(
       id: 3,
+      name: r'images',
+      type: IsarType.stringList,
+    ),
+    r'jsonDesc': PropertySchema(
+      id: 4,
       name: r'jsonDesc',
       type: IsarType.string,
     ),
     r'localSetsCount': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'localSetsCount',
       type: IsarType.long,
     ),
-    r'name': PropertySchema(id: 5, name: r'name', type: IsarType.string),
+    r'name': PropertySchema(id: 6, name: r'name', type: IsarType.string),
     r'oneRmFormula': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'oneRmFormula',
       type: IsarType.string,
     ),
-    r'ownerId': PropertySchema(id: 7, name: r'ownerId', type: IsarType.string),
+    r'ownerId': PropertySchema(id: 8, name: r'ownerId', type: IsarType.string),
     r'popularity': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'popularity',
       type: IsarType.double,
     ),
     r'syncStatus': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'syncStatus',
       type: IsarType.byte,
       enumMap: _ExercisesyncStatusEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
@@ -115,6 +120,18 @@ int _exerciseEstimateSize(
     }
   }
   {
+    final list = object.images;
+    if (list != null) {
+      bytesCount += 3 + list.length * 3;
+      {
+        for (var i = 0; i < list.length; i++) {
+          final value = list[i];
+          bytesCount += value.length * 3;
+        }
+      }
+    }
+  }
+  {
     final value = object.jsonDesc;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -150,14 +167,15 @@ void _exerciseSerialize(
   writer.writeString(offsets[0], object.backendId);
   writer.writeDateTime(offsets[1], object.createdAt);
   writer.writeString(offsets[2], object.description);
-  writer.writeString(offsets[3], object.jsonDesc);
-  writer.writeLong(offsets[4], object.localSetsCount);
-  writer.writeString(offsets[5], object.name);
-  writer.writeString(offsets[6], object.oneRmFormula);
-  writer.writeString(offsets[7], object.ownerId);
-  writer.writeDouble(offsets[8], object.popularity);
-  writer.writeByte(offsets[9], object.syncStatus.index);
-  writer.writeDateTime(offsets[10], object.updatedAt);
+  writer.writeStringList(offsets[3], object.images);
+  writer.writeString(offsets[4], object.jsonDesc);
+  writer.writeLong(offsets[5], object.localSetsCount);
+  writer.writeString(offsets[6], object.name);
+  writer.writeString(offsets[7], object.oneRmFormula);
+  writer.writeString(offsets[8], object.ownerId);
+  writer.writeDouble(offsets[9], object.popularity);
+  writer.writeByte(offsets[10], object.syncStatus.index);
+  writer.writeDateTime(offsets[11], object.updatedAt);
 }
 
 Exercise _exerciseDeserialize(
@@ -170,16 +188,17 @@ Exercise _exerciseDeserialize(
     backendId: reader.readStringOrNull(offsets[0]),
     createdAt: reader.readDateTimeOrNull(offsets[1]),
     description: reader.readStringOrNull(offsets[2]),
-    jsonDesc: reader.readStringOrNull(offsets[3]),
-    localSetsCount: reader.readLongOrNull(offsets[4]),
-    name: reader.readStringOrNull(offsets[5]),
-    oneRmFormula: reader.readStringOrNull(offsets[6]),
-    ownerId: reader.readStringOrNull(offsets[7]),
-    popularity: reader.readDoubleOrNull(offsets[8]),
+    images: reader.readStringList(offsets[3]),
+    jsonDesc: reader.readStringOrNull(offsets[4]),
+    localSetsCount: reader.readLongOrNull(offsets[5]),
+    name: reader.readStringOrNull(offsets[6]),
+    oneRmFormula: reader.readStringOrNull(offsets[7]),
+    ownerId: reader.readStringOrNull(offsets[8]),
+    popularity: reader.readDoubleOrNull(offsets[9]),
     syncStatus:
-        _ExercisesyncStatusValueEnumMap[reader.readByteOrNull(offsets[9])] ??
+        _ExercisesyncStatusValueEnumMap[reader.readByteOrNull(offsets[10])] ??
         SyncStatus.pendingCreate,
-    updatedAt: reader.readDateTimeOrNull(offsets[10]),
+    updatedAt: reader.readDateTimeOrNull(offsets[11]),
   );
   object.id = id;
   return object;
@@ -199,22 +218,24 @@ P _exerciseDeserializeProp<P>(
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset)) as P;
     case 4:
-      return (reader.readLongOrNull(offset)) as P;
-    case 5:
       return (reader.readStringOrNull(offset)) as P;
+    case 5:
+      return (reader.readLongOrNull(offset)) as P;
     case 6:
       return (reader.readStringOrNull(offset)) as P;
     case 7:
       return (reader.readStringOrNull(offset)) as P;
     case 8:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 9:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 10:
       return (_ExercisesyncStatusValueEnumMap[reader.readByteOrNull(offset)] ??
               SyncStatus.pendingCreate)
           as P;
-    case 10:
+    case 11:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -916,6 +937,222 @@ extension ExerciseQueryFilter
           upper: upper,
           includeUpper: includeUpper,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'images'),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'images'),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'images',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition>
+  imagesElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'images',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'images',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'images',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition>
+  imagesElementStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'images',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'images',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesElementContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'images',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesElementMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'images',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition>
+  imagesElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'images', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition>
+  imagesElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'images', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesLengthEqualTo(
+    int length,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'images', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'images', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'images', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'images', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition>
+  imagesLengthGreaterThan(int length, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'images', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> imagesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'images',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
       );
     });
   }
@@ -2180,6 +2417,12 @@ extension ExerciseQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Exercise, Exercise, QDistinct> distinctByImages() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'images');
+    });
+  }
+
   QueryBuilder<Exercise, Exercise, QDistinct> distinctByJsonDesc({
     bool caseSensitive = true,
   }) {
@@ -2260,6 +2503,12 @@ extension ExerciseQueryProperty
   QueryBuilder<Exercise, String?, QQueryOperations> descriptionProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'description');
+    });
+  }
+
+  QueryBuilder<Exercise, List<String>?, QQueryOperations> imagesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'images');
     });
   }
 

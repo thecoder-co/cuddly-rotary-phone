@@ -79,6 +79,7 @@ class CreateMealDto {
   final double? weight;
   final List<MealComponentDto>? components;
   final String? originalMealId;
+  final String? image;
 
   CreateMealDto({
     this.name,
@@ -94,6 +95,7 @@ class CreateMealDto {
     this.weight,
     this.components,
     this.originalMealId,
+    this.image,
   });
 
   Map<String, dynamic> toJson() => {
@@ -110,6 +112,7 @@ class CreateMealDto {
     'weight': weight,
     'components': components?.map((e) => e.toJson()).toList(),
     'originalMealId': originalMealId,
+    'image': image,
   };
 }
 
@@ -128,6 +131,7 @@ class UpdateMealDto extends CreateMealDto {
     super.weight,
     super.components,
     super.originalMealId,
+    super.image,
   });
 }
 
@@ -163,6 +167,7 @@ class MealResponseDto {
   num? fat;
   num? carbs;
   num? fibre;
+  String? image;
 
   MealResponseDto({
     this.id,
@@ -186,6 +191,7 @@ class MealResponseDto {
     this.fat,
     this.carbs,
     this.fibre,
+    this.image,
   });
 
   MealResponseDto copyWith({
@@ -210,6 +216,7 @@ class MealResponseDto {
     num? fat,
     num? carbs,
     num? fibre,
+    String? image,
   }) => MealResponseDto(
     id: id ?? this.id,
     creatorId: creatorId ?? this.creatorId,
@@ -232,6 +239,7 @@ class MealResponseDto {
     fat: fat ?? this.fat,
     carbs: carbs ?? this.carbs,
     fibre: fibre ?? this.fibre,
+    image: image ?? this.image,
   );
 
   factory MealResponseDto.fromJson(Map<String, dynamic> json) =>
@@ -267,6 +275,7 @@ class MealResponseDto {
         fat: json["fat"],
         carbs: json["carbs"],
         fibre: json["fibre"],
+        image: json["image"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -293,6 +302,7 @@ class MealResponseDto {
     "fat": fat,
     "carbs": carbs,
     "fibre": fibre,
+    "image": image,
   };
 }
 

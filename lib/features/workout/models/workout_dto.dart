@@ -155,7 +155,9 @@ class ExerciseDto {
     popularity: json["popularity"]?.toDouble(),
     ownerId: json["ownerId"],
     jsonDesc: json["jsonDesc"],
-    images: json["images"],
+    images: json["images"] != null
+        ? List<String>.from(json["images"].map((x) => x))
+        : null,
     oneRmFormula: json["oneRmFormula"],
     description: json["description"],
     createdAt: json["createdAt"] == null

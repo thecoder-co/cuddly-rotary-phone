@@ -5,6 +5,7 @@ import 'package:calorie_tracker/features/auth/presentation/login_screen.dart';
 import 'package:calorie_tracker/features/meals/repo/meal_repo.dart';
 import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
 import 'package:calorie_tracker/features/meals/services/meal_sync_service.dart';
+import 'package:calorie_tracker/core/services/api_handler/upload_service.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 
 void main() async {
@@ -14,6 +15,7 @@ void main() async {
     MealSyncService(
       localRepo: LocalMealRepo(),
       cloudRepo: MealCloudRepo(),
+      uploadService: UploadService(),
     ).syncPendingMeals();
   }
   runApp(const ProviderScope(child: MyApp()));

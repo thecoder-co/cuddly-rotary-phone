@@ -58,69 +58,70 @@ const MealSchema = CollectionSchema(
       type: IsarType.double,
     ),
     r'date': PropertySchema(id: 8, name: r'date', type: IsarType.string),
+    r'image': PropertySchema(id: 9, name: r'image', type: IsarType.string),
     r'inferredCaloriePerGram': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'inferredCaloriePerGram',
       type: IsarType.double,
     ),
     r'inferredCarbsPerGram': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'inferredCarbsPerGram',
       type: IsarType.double,
     ),
     r'inferredFatPerGram': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'inferredFatPerGram',
       type: IsarType.double,
     ),
     r'inferredProteinPerGram': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'inferredProteinPerGram',
       type: IsarType.double,
     ),
     r'macros': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'macros',
       type: IsarType.object,
 
       target: r'Macros',
     ),
-    r'name': PropertySchema(id: 14, name: r'name', type: IsarType.string),
+    r'name': PropertySchema(id: 15, name: r'name', type: IsarType.string),
     r'resolvedWeight': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'resolvedWeight',
       type: IsarType.double,
     ),
     r'showAsSubmeal': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'showAsSubmeal',
       type: IsarType.bool,
     ),
     r'subMeals': PropertySchema(
-      id: 17,
+      id: 18,
       name: r'subMeals',
       type: IsarType.objectList,
 
       target: r'SubMeal',
     ),
     r'syncError': PropertySchema(
-      id: 18,
+      id: 19,
       name: r'syncError',
       type: IsarType.string,
     ),
     r'syncStatus': PropertySchema(
-      id: 19,
+      id: 20,
       name: r'syncStatus',
       type: IsarType.byte,
       enumMap: _MealsyncStatusEnumValueMap,
     ),
     r'totalSubMealWeight': PropertySchema(
-      id: 20,
+      id: 21,
       name: r'totalSubMealWeight',
       type: IsarType.double,
     ),
-    r'type': PropertySchema(id: 21, name: r'type', type: IsarType.string),
-    r'weight': PropertySchema(id: 22, name: r'weight', type: IsarType.double),
+    r'type': PropertySchema(id: 22, name: r'type', type: IsarType.string),
+    r'weight': PropertySchema(id: 23, name: r'weight', type: IsarType.double),
   },
 
   estimateSize: _mealEstimateSize,
@@ -172,6 +173,12 @@ int _mealEstimateSize(
     }
   }
   {
+    final value = object.image;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.macros;
     if (value != null) {
       bytesCount +=
@@ -217,30 +224,31 @@ void _mealSerialize(
   writer.writeString(offsets[6], object.calories);
   writer.writeDouble(offsets[7], object.caloriesUnit);
   writer.writeString(offsets[8], object.date);
-  writer.writeDouble(offsets[9], object.inferredCaloriePerGram);
-  writer.writeDouble(offsets[10], object.inferredCarbsPerGram);
-  writer.writeDouble(offsets[11], object.inferredFatPerGram);
-  writer.writeDouble(offsets[12], object.inferredProteinPerGram);
+  writer.writeString(offsets[9], object.image);
+  writer.writeDouble(offsets[10], object.inferredCaloriePerGram);
+  writer.writeDouble(offsets[11], object.inferredCarbsPerGram);
+  writer.writeDouble(offsets[12], object.inferredFatPerGram);
+  writer.writeDouble(offsets[13], object.inferredProteinPerGram);
   writer.writeObject<Macros>(
-    offsets[13],
+    offsets[14],
     allOffsets,
     MacrosSchema.serialize,
     object.macros,
   );
-  writer.writeString(offsets[14], object.name);
-  writer.writeDouble(offsets[15], object.resolvedWeight);
-  writer.writeBool(offsets[16], object.showAsSubmeal);
+  writer.writeString(offsets[15], object.name);
+  writer.writeDouble(offsets[16], object.resolvedWeight);
+  writer.writeBool(offsets[17], object.showAsSubmeal);
   writer.writeObjectList<SubMeal>(
-    offsets[17],
+    offsets[18],
     allOffsets,
     SubMealSchema.serialize,
     object.subMeals,
   );
-  writer.writeString(offsets[18], object.syncError);
-  writer.writeByte(offsets[19], object.syncStatus.index);
-  writer.writeDouble(offsets[20], object.totalSubMealWeight);
-  writer.writeString(offsets[21], object.type);
-  writer.writeDouble(offsets[22], object.weight);
+  writer.writeString(offsets[19], object.syncError);
+  writer.writeByte(offsets[20], object.syncStatus.index);
+  writer.writeDouble(offsets[21], object.totalSubMealWeight);
+  writer.writeString(offsets[22], object.type);
+  writer.writeDouble(offsets[23], object.weight);
 }
 
 Meal _mealDeserialize(
@@ -253,29 +261,30 @@ Meal _mealDeserialize(
     backendId: reader.readStringOrNull(offsets[4]),
     caloriePerGram: reader.readDoubleOrNull(offsets[5]),
     date: reader.readStringOrNull(offsets[8]),
+    image: reader.readStringOrNull(offsets[9]),
     macros: reader.readObjectOrNull<Macros>(
-      offsets[13],
+      offsets[14],
       MacrosSchema.deserialize,
       allOffsets,
     ),
-    name: reader.readStringOrNull(offsets[14]),
-    showAsSubmeal: reader.readBoolOrNull(offsets[16]) ?? false,
+    name: reader.readStringOrNull(offsets[15]),
+    showAsSubmeal: reader.readBoolOrNull(offsets[17]) ?? false,
     subMeals:
         reader.readObjectList<SubMeal>(
-          offsets[17],
+          offsets[18],
           SubMealSchema.deserialize,
           allOffsets,
           SubMeal(),
         ) ??
         const [],
     syncStatus:
-        _MealsyncStatusValueEnumMap[reader.readByteOrNull(offsets[19])] ??
+        _MealsyncStatusValueEnumMap[reader.readByteOrNull(offsets[20])] ??
         SyncStatus.pendingCreate,
-    type: reader.readStringOrNull(offsets[21]) ?? 'LOGENTRY',
-    weight: reader.readDoubleOrNull(offsets[22]),
+    type: reader.readStringOrNull(offsets[22]) ?? 'LOGENTRY',
+    weight: reader.readDoubleOrNull(offsets[23]),
   );
   object.id = id;
-  object.syncError = reader.readStringOrNull(offsets[18]);
+  object.syncError = reader.readStringOrNull(offsets[19]);
   return object;
 }
 
@@ -305,7 +314,7 @@ P _mealDeserializeProp<P>(
     case 8:
       return (reader.readStringOrNull(offset)) as P;
     case 9:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 10:
       return (reader.readDouble(offset)) as P;
     case 11:
@@ -313,19 +322,21 @@ P _mealDeserializeProp<P>(
     case 12:
       return (reader.readDouble(offset)) as P;
     case 13:
+      return (reader.readDouble(offset)) as P;
+    case 14:
       return (reader.readObjectOrNull<Macros>(
             offset,
             MacrosSchema.deserialize,
             allOffsets,
           ))
           as P;
-    case 14:
-      return (reader.readStringOrNull(offset)) as P;
     case 15:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 16:
-      return (reader.readBoolOrNull(offset) ?? false) as P;
+      return (reader.readDouble(offset)) as P;
     case 17:
+      return (reader.readBoolOrNull(offset) ?? false) as P;
+    case 18:
       return (reader.readObjectList<SubMeal>(
                 offset,
                 SubMealSchema.deserialize,
@@ -334,17 +345,17 @@ P _mealDeserializeProp<P>(
               ) ??
               const [])
           as P;
-    case 18:
-      return (reader.readStringOrNull(offset)) as P;
     case 19:
+      return (reader.readStringOrNull(offset)) as P;
+    case 20:
       return (_MealsyncStatusValueEnumMap[reader.readByteOrNull(offset)] ??
               SyncStatus.pendingCreate)
           as P;
-    case 20:
-      return (reader.readDouble(offset)) as P;
     case 21:
-      return (reader.readStringOrNull(offset) ?? 'LOGENTRY') as P;
+      return (reader.readDouble(offset)) as P;
     case 22:
+      return (reader.readStringOrNull(offset) ?? 'LOGENTRY') as P;
+    case 23:
       return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1571,6 +1582,168 @@ extension MealQueryFilter on QueryBuilder<Meal, Meal, QFilterCondition> {
           upper: upper,
           includeUpper: includeUpper,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'image'),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'image'),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'image',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'image',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'image',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'image',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'image',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'image',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'image',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'image',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'image', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterFilterCondition> imageIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'image', value: ''),
       );
     });
   }
@@ -2854,6 +3027,18 @@ extension MealQuerySortBy on QueryBuilder<Meal, Meal, QSortBy> {
     });
   }
 
+  QueryBuilder<Meal, Meal, QAfterSortBy> sortByImage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'image', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterSortBy> sortByImageDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'image', Sort.desc);
+    });
+  }
+
   QueryBuilder<Meal, Meal, QAfterSortBy> sortByInferredCaloriePerGram() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'inferredCaloriePerGram', Sort.asc);
@@ -3120,6 +3305,18 @@ extension MealQuerySortThenBy on QueryBuilder<Meal, Meal, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Meal, Meal, QAfterSortBy> thenByImage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'image', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Meal, Meal, QAfterSortBy> thenByImageDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'image', Sort.desc);
+    });
+  }
+
   QueryBuilder<Meal, Meal, QAfterSortBy> thenByInferredCaloriePerGram() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'inferredCaloriePerGram', Sort.asc);
@@ -3326,6 +3523,14 @@ extension MealQueryWhereDistinct on QueryBuilder<Meal, Meal, QDistinct> {
     });
   }
 
+  QueryBuilder<Meal, Meal, QDistinct> distinctByImage({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'image', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Meal, Meal, QDistinct> distinctByInferredCaloriePerGram() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'inferredCaloriePerGram');
@@ -3463,6 +3668,12 @@ extension MealQueryProperty on QueryBuilder<Meal, Meal, QQueryProperty> {
   QueryBuilder<Meal, String?, QQueryOperations> dateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'date');
+    });
+  }
+
+  QueryBuilder<Meal, String?, QQueryOperations> imageProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'image');
     });
   }
 

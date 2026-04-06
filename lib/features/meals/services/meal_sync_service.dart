@@ -2,6 +2,7 @@ import 'package:calorie_tracker/features/meals/models/meal.dart';
 import 'package:calorie_tracker/features/meals/models/meal_dto.dart';
 import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
 import 'package:calorie_tracker/features/meals/repo/meal_repo.dart';
+import 'package:calorie_tracker/core/services/api_handler/upload_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:developer';
@@ -10,19 +11,36 @@ final mealSyncServiceProvider = Provider((ref) {
   return MealSyncService(
     localRepo: LocalMealRepo(),
     cloudRepo: MealCloudRepo(),
+    uploadService: ref.read(uploadServiceProvider),
   );
 });
 
 class MealSyncService {
   final LocalMealRepo localRepo;
   final MealCloudRepo cloudRepo;
+  final UploadService uploadService;
 
-  MealSyncService({required this.localRepo, required this.cloudRepo});
+  MealSyncService({
+    required this.localRepo,
+    required this.cloudRepo,
+    required this.uploadService,
+  });
 
   Future<void> syncPendingMeals() async {
     final pendingMeals = await localRepo.getPendingMeals();
     for (final meal in pendingMeals) {
       try {
+        if (meal.image != null && meal.image!.startsWith('offline_file:')) {
+          final localPath = meal.image!.replaceAll('offline_file:', '');
+          final uploadRes = await uploadService.uploadFile(localPath);
+          if (uploadRes.valid && uploadRes.data != null) {
+            await localRepo.isar.writeTxn(() async {
+              meal.image = uploadRes.data;
+              await localRepo.isar.meals.put(meal);
+            });
+          }
+        }
+
         if (meal.syncStatus == SyncStatus.pendingCreate) {
           final dto = CreateMealDto(
             name: meal.name,
@@ -46,6 +64,7 @@ class MealSyncService {
                 weightUsed: e.chosenWeight?.toInt(),
               );
             }).toList(),
+            image: meal.image,
           );
           final res = await cloudRepo.createMeal(dto);
           if (res.valid) {
@@ -86,6 +105,7 @@ class MealSyncService {
                 weightUsed: e.chosenWeight?.toInt(),
               );
             }).toList(),
+            image: meal.image,
           );
           final res = await cloudRepo.updateMeal(meal.backendId!, dto);
           if (res.valid) {
@@ -159,6 +179,7 @@ class MealSyncService {
         isarMeal.date = m.consumedDate?.toIso8601String().split('T').first;
         isarMeal.caloriePerGram = m.caloriePerGram?.toDouble();
         isarMeal.weight = m.weight?.toDouble();
+        isarMeal.image = m.image;
         isarMeal.syncStatus = SyncStatus.synced;
         isarMeal.showAsSubmeal = m.type == 'TEMPLATE';
 

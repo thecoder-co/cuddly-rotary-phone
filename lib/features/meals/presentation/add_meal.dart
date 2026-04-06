@@ -1,9 +1,13 @@
-import 'package:calorie_tracker/core/dialogs/toast.dart';
-import 'package:calorie_tracker/features/meals_home_page/presentation/widgets/date_selector.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calorie_tracker/features/meals_home_page/presentation/widgets/meal_tile.dart';
 import 'package:calorie_tracker/features/meals/models/meal.dart';
 import 'package:calorie_tracker/features/meals/presentation/meals.dart';
 import 'package:calorie_tracker/features/meals/providers/meal_provider.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 
 class AddMealPage extends ConsumerStatefulWidget {
@@ -41,8 +45,58 @@ class _HomePageState extends ConsumerState<AddMealPage> {
   //         (e) => e..withoutWeight = true,
   //       )
   //       .toList();
-  //   setState(() {});
+  //     setState(() {});
   // }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      final appDir = await getApplicationDocumentsDirectory();
+      // Use timestamp to avoid name collisions
+      final fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${pickedFile.name}';
+      final savedFile = await File(
+        pickedFile.path,
+      ).copy('${appDir.path}/$fileName');
+
+      setState(() {
+        model.image = 'offline_file:${savedFile.path}';
+      });
+    }
+  }
+
+  void _showImageSourceActionSheet(BuildContext context) {
+    if (kIsWeb) return;
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('Add Meal Image'),
+        actions: [
+          CupertinoActionSheetAction(
+            child: const Text('Camera'),
+            onPressed: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.camera);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Gallery'),
+            onPressed: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.gallery);
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDestructiveAction: true,
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+      ),
+    );
+  }
 
   calculateOverrides() {
     double totalCalories = 0;
@@ -187,6 +241,59 @@ class _HomePageState extends ConsumerState<AddMealPage> {
                   onChanged: (v) {
                     model.name = v;
                   },
+                ),
+                24.gap,
+                GestureDetector(
+                  onTap: () => _showImageSourceActionSheet(context),
+                  child: Container(
+                    height: 160,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: model.image != null
+                        ? (model.image!.startsWith('offline_file:')
+                              ? Image.file(
+                                  File(
+                                    model.image!.replaceAll(
+                                      'offline_file:',
+                                      '',
+                                    ),
+                                  ),
+                                  fit: BoxFit.cover,
+                                )
+                              : CachedNetworkImage(
+                                  imageUrl: model.image!,
+                                  fit: BoxFit.cover,
+                                ))
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add_a_photo_outlined,
+                                size: 40,
+                                color: Theme.of(
+                                  context,
+                                ).primaryColor.withOpacity(0.6),
+                              ),
+                              8.gap,
+                              Text(
+                                'Add Photo',
+                                style: CustomTextStyle.textsmall14.withColor(
+                                  Theme.of(
+                                    context,
+                                  ).primaryColor.withOpacity(0.8),
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
                 ),
                 24.gap,
                 Text('Submeals', style: CustomTextStyle.textmedium16.w700),

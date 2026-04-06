@@ -2,9 +2,11 @@ import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/search_exercises_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:calorie_tracker/features/workout/models/exercise.dart';
+import 'package:calorie_tracker/features/workout/presentation/exercise_info_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class AddExerciseScreen extends ConsumerStatefulWidget {
   final List<String> initialSelectedIds;
@@ -189,54 +191,85 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                         final isSelected = _selectedExerciseIds.contains(id);
                         final isLocked = _lockedIds.contains(id);
 
-                        return CupertinoListTile(
-                          backgroundColor: CupertinoColors.transparent,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          leading: isSelected
-                              ? Icon(
-                                  CupertinoIcons.check_mark,
-                                  color: isLocked
-                                      ? isDark
-                                            ? CupertinoColors.systemGrey
-                                                  .withValues(alpha: 0.5)
-                                            : CupertinoColors.systemGreen
-                                      : CupertinoColors.systemGreen,
-                                  size: 18,
-                                )
-                              : const SizedBox(width: 18),
-                          title: Text(
-                            exercise.name ?? 'Unnamed',
-                            style: TextStyle(
-                              color: isLocked
-                                  ? isDark
-                                        ? CupertinoColors.systemGrey.withValues(
-                                            alpha: 0.5,
-                                          )
-                                        : CupertinoColors.systemGreen
-                                  : isDark
-                                  ? CupertinoColors.white
-                                  : CupertinoColors.black,
-                              fontSize: 16,
-                            ),
-                          ),
-                          trailing: _buildPopularityIndicator(
-                            (exercise.popularity ?? 0) / 100,
-                            size: 24,
-                          ),
-                          onTap: isLocked
-                              ? null
-                              : () {
-                                  setState(() {
-                                    if (_selectedExerciseIds.contains(id)) {
-                                      _selectedExerciseIds.remove(id);
-                                    } else {
-                                      _selectedExerciseIds.add(id);
-                                    }
-                                  });
+                        return Slidable(
+                          key: ValueKey(id),
+                          startActionPane: ActionPane(
+                            motion: const BehindMotion(),
+                            children: [
+                              SlidableAction(
+                                padding: EdgeInsets.zero,
+                                onPressed: (context) {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => ExerciseInfoScreen(
+                                        exercise: exercise,
+                                      ),
+                                    ),
+                                  );
                                 },
+                                icon: CupertinoIcons.info,
+                                backgroundColor: isDark
+                                    ? CupertinoColors.systemBlue.withValues(
+                                      alpha: 0.2,
+                                    )
+                                    : CupertinoColors.systemBlue.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                foregroundColor: CupertinoColors.systemBlue,
+                                label: 'Info',
+                              ),
+                            ],
+                          ),
+                          child: CupertinoListTile(
+                            backgroundColor: CupertinoColors.transparent,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            leading: isSelected
+                                ? Icon(
+                                    CupertinoIcons.check_mark,
+                                    color: isLocked
+                                        ? isDark
+                                              ? CupertinoColors.systemGrey
+                                                    .withValues(alpha: 0.5)
+                                              : CupertinoColors.systemGreen
+                                        : CupertinoColors.systemGreen,
+                                    size: 18,
+                                  )
+                                : const SizedBox(width: 18),
+                            title: Text(
+                              exercise.name ?? 'Unnamed',
+                              style: TextStyle(
+                                color: isLocked
+                                    ? isDark
+                                          ? CupertinoColors.systemGrey.withValues(
+                                              alpha: 0.5,
+                                            )
+                                          : CupertinoColors.systemGreen
+                                    : isDark
+                                    ? CupertinoColors.white
+                                    : CupertinoColors.black,
+                                fontSize: 16,
+                              ),
+                            ),
+                            trailing: _buildPopularityIndicator(
+                              (exercise.popularity ?? 0) / 100,
+                              size: 24,
+                            ),
+                            onTap: isLocked
+                                ? null
+                                : () {
+                                    setState(() {
+                                      if (_selectedExerciseIds.contains(id)) {
+                                        _selectedExerciseIds.remove(id);
+                                      } else {
+                                        _selectedExerciseIds.add(id);
+                                      }
+                                    });
+                                  },
+                          ),
                         );
                       },
                     );

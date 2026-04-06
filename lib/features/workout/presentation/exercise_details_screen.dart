@@ -8,6 +8,7 @@ import 'package:calorie_tracker/features/workout/presentation/widgets/exercise_d
 import 'package:calorie_tracker/features/workout/presentation/widgets/exercise_details_header_row.dart';
 import 'package:calorie_tracker/features/workout/presentation/widgets/exercise_set_tile.dart';
 import 'package:calorie_tracker/features/workout/presentation/widgets/record_set_sheet.dart';
+import 'package:calorie_tracker/features/workout/presentation/exercise_info_screen.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_analytics_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_set_provider.dart';
@@ -143,12 +144,29 @@ class _ExerciseDetailsScreenState extends ConsumerState<ExerciseDetailsScreen> {
                             const Divider(height: 1, indent: 48),
                             ExerciseDetailsHeaderRow(
                               context: context,
-                              icon: Icons.wb_sunny_outlined,
-                              iconColor: Colors.purpleAccent,
-                              title: '1RM',
-                              value: widget.exercise.oneRmFormula ?? 'Epley',
-                              onTap: () {},
+                              icon: CupertinoIcons.info_circle,
+                              iconColor: CupertinoColors.systemBlue,
+                              title: 'How to perform',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => ExerciseInfoScreen(
+                                      exercise: widget.exercise,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
+                            // const Divider(height: 1, indent: 48),
+                            // ExerciseDetailsHeaderRow(
+                            //   context: context,
+                            //   icon: Icons.wb_sunny_outlined,
+                            //   iconColor: Colors.purpleAccent,
+                            //   title: '1RM',
+                            //   value: widget.exercise.oneRmFormula ?? 'Epley',
+                            //   onTap: () {},
+                            // ),
                           ],
                         ),
                       ),
