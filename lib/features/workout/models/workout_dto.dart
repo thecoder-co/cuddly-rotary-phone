@@ -131,11 +131,15 @@ class ExerciseDto {
   String? description;
   DateTime? createdAt;
   DateTime? updatedAt;
+  Map? jsonDesc;
+  List<String>? images;
   ExerciseCountDto? count;
 
   ExerciseDto({
     this.id,
     this.name,
+    this.jsonDesc,
+    this.images,
     this.popularity,
     this.ownerId,
     this.oneRmFormula,
@@ -150,6 +154,8 @@ class ExerciseDto {
     name: json["name"],
     popularity: json["popularity"]?.toDouble(),
     ownerId: json["ownerId"],
+    jsonDesc: json["jsonDesc"],
+    images: json["images"],
     oneRmFormula: json["oneRmFormula"],
     description: json["description"],
     createdAt: json["createdAt"] == null
@@ -170,6 +176,8 @@ class ExerciseDto {
     "ownerId": ownerId,
     "oneRmFormula": oneRmFormula,
     "description": description,
+    "jsonDesc": jsonDesc,
+    "images": images,
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
     "_count": count?.toJson(),

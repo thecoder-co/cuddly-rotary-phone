@@ -292,10 +292,6 @@ class TokenRouter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (LocalData.token != null) {
-      return const Home();
-    } else {
-      return const LoginScreen();
-    }
+    return const Home();
   }
 }

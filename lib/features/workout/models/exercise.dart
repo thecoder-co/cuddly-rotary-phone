@@ -18,6 +18,8 @@ class Exercise {
   DateTime? createdAt;
   DateTime? updatedAt;
   int? localSetsCount;
+  String? jsonDesc;
+  List<String>? images;
 
   @enumerated
   SyncStatus syncStatus = SyncStatus.pendingCreate;
@@ -32,6 +34,8 @@ class Exercise {
     this.createdAt,
     this.updatedAt,
     this.localSetsCount = 0,
+    this.jsonDesc,
+    this.images,
     this.syncStatus = SyncStatus.pendingCreate,
   });
 
@@ -44,6 +48,8 @@ class Exercise {
     String? description,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<String>? images,
+    String? jsonDesc,
     int? localSetsCount,
     SyncStatus? syncStatus,
   }) {
@@ -56,6 +62,8 @@ class Exercise {
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      images: images ?? this.images,
+      jsonDesc: jsonDesc ?? this.jsonDesc,
       localSetsCount: localSetsCount ?? this.localSetsCount,
       syncStatus: syncStatus ?? this.syncStatus,
     )..id = id;

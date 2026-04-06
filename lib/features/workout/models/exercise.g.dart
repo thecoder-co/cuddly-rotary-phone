@@ -32,31 +32,36 @@ const ExerciseSchema = CollectionSchema(
       name: r'description',
       type: IsarType.string,
     ),
-    r'localSetsCount': PropertySchema(
+    r'jsonDesc': PropertySchema(
       id: 3,
+      name: r'jsonDesc',
+      type: IsarType.string,
+    ),
+    r'localSetsCount': PropertySchema(
+      id: 4,
       name: r'localSetsCount',
       type: IsarType.long,
     ),
-    r'name': PropertySchema(id: 4, name: r'name', type: IsarType.string),
+    r'name': PropertySchema(id: 5, name: r'name', type: IsarType.string),
     r'oneRmFormula': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'oneRmFormula',
       type: IsarType.string,
     ),
-    r'ownerId': PropertySchema(id: 6, name: r'ownerId', type: IsarType.string),
+    r'ownerId': PropertySchema(id: 7, name: r'ownerId', type: IsarType.string),
     r'popularity': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'popularity',
       type: IsarType.double,
     ),
     r'syncStatus': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'syncStatus',
       type: IsarType.byte,
       enumMap: _ExercisesyncStatusEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
@@ -110,6 +115,12 @@ int _exerciseEstimateSize(
     }
   }
   {
+    final value = object.jsonDesc;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.name;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -139,13 +150,14 @@ void _exerciseSerialize(
   writer.writeString(offsets[0], object.backendId);
   writer.writeDateTime(offsets[1], object.createdAt);
   writer.writeString(offsets[2], object.description);
-  writer.writeLong(offsets[3], object.localSetsCount);
-  writer.writeString(offsets[4], object.name);
-  writer.writeString(offsets[5], object.oneRmFormula);
-  writer.writeString(offsets[6], object.ownerId);
-  writer.writeDouble(offsets[7], object.popularity);
-  writer.writeByte(offsets[8], object.syncStatus.index);
-  writer.writeDateTime(offsets[9], object.updatedAt);
+  writer.writeString(offsets[3], object.jsonDesc);
+  writer.writeLong(offsets[4], object.localSetsCount);
+  writer.writeString(offsets[5], object.name);
+  writer.writeString(offsets[6], object.oneRmFormula);
+  writer.writeString(offsets[7], object.ownerId);
+  writer.writeDouble(offsets[8], object.popularity);
+  writer.writeByte(offsets[9], object.syncStatus.index);
+  writer.writeDateTime(offsets[10], object.updatedAt);
 }
 
 Exercise _exerciseDeserialize(
@@ -158,15 +170,16 @@ Exercise _exerciseDeserialize(
     backendId: reader.readStringOrNull(offsets[0]),
     createdAt: reader.readDateTimeOrNull(offsets[1]),
     description: reader.readStringOrNull(offsets[2]),
-    localSetsCount: reader.readLongOrNull(offsets[3]),
-    name: reader.readStringOrNull(offsets[4]),
-    oneRmFormula: reader.readStringOrNull(offsets[5]),
-    ownerId: reader.readStringOrNull(offsets[6]),
-    popularity: reader.readDoubleOrNull(offsets[7]),
+    jsonDesc: reader.readStringOrNull(offsets[3]),
+    localSetsCount: reader.readLongOrNull(offsets[4]),
+    name: reader.readStringOrNull(offsets[5]),
+    oneRmFormula: reader.readStringOrNull(offsets[6]),
+    ownerId: reader.readStringOrNull(offsets[7]),
+    popularity: reader.readDoubleOrNull(offsets[8]),
     syncStatus:
-        _ExercisesyncStatusValueEnumMap[reader.readByteOrNull(offsets[8])] ??
+        _ExercisesyncStatusValueEnumMap[reader.readByteOrNull(offsets[9])] ??
         SyncStatus.pendingCreate,
-    updatedAt: reader.readDateTimeOrNull(offsets[9]),
+    updatedAt: reader.readDateTimeOrNull(offsets[10]),
   );
   object.id = id;
   return object;
@@ -186,20 +199,22 @@ P _exerciseDeserializeProp<P>(
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readLongOrNull(offset)) as P;
-    case 4:
       return (reader.readStringOrNull(offset)) as P;
+    case 4:
+      return (reader.readLongOrNull(offset)) as P;
     case 5:
       return (reader.readStringOrNull(offset)) as P;
     case 6:
       return (reader.readStringOrNull(offset)) as P;
     case 7:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 8:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 9:
       return (_ExercisesyncStatusValueEnumMap[reader.readByteOrNull(offset)] ??
               SyncStatus.pendingCreate)
           as P;
-    case 9:
+    case 10:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -901,6 +916,168 @@ extension ExerciseQueryFilter
           upper: upper,
           includeUpper: includeUpper,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'jsonDesc'),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'jsonDesc'),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'jsonDesc',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'jsonDesc',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'jsonDesc',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'jsonDesc',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'jsonDesc',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'jsonDesc',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'jsonDesc',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'jsonDesc',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'jsonDesc', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> jsonDescIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'jsonDesc', value: ''),
       );
     });
   }
@@ -1735,6 +1912,18 @@ extension ExerciseQuerySortBy on QueryBuilder<Exercise, Exercise, QSortBy> {
     });
   }
 
+  QueryBuilder<Exercise, Exercise, QAfterSortBy> sortByJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'jsonDesc', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterSortBy> sortByJsonDescDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'jsonDesc', Sort.desc);
+    });
+  }
+
   QueryBuilder<Exercise, Exercise, QAfterSortBy> sortByLocalSetsCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'localSetsCount', Sort.asc);
@@ -1870,6 +2059,18 @@ extension ExerciseQuerySortThenBy
     });
   }
 
+  QueryBuilder<Exercise, Exercise, QAfterSortBy> thenByJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'jsonDesc', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterSortBy> thenByJsonDescDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'jsonDesc', Sort.desc);
+    });
+  }
+
   QueryBuilder<Exercise, Exercise, QAfterSortBy> thenByLocalSetsCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'localSetsCount', Sort.asc);
@@ -1979,6 +2180,14 @@ extension ExerciseQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Exercise, Exercise, QDistinct> distinctByJsonDesc({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'jsonDesc', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Exercise, Exercise, QDistinct> distinctByLocalSetsCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'localSetsCount');
@@ -2051,6 +2260,12 @@ extension ExerciseQueryProperty
   QueryBuilder<Exercise, String?, QQueryOperations> descriptionProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'description');
+    });
+  }
+
+  QueryBuilder<Exercise, String?, QQueryOperations> jsonDescProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'jsonDesc');
     });
   }
 

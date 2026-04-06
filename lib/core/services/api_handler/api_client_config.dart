@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:calorie_tracker/core/services/local_data/local_data.dart';
+import 'package:calorie_tracker/core/utils/string_exception.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'app_endpoints.dart';
 import 'bad_certificate_fixer.dart';
@@ -12,17 +13,18 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
 
-class CustomHeaders {
+class CustomExtras {
   static const removeEmptyStringsList = 'RemoveEmptyStringsList';
   static const removeEmptyStrings = 'RemoveEmptyStrings';
   static const removeNullValues = 'RemoveNullValues';
   static const removeEmptyLists = 'RemoveEmptyLists';
-
+  static const tokenRequired = 'TokenRequired';
   static const all = [
     removeEmptyStringsList,
     removeEmptyStrings,
     removeNullValues,
     removeEmptyLists,
+    tokenRequired,
   ];
 }
 
@@ -103,10 +105,6 @@ class BackendService {
       options.headers.addAll({'Content-Type': 'application/json'});
     }
 
-    for (var i in CustomHeaders.all) {
-      options.headers.remove(i);
-    }
-
     return requestInterceptorHandler.next(options);
   }
 
@@ -114,15 +112,20 @@ class BackendService {
     RequestOptions options,
     RequestInterceptorHandler requestInterceptorHandler,
   ) {
-    options.headers.addAll({CustomHeaders.removeNullValues: true});
+    if (options.extra[CustomExtras.tokenRequired] ?? true) {
+      if (options.headers.containsKey('Authorization')) {
+        throw StringException('Token required');
+      }
+    }
+    options.extra.addAll({CustomExtras.removeNullValues: true});
 
-    if (options.headers.containsKey(CustomHeaders.removeNullValues)) {
+    if (options.extra.containsKey(CustomExtras.removeNullValues)) {
       if (options.data != null && options.data is Map) {
         options.data.removeWhere((key, value) => value == null);
       }
     }
 
-    if (options.headers.containsKey(CustomHeaders.removeEmptyLists)) {
+    if (options.extra.containsKey(CustomExtras.removeEmptyLists)) {
       if (options.data != null && options.data is Map) {
         options.data.removeWhere(
           (key, value) => value is List && value.isEmpty,
@@ -130,7 +133,7 @@ class BackendService {
       }
     }
 
-    if (options.headers.containsKey(CustomHeaders.removeEmptyStrings)) {
+    if (options.extra.containsKey(CustomExtras.removeEmptyStrings)) {
       if (options.data != null && options.data is Map) {
         options.data.removeWhere(
           (key, value) => value is String && value.isEmpty,
@@ -138,7 +141,7 @@ class BackendService {
       }
     }
 
-    if (options.headers.containsKey(CustomHeaders.removeEmptyStringsList)) {
+    if (options.extra.containsKey(CustomExtras.removeEmptyStringsList)) {
       if (options.data != null && options.data is Map) {
         options.data.removeWhere(
           (key, value) =>

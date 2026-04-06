@@ -38,6 +38,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
           ? CupertinoColors.black
           : CupertinoColors.systemGroupedBackground,
       child: Material(
+        borderRadius: BorderRadius.zero,
         color: Colors.transparent,
         child: CustomScrollView(
           slivers: [

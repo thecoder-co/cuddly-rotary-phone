@@ -32,7 +32,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      ref.read(searchExercisesProvider.notifier).loadMore();
+      ref.watch(searchExercisesProvider.notifier).loadMore();
     }
   }
 
@@ -102,7 +102,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                         itemColor: CupertinoColors.systemGreen,
                         onChanged: (value) {
                           ref
-                              .read(searchExercisesProvider.notifier)
+                              .watch(searchExercisesProvider.notifier)
                               .updateQuery(value);
                         },
                       ),

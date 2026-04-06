@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:calorie_tracker/features/meals/models/meal.dart'; // SyncStatus
 import 'package:calorie_tracker/features/workout/models/program.dart';
@@ -189,6 +190,7 @@ class WorkoutSyncService {
         if (existing != null) {
           existing.syncStatus = SyncStatus.pendingAddFromParent;
           existing.ownerId = LocalData.userId;
+
           await localRepo.isar.exercises.put(existing);
         }
       }
@@ -215,6 +217,10 @@ class WorkoutSyncService {
           final isarExercise = existing ?? Exercise();
           isarExercise.backendId = backendId;
           isarExercise.name = p.name;
+          if (p.jsonDesc != null) {
+            isarExercise.jsonDesc = json.encode(p.jsonDesc);
+          }
+          isarExercise.images = p.images;
           isarExercise.popularity = p.popularity;
           isarExercise.ownerId = LocalData.userId;
           isarExercise.oneRmFormula = p.oneRmFormula;
@@ -263,6 +269,11 @@ class WorkoutSyncService {
           isarExercise.backendId = backendId;
           isarExercise.name = p.name;
           isarExercise.popularity = p.popularity;
+          if (p.jsonDesc != null) {
+            isarExercise.jsonDesc = json.encode(p.jsonDesc);
+          }
+          isarExercise.images = p.images;
+
           if (isarExercise.ownerId != LocalData.userId) {
             isarExercise.ownerId = p.ownerId;
           }

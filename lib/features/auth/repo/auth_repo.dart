@@ -14,6 +14,7 @@ class AuthRepo {
       _apiService.dio.post(
         '${AppEndpoints.baseUrl}/create-user',
         data: model.toJson(),
+        options: Options(extra: {CustomExtras.tokenRequired: false}),
       ),
     );
 
@@ -40,6 +41,7 @@ class AuthRepo {
       _apiService.dio.post(
         '${AppEndpoints.baseUrl}/send-login-otp',
         data: model.toJson(),
+        options: Options(extra: {CustomExtras.tokenRequired: false}),
       ),
     );
 
@@ -68,6 +70,7 @@ class AuthRepo {
       _apiService.dio.post(
         '${AppEndpoints.baseUrl}/token',
         data: model.toJson(),
+        options: Options(extra: {CustomExtras.tokenRequired: false}),
       ),
     );
 
@@ -95,6 +98,7 @@ class AuthRepo {
         '${AppEndpoints.baseUrl}/token/refresh',
         options: Options(
           headers: {'Authorization': 'Bearer ${LocalData.refreshToken}'},
+          extra: {CustomExtras.tokenRequired: false},
         ),
       ),
     );
