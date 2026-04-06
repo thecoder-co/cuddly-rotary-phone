@@ -6,13 +6,13 @@ import 'package:intl/intl.dart';
 
 class ExerciseSetTile extends StatelessWidget {
   final WorkoutSet workoutSet;
-  final VoidCallback onEdit;
+  final VoidCallback onRepeat;
   final VoidCallback onDelete;
 
   const ExerciseSetTile({
     super.key,
     required this.workoutSet,
-    required this.onEdit,
+    required this.onRepeat,
     required this.onDelete,
   });
 
@@ -31,11 +31,11 @@ class ExerciseSetTile extends StatelessWidget {
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
-            onPressed: (_) => onEdit(),
-            backgroundColor: CupertinoColors.activeBlue,
+            onPressed: (_) => onRepeat(),
+            backgroundColor: CupertinoColors.activeGreen,
             foregroundColor: Colors.white,
-            icon: CupertinoIcons.pencil,
-            label: 'Edit',
+            icon: CupertinoIcons.repeat,
+            label: 'Repeat',
           ),
         ],
       ),
@@ -52,7 +52,7 @@ class ExerciseSetTile extends StatelessWidget {
         ],
       ),
       child: InkWell(
-        onTap: onEdit,
+        onTap: onRepeat,
         child: Container(
           color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

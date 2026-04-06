@@ -27,6 +27,26 @@ class _MealAnalyticsScreenState extends ConsumerState<MealAnalyticsScreen> {
     final analytics = ref.watch(analyticsProvider(_period));
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(
+          'Analytics',
+          style: TextStyle(
+            color: isDark ? Colors.white : AppColors.primary900,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
+        ),
+        backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? Colors.white.withOpacity(0.08)
+                : Colors.black.withOpacity(0.06),
+            width: 0.5,
+          ),
+        ),
+      ),
       backgroundColor: isDark
           ? CupertinoColors.black
           : CupertinoColors.systemGroupedBackground,
@@ -34,9 +54,13 @@ class _MealAnalyticsScreenState extends ConsumerState<MealAnalyticsScreen> {
         color: Colors.transparent,
         child: CustomScrollView(
           slivers: [
-            AnalyticsAppBar(
-              period: _period,
-              onPeriodChanged: (p) => setState(() => _period = p),
+            // Safe area to keep the segment control below the app bar natively without clipping the scroll
+            SliverSafeArea(
+              bottom: false,
+              sliver: AnalyticsPeriodSelector(
+                period: _period,
+                onPeriodChanged: (p) => setState(() => _period = p),
+              ),
             ),
             CupertinoSliverRefreshControl(
               onRefresh: () async {

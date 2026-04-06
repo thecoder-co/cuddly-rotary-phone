@@ -15,8 +15,12 @@ class WorkoutSetNotifier extends AsyncNotifier<List<WorkoutSet>> {
   final String arg;
   WorkoutSetNotifier(this.arg);
   @override
-  FutureOr<List<WorkoutSet>> build() async {
-    return await ref.watch(isarWorkoutSetsStreamProvider(arg).future);
+  FutureOr<List<WorkoutSet>> build() {
+    final asyncData = ref.watch(isarWorkoutSetsStreamProvider(arg));
+    if (asyncData.hasValue) {
+      return asyncData.requireValue;
+    }
+    return ref.watch(isarWorkoutSetsStreamProvider(arg).future);
   }
 
   Future<void> addSet(WorkoutSet set) async {

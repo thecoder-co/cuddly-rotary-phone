@@ -175,7 +175,7 @@ class _WorkoutAnalyticsScreenState
                                                 ),
                                               ExerciseSetTile(
                                                 workoutSet: set,
-                                                onEdit: () {
+                                                onRepeat: () {
                                                   Navigator.push(
                                                     context,
                                                     CupertinoPageRoute(

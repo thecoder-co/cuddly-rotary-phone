@@ -44,7 +44,7 @@ class _ExerciseDetailsScreenState extends ConsumerState<ExerciseDetailsScreen> {
     return groups;
   }
 
-  void _showAddSetModal(BuildContext context, [WorkoutSet? prefillFrom]) {
+  void _showAddSetModal(BuildContext context, String backendId, [WorkoutSet? prefillFrom]) {
     final initialWeight = prefillFrom?.weight ?? 20.0;
     final initialReps = prefillFrom?.reps ?? 10;
 
@@ -58,16 +58,13 @@ class _ExerciseDetailsScreenState extends ConsumerState<ExerciseDetailsScreen> {
           initialReps: initialReps,
           onSave: (weight, reps) {
             final newSet = WorkoutSet()
-              ..exerciseId =
-                  widget.exercise.backendId ?? widget.exercise.id.toString()
+              ..exerciseId = backendId
               ..weight = weight
               ..reps = reps
               ..date = DateTime.now();
 
             ref
-                .read(
-                  workoutSetProvider(widget.exercise.backendId ?? '').notifier,
-                )
+                .read(workoutSetProvider(backendId).notifier)
                 .addSet(newSet);
 
             Navigator.pop(context);
@@ -266,17 +263,35 @@ class _ExerciseDetailsScreenState extends ConsumerState<ExerciseDetailsScreen> {
                                         ),
                                       ExerciseSetTile(
                                         workoutSet: set,
-                                        onEdit: () {
-                                          Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  EditSetScreen(
-                                                    exercise: widget.exercise,
-                                                    workoutSet: set,
-                                                  ),
-                                            ),
-                                          );
+                                        onRepeat: () {
+                                          final sets = setsAsync
+                                              .whenData((s) => s)
+                                              .value;
+                                          WorkoutSet? lastSet;
+                                          if (sets != null && sets.isNotEmpty) {
+                                            final sorted = [...sets]
+                                              ..sort((a, b) {
+                                                final aDate =
+                                                    a.date ?? DateTime(2000);
+                                                final bDate =
+                                                    b.date ?? DateTime(2000);
+                                                return bDate.compareTo(aDate);
+                                              });
+                                            lastSet = sorted.first;
+                                          }
+
+                                          ref
+                                              .read(
+                                                workoutSetProvider(backendId).notifier,
+                                              )
+                                              .addSet(
+                                                WorkoutSet(
+                                                  exerciseId: backendId,
+                                                  reps: lastSet?.reps,
+                                                  weight: lastSet?.weight,
+                                                  date: DateTime.now(),
+                                                ),
+                                              );
                                         },
                                         onDelete: () {
                                           ref
@@ -335,7 +350,7 @@ class _ExerciseDetailsScreenState extends ConsumerState<ExerciseDetailsScreen> {
                         });
                       lastSet = sorted.first;
                     }
-                    _showAddSetModal(context, lastSet);
+                    _showAddSetModal(context, backendId, lastSet);
                   },
                   child: Container(
                     width: 56,
