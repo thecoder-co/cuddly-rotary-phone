@@ -38,9 +38,9 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   60.spacingH,
-                  const Text(
+                  Text(
                     'Verify It\'s You 🔐',
-                    style: CustomTextStyle.textextraBold24,
+                    style: CustomTextStyle.textextraBold24.w700,
                   ),
                   8.spacingH,
                   Text(

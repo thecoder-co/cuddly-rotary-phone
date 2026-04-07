@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:calorie_tracker/features/meals/models/meal.dart';
 import 'package:calorie_tracker/features/workout/models/workout_set.dart';
+import 'package:calorie_tracker/features/workout/presentation/widgets/record_set_sheet.dart';
+import 'package:calorie_tracker/features/workout/providers/timer_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
 import 'package:calorie_tracker/features/workout/services/workout_sync_service.dart';
 import 'package:calorie_tracker/packages/packages.dart';
@@ -21,6 +23,41 @@ class WorkoutSetNotifier extends AsyncNotifier<List<WorkoutSet>> {
       return asyncData.requireValue;
     }
     return ref.watch(isarWorkoutSetsStreamProvider(arg).future);
+  }
+
+  void showAddSetModal(
+    String exerciseName,
+    String backendId, [
+    WorkoutSet? prefillFrom,
+  ]) {
+    final initialWeight = prefillFrom?.weight ?? 20.0;
+    final initialReps = prefillFrom?.reps ?? 10;
+
+    showModalBottomSheet(
+      context: NavigationService.context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return RecordSetSheet(
+          initialWeight: initialWeight,
+          initialReps: initialReps,
+          onSave: (weight, reps) {
+            final newSet = WorkoutSet()
+              ..exerciseId = backendId
+              ..weight = weight
+              ..reps = reps
+              ..date = DateTime.now();
+
+            addSet(newSet);
+            ref
+                .read(workoutTimerProvider.notifier)
+                .startTimer(exerciseName: exerciseName);
+
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
   }
 
   Future<void> addSet(WorkoutSet set) async {

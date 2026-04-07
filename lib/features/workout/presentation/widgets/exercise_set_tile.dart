@@ -32,8 +32,10 @@ class ExerciseSetTile extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (_) => onRepeat(),
-            backgroundColor: CupertinoColors.activeGreen,
-            foregroundColor: Colors.white,
+            backgroundColor: isDark
+                ? Colors.green.shade900.withValues(alpha: 0.5)
+                : Colors.green.shade100,
+            foregroundColor: CupertinoColors.systemGreen,
             icon: CupertinoIcons.repeat,
             label: 'Repeat',
           ),
@@ -44,8 +46,10 @@ class ExerciseSetTile extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (_) => onDelete(),
-            backgroundColor: CupertinoColors.destructiveRed,
-            foregroundColor: Colors.white,
+            backgroundColor: isDark
+                ? Colors.red.shade900.withValues(alpha: 0.5)
+                : Colors.red.shade100,
+            foregroundColor: CupertinoColors.destructiveRed,
             icon: CupertinoIcons.delete,
             label: 'Delete',
           ),

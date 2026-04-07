@@ -30,7 +30,7 @@ class _HomeState extends ConsumerState<Home> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          color: isDark ? Theme.of(context).scaffoldBackgroundColor : null,
+          color: isDark ? Colors.black : null,
           gradient: isDark
               ? null
               : const LinearGradient(

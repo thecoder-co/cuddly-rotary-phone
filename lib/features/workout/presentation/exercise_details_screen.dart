@@ -46,41 +46,6 @@ class _ExerciseDetailsScreenState extends ConsumerState<ExerciseDetailsScreen> {
     return groups;
   }
 
-  void _showAddSetModal(
-    BuildContext context,
-    String backendId, [
-    WorkoutSet? prefillFrom,
-  ]) {
-    final initialWeight = prefillFrom?.weight ?? 20.0;
-    final initialReps = prefillFrom?.reps ?? 10;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return RecordSetSheet(
-          initialWeight: initialWeight,
-          initialReps: initialReps,
-          onSave: (weight, reps) {
-            final newSet = WorkoutSet()
-              ..exerciseId = backendId
-              ..weight = weight
-              ..reps = reps
-              ..date = DateTime.now();
-
-            ref.read(workoutSetProvider(backendId).notifier).addSet(newSet);
-            ref
-                .read(workoutTimerProvider.notifier)
-                .startTimer(exerciseName: widget.exercise.name ?? 'Rest');
-
-            Navigator.pop(context);
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // Only load if backendId exists, otherwise just show empty using fake ID
@@ -114,7 +79,13 @@ class _ExerciseDetailsScreenState extends ConsumerState<ExerciseDetailsScreen> {
                 });
               lastSet = sorted.first;
             }
-            _showAddSetModal(context, backendId, lastSet);
+            ref
+                .read(workoutSetProvider(backendId).notifier)
+                .showAddSetModal(
+                  widget.exercise.name ?? 'Rest',
+                  backendId,
+                  lastSet,
+                );
           },
           child: Container(
             width: 32,

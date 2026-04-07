@@ -119,7 +119,7 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
     // Android Initialization
     if (Platform.isAndroid) {
       const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/launcher_icon');
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
       const DarwinInitializationSettings initializationSettingsDarwin =
           DarwinInitializationSettings(
@@ -174,6 +174,10 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
     String? activityId;
 
     if (Platform.isAndroid) {
+      final androidPlugin = _localNotificationsPlugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      await androidPlugin?.requestNotificationsPermission();
+      await androidPlugin?.requestExactAlarmsPermission();
       _showAndroidOngoingNotification(endTime, exerciseName);
     } else if (Platform.isIOS) {
       activityId = await _startLiveActivity(endTime, exerciseName);
@@ -198,19 +202,51 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
     _startInternalDartTimer(state);
   }
 
-  void stopTimer() {
+  Future<void> stopTimer({bool isNaturalExpiration = false}) async {
     _timer?.cancel();
     _clearPrefs();
 
-    _localNotificationsPlugin.cancel(id: _completionNotificationId);
+    // Cancel both possible notification IDs to be safe
+    await _localNotificationsPlugin.cancel(id: _completionNotificationId);
+    await _localNotificationsPlugin.cancel(id: _runningNotificationId);
 
-    if (Platform.isAndroid) {
-      _localNotificationsPlugin.cancel(id: _runningNotificationId);
-    } else if (Platform.isIOS && state.liveActivityId != null) {
-      _liveActivities.endActivity(state.liveActivityId!);
+    if (isNaturalExpiration) {
+      await _fireImmediateCompletionNotification(state.exerciseName);
+    }
+
+    if (Platform.isIOS) {
+      // More robust than ending a specific ID which might be lost/null
+      await _liveActivities.endAllActivities();
     }
 
     state = const TimerState(); // Idle state
+  }
+
+  Future<void> _fireImmediateCompletionNotification(String exerciseName) async {
+    final androidDetails = const AndroidNotificationDetails(
+      'completion_channel',
+      'Timer Completion',
+      channelDescription: 'Alerts when rest timer finishes',
+      importance: Importance.max,
+      priority: Priority.high,
+      color: Color(0xFF34C759),
+      icon: '@mipmap/ic_launcher',
+      playSound: true,
+    );
+    final iosDetails = const DarwinNotificationDetails(
+      presentSound: true,
+      presentAlert: true,
+      interruptionLevel: InterruptionLevel.timeSensitive,
+    );
+    await _localNotificationsPlugin.show(
+      id: _completionNotificationId,
+      title: 'Rest Complete!',
+      body: 'Time for: $exerciseName',
+      notificationDetails: NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      ),
+    );
   }
 
   void addSeconds(int secondsToAdd) {
@@ -255,7 +291,9 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
 
       final remaining = state.endTime!.difference(DateTime.now());
       if (remaining.inSeconds <= 0) {
-        stopTimer();
+        // If expired natively while Dart is active (within 2 seconds of zero), fire explicitly
+        final justExpired = remaining.inSeconds >= -2;
+        stopTimer(isNaturalExpiration: justExpired);
       } else {
         state = state.copyWith(remaining: remaining);
       }
@@ -285,7 +323,7 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
       ongoing: true, 
       autoCancel: false,
       color: const Color(0xFF34C759),
-      icon: '@mipmap/launcher_icon',
+      icon: '@mipmap/ic_launcher',
     );
     await _localNotificationsPlugin.show(
       id: _runningNotificationId,
@@ -314,7 +352,7 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
       importance: Importance.max,
       priority: Priority.high,
       color: Color(0xFF34C759),
-      icon: '@mipmap/launcher_icon',
+      icon: '@mipmap/ic_launcher',
       playSound: true,
     );
     
@@ -328,7 +366,15 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
       id: _completionNotificationId,
       title: 'Rest Complete!',
       body: 'Time for: $exerciseName',
-      scheduledDate: tz.TZDateTime.from(endTime, tz.local),
+      scheduledDate: tz.TZDateTime(
+        tz.local,
+        endTime.year,
+        endTime.month,
+        endTime.day,
+        endTime.hour,
+        endTime.minute,
+        endTime.second,
+      ),
       notificationDetails: NotificationDetails(
         android: androidDetails,
         iOS: iosDetails,

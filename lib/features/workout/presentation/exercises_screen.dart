@@ -1,4 +1,5 @@
 import 'package:calorie_tracker/features/workout/models/program.dart';
+import 'package:calorie_tracker/features/workout/models/workout_set.dart';
 import 'package:calorie_tracker/features/workout/presentation/add_exercise_screen.dart';
 import 'package:calorie_tracker/features/workout/presentation/add_program_screen.dart';
 import 'package:calorie_tracker/features/workout/presentation/exercise_details_screen.dart';
@@ -118,7 +119,42 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                               motion: const BehindMotion(),
                                               children: [
                                                 SlidableAction(
-                                                  onPressed: (_) {},
+                                                  onPressed: (_) {
+                                                    final backendId =
+                                                        exercise.backendId ??
+                                                        'local_${exercise.id}';
+                                                    final sets = setsAsync
+                                                        .whenData((s) => s)
+                                                        .value;
+                                                    WorkoutSet? lastSet;
+                                                    if (sets != null &&
+                                                        sets.isNotEmpty) {
+                                                      final sorted = [...sets]
+                                                        ..sort((a, b) {
+                                                          final aDate =
+                                                              a.date ??
+                                                              DateTime(2000);
+                                                          final bDate =
+                                                              b.date ??
+                                                              DateTime(2000);
+                                                          return bDate
+                                                              .compareTo(aDate);
+                                                        });
+                                                      lastSet = sorted.first;
+                                                    }
+                                                    ref
+                                                        .read(
+                                                          workoutSetProvider(
+                                                            backendId,
+                                                          ).notifier,
+                                                        )
+                                                        .showAddSetModal(
+                                                          exercise.name ??
+                                                              'Rest',
+                                                          backendId,
+                                                          lastSet,
+                                                        );
+                                                  },
                                                   backgroundColor: isDark
                                                       ? Colors.green.shade900
                                                             .withValues(

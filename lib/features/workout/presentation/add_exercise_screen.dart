@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/search_exercises_provider.dart';
 import 'package:calorie_tracker/features/workout/providers/workout_provider.dart';
@@ -89,7 +90,8 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                     Expanded(
                       child: CupertinoSearchTextField(
                         controller: _searchController,
-                        placeholder: 'Search or enter exercise name...',
+                        placeholder:
+                            'Search by exercise name, target muscle, equipment...',
                         backgroundColor: isDark
                             ? const Color(0xFF1C1C1E)
                             : CupertinoColors.systemGroupedBackground,
@@ -150,7 +152,35 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                     final query = searchState.query.toLowerCase();
                     final filtered = allExercises.where((e) {
                       final name = e.name?.toLowerCase() ?? '';
-                      return name.contains(query);
+                      if (name.contains(query)) return true;
+
+                      if (e.jsonDesc != null) {
+                        try {
+                          final desc =
+                              json.decode(e.jsonDesc!) as Map<String, dynamic>;
+
+                          final category =
+                              (desc['category'] as String?)?.toLowerCase() ??
+                              '';
+                          if (category.contains(query)) return true;
+
+                          final equipment =
+                              (desc['equipment'] as String?)?.toLowerCase() ??
+                              '';
+                          if (equipment.contains(query)) return true;
+
+                          final muscles = desc['primaryMuscles'] as List?;
+                          if (muscles != null &&
+                              muscles.any(
+                                (m) =>
+                                    m.toString().toLowerCase().contains(query),
+                              )) {
+                            return true;
+                          }
+                        } catch (_) {}
+                      }
+
+                      return false;
                     }).toList();
 
                     filtered.sort(
@@ -211,11 +241,11 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                 icon: CupertinoIcons.info,
                                 backgroundColor: isDark
                                     ? CupertinoColors.systemBlue.withValues(
-                                      alpha: 0.2,
-                                    )
+                                        alpha: 0.2,
+                                      )
                                     : CupertinoColors.systemBlue.withValues(
-                                      alpha: 0.1,
-                                    ),
+                                        alpha: 0.1,
+                                      ),
                                 foregroundColor: CupertinoColors.systemBlue,
                                 label: 'Info',
                               ),
@@ -244,9 +274,8 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                               style: TextStyle(
                                 color: isLocked
                                     ? isDark
-                                          ? CupertinoColors.systemGrey.withValues(
-                                              alpha: 0.5,
-                                            )
+                                          ? CupertinoColors.systemGrey
+                                                .withValues(alpha: 0.5)
                                           : CupertinoColors.systemGreen
                                     : isDark
                                     ? CupertinoColors.white
