@@ -1,4 +1,4 @@
-package com.calorietracker.calorie_tracker
+package com.qarrprojects.trackers
 
 import io.flutter.embedding.android.FlutterActivity
 

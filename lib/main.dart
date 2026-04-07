@@ -6,6 +6,7 @@ import 'package:calorie_tracker/features/meals/repo/meal_repo.dart';
 import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
 import 'package:calorie_tracker/features/meals/services/meal_sync_service.dart';
 import 'package:calorie_tracker/core/services/api_handler/upload_service.dart';
+import 'package:calorie_tracker/features/workout/presentation/widgets/workout_timer_overlay.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 
 void main() async {
@@ -49,6 +50,11 @@ class MyApp extends ConsumerWidget {
         child: MaterialApp(
           navigatorKey: NavigationService.navigatorKey,
           debugShowCheckedModeBanner: false,
+          builder: (context, child) {
+            return Stack(
+              children: [if (child != null) child, const WorkoutTimerOverlay()],
+            );
+          },
           themeMode: themeMode,
           theme: ThemeData(
             useMaterial3: false,
@@ -294,6 +300,9 @@ class TokenRouter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (LocalData.token == null) {
+      return const LoginScreen();
+    }
     return const Home();
   }
 }
