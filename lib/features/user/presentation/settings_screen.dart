@@ -2,12 +2,15 @@ import 'package:calorie_tracker/core/dialogs/dialog.dart';
 import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/core/services/local_data/isar_service.dart';
 import 'package:calorie_tracker/core/services/local_data/local_data.dart';
-import 'package:calorie_tracker/features/auth/presentation/login_screen.dart';
+import 'package:calorie_tracker/core/providers/session_controller.dart';
+import 'package:calorie_tracker/features/auth/presentation/register_screen.dart';
 import 'package:calorie_tracker/features/user/presentation/meal_settings_screen.dart';
 import 'package:calorie_tracker/features/user/presentation/workout_settings_screen.dart';
 import 'package:calorie_tracker/features/user/providers/user_provider.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 import 'package:flutter/cupertino.dart';
+import '../../medications/presentation/medication_settings_screen.dart';
+import '../../../core/services/notifications/notification_coordinator.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -16,6 +19,9 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(userProvider);
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+    final isGuest = LocalData.userType == 'ANONYMOUS';
+    final profileName = userAsync.value?.name ?? LocalData.userName ?? 'Guest';
+    final profileEmail = userAsync.value?.email ?? LocalData.userEmail;
 
     return CupertinoPageScaffold(
       backgroundColor: isDark
@@ -70,7 +76,7 @@ class SettingsScreen extends ConsumerWidget {
                                 userAsync.whenOrNull(
                                   data: (user) => Center(
                                     child: Text(
-                                      (user?.name ?? 'U')
+                                      (user?.name ?? profileName)
                                           .substring(0, 1)
                                           .toUpperCase(),
                                       style: CustomTextStyle.textxLarge20.w700
@@ -89,12 +95,14 @@ class SettingsScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  userAsync.value?.name ?? '—',
+                                  profileName,
                                   style: CustomTextStyle.textmedium16.w700,
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  userAsync.value?.email ?? '—',
+                                  isGuest
+                                      ? 'Guest account'
+                                      : profileEmail ?? '—',
                                   style: CustomTextStyle.textsmall14.withColor(
                                     AppColors.greyTertiary,
                                   ),
@@ -152,17 +160,58 @@ class SettingsScreen extends ConsumerWidget {
                       },
                     ),
                     const SizedBox(height: 20),
+                    _SettingsTile(
+                      icon: CupertinoIcons.capsule,
+                      title: 'Medication Settings',
+                      iconColor: CupertinoColors.systemGreen,
+                      onTap: () => Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (_) => const MedicationSettingsScreen(),
+                        ),
+                      ),
+                    ),
                     const _SectionLabel('Account'),
+                    _SettingsTile(
+                      icon: CupertinoIcons.person_crop_circle_badge_checkmark,
+                      title: 'Account type',
+                      subtitle: isGuest ? 'Guest' : 'Email account',
+                    ),
                     _SettingsTile(
                       icon: CupertinoIcons.person,
                       title: 'Name',
-                      subtitle: userAsync.value?.name,
+                      subtitle: profileName,
                     ),
                     _SettingsTile(
                       icon: CupertinoIcons.mail,
                       title: 'Email',
-                      subtitle: userAsync.value?.email,
+                      subtitle: profileEmail ?? (isGuest ? 'Not linked' : null),
                     ),
+                    if (isGuest)
+                      _SettingsTile(
+                        icon: CupertinoIcons.link,
+                        title: 'Link email',
+                        subtitle:
+                            'Keep this account if you reinstall or change devices',
+                        onTap: () => Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) =>
+                                const RegisterScreen(isGuestUpgrade: true),
+                          ),
+                        ),
+                      ),
+                    if (LocalData.prefs.getBool(
+                          'accountDataReconciliationNeeded:${LocalData.userId}',
+                        ) ==
+                        true)
+                      const _SettingsTile(
+                        icon: CupertinoIcons.exclamationmark_triangle,
+                        title: 'Local data needs review',
+                        subtitle:
+                            'Older shared meals or workout sets were kept separate until you choose how to reconcile them.',
+                        iconColor: CupertinoColors.systemOrange,
+                      ),
                     const SizedBox(height: 20),
 
                     // ── Danger zone ─────────────────────────────────────────
@@ -173,27 +222,43 @@ class SettingsScreen extends ConsumerWidget {
                       titleColor: AppColors.error500,
                       iconColor: AppColors.error500,
                       onTap: () async {
-                        await LocalData.removeToken();
-                        pushToAndClearStack(const LoginScreen());
+                        await ref.read(sessionProvider.notifier).signOut();
                       },
                     ),
                     _SettingsTile(
                       icon: CupertinoIcons.trash,
                       title: 'Clear Local Data',
-                      subtitle: 'Drop all rows from Isar',
+                      subtitle: 'Remove this account’s data from this device',
                       titleColor: AppColors.error500,
                       iconColor: AppColors.error500,
                       onTap: () async {
                         final confirmed = await Dialogs.confirmDialog(
                           title: 'Clear Local Data',
                           subtitle:
-                              'This will permanently delete all your local meals, exercises, and workout data. This action cannot be undone.',
+                              'This removes local meals, exercises, workouts, and this account’s medication records, including unsynced changes, and cancels medication reminders. Cloud records are not deleted and may download again. This action cannot be undone.',
                           yesText: 'Clear All',
                           noText: 'Cancel',
                         );
 
                         if (confirmed) {
                           try {
+                            for (final key
+                                in LocalData.prefs
+                                    .getKeys()
+                                    .where(
+                                      (key) => key.startsWith(
+                                        'medication_scheduled_',
+                                      ),
+                                    )
+                                    .toList()) {
+                              for (final occurrence
+                                  in LocalData.prefs.getStringList(key) ??
+                                      <String>[]) {
+                                await NotificationCoordinator.instance
+                                    .cancelMedication(occurrence);
+                              }
+                              await LocalData.prefs.remove(key);
+                            }
                             await IsarService.clearAll();
                             AppToast.success('Local data cleared successfully');
                           } catch (e) {

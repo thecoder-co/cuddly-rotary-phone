@@ -1,8 +1,14 @@
 import 'package:calorie_tracker/features/meals_home/presentation/home.dart';
 import 'package:calorie_tracker/features/user/presentation/settings_screen.dart';
-import 'package:calorie_tracker/features/auth/providers/auth_provider.dart';
-import 'package:calorie_tracker/features/user/providers/user_provider.dart';
+import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
+import 'package:calorie_tracker/features/meals/repo/meal_repo.dart';
+import 'package:calorie_tracker/features/meals/services/meal_sync_service.dart';
+import 'package:calorie_tracker/core/services/api_handler/upload_service.dart';
+import 'package:calorie_tracker/core/services/local_data/local_data.dart';
 import 'package:calorie_tracker/features/workout/presentation/workout_home.dart';
+import 'package:calorie_tracker/features/medications/presentation/medications_home.dart';
+import 'package:calorie_tracker/features/medications/providers/medication_provider.dart';
+import 'package:calorie_tracker/core/services/notifications/notification_coordinator.dart';
 import 'package:calorie_tracker/packages/packages.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -16,15 +22,23 @@ class _HomeState extends ConsumerState<Home> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authProvider.notifier).refreshTokenOnStartup();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      MealSyncService(
+        localRepo: LocalMealRepo(),
+        cloudRepo: MealCloudRepo(),
+        uploadService: UploadService(),
+      ).syncPendingMeals();
+      ref.read(medicationSyncServiceProvider).syncPending();
+      ref.read(medicationActionsProvider).refreshReminders();
+      final payload = NotificationCoordinator.instance.takeLaunchPayload();
+      if (payload != null && payload.belongsTo(LocalData.userId)) {
+        NotificationCoordinator.instance.onPayload?.call(payload);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final userAsync = ref.watch(userProvider);
-
     final topPad = MediaQuery.paddingOf(context).top;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
@@ -97,66 +111,122 @@ class _HomeState extends ConsumerState<Home> {
                 const SizedBox(height: 40),
                 // Category grid
                 Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.88,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _CategoryCard(
-                        label: 'Meals',
-                        subtitle: 'Track calories\n& macros',
-                        icon: Icons.restaurant_menu_rounded,
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF17621A), Color(0xFF3A7F3A)],
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 184,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _CategoryCard(
+                                  label: 'Meals',
+                                  subtitle: 'Track calories\n& macros',
+                                  icon: Icons.restaurant_menu_rounded,
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Color(0xFF17621A),
+                                      Color(0xFF3A7F3A),
+                                    ],
+                                  ),
+                                  iconBgColor: Colors.white.withOpacity(0.18),
+                                  onTap: () => pushTo(const MealsHome()),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _CategoryCard(
+                                  label: 'Workouts',
+                                  subtitle: 'Log your\nexercise',
+                                  icon: Icons.fitness_center_rounded,
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Color(0xFF1565C0),
+                                      Color(0xFF42A5F5),
+                                    ],
+                                  ),
+                                  iconBgColor: Colors.white.withOpacity(0.18),
+                                  onTap: () {
+                                    pushTo(const WorkoutHome());
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        iconBgColor: Colors.white.withOpacity(0.18),
-                        onTap: () => pushTo(const MealsHome()),
-                      ),
-                      _CategoryCard(
-                        label: 'Workouts',
-                        subtitle: 'Log your\nexercise',
-                        icon: Icons.fitness_center_rounded,
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 142,
+                          width: double.infinity,
+                          child: _CategoryCard(
+                            label: 'Medications',
+                            subtitle: 'Doses, reminders & supply',
+                            icon: Icons.medication_rounded,
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFF00796B), Color(0xFF26A69A)],
+                            ),
+                            iconBgColor: Colors.white.withOpacity(0.18),
+                            onTap: () => pushTo(
+                              const MedicationsHome(),
+                              null,
+                              PushStyle.cupertino,
+                            ),
+                          ),
                         ),
-                        iconBgColor: Colors.white.withOpacity(0.18),
-                        onTap: () {
-                          pushTo(const WorkoutHome());
-                        },
-                      ),
-                      _CategoryCard(
-                        label: 'Spending',
-                        subtitle: 'Monitor your\nbudget',
-                        icon: Icons.wallet_rounded,
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF6A1B9A), Color(0xFFAB47BC)],
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 184,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _CategoryCard(
+                                  label: 'Spending',
+                                  subtitle: 'Monitor your\nbudget',
+                                  icon: Icons.wallet_rounded,
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Color(0xFF6A1B9A),
+                                      Color(0xFFAB47BC),
+                                    ],
+                                  ),
+                                  iconBgColor: Colors.white.withOpacity(0.18),
+                                  onTap: () {},
+                                  comingSoon: true,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _CategoryCard(
+                                  label: 'Mood',
+                                  subtitle: 'Track your\nmood',
+                                  icon: Icons.sentiment_satisfied_alt_rounded,
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Color(0xFFFF4E7E),
+                                      Color(0xFFFF0D5E),
+                                    ],
+                                  ),
+                                  iconBgColor: Colors.white.withOpacity(0.18),
+                                  onTap: () {},
+                                  comingSoon: true,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        iconBgColor: Colors.white.withOpacity(0.18),
-                        onTap: () {},
-                        comingSoon: true,
-                      ),
-                      _CategoryCard(
-                        label: 'Mood',
-                        subtitle: 'Track your\nmood',
-                        icon: Icons.sentiment_satisfied_alt_rounded,
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFFFF4E7E), Color(0xFFFF0D5E)],
-                        ),
-                        iconBgColor: Colors.white.withOpacity(0.18),
-                        onTap: () {},
-                        comingSoon: true,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

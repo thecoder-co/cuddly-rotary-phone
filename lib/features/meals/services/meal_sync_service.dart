@@ -3,11 +3,14 @@ import 'package:calorie_tracker/features/meals/models/meal_dto.dart';
 import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
 import 'package:calorie_tracker/features/meals/repo/meal_repo.dart';
 import 'package:calorie_tracker/core/services/api_handler/upload_service.dart';
+import 'package:calorie_tracker/core/providers/account_scope_provider.dart';
+import 'package:calorie_tracker/core/services/local_data/local_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:developer';
 
 final mealSyncServiceProvider = Provider((ref) {
+  ref.watch(accountScopeProvider);
   return MealSyncService(
     localRepo: LocalMealRepo(),
     cloudRepo: MealCloudRepo(),
@@ -19,16 +22,24 @@ class MealSyncService {
   final LocalMealRepo localRepo;
   final MealCloudRepo cloudRepo;
   final UploadService uploadService;
+  final String? accountId;
 
   MealSyncService({
     required this.localRepo,
     required this.cloudRepo,
     required this.uploadService,
-  });
+  }) : accountId = LocalData.userId;
+
+  bool get _isActiveAccount =>
+      accountId != null &&
+      accountId == LocalData.userId &&
+      LocalData.token != null;
 
   Future<void> syncPendingMeals() async {
+    if (!_isActiveAccount) return;
     final pendingMeals = await localRepo.getPendingMeals();
     for (final meal in pendingMeals) {
+      if (!_isActiveAccount) return;
       try {
         if (meal.image != null && meal.image!.startsWith('offline_file:')) {
           final localPath = meal.image!.replaceAll('offline_file:', '');
@@ -40,6 +51,8 @@ class MealSyncService {
             });
           }
         }
+
+        if (!_isActiveAccount) return;
 
         if (meal.syncStatus == SyncStatus.pendingCreate) {
           final dto = CreateMealDto(
@@ -143,6 +156,7 @@ class MealSyncService {
   }
 
   Future<void> syncDailyMeals(String date) async {
+    if (!_isActiveAccount) return;
     try {
       final res = await cloudRepo.getDailyMeals(date);
       if (!res.valid || res.data == null) return;
@@ -152,6 +166,7 @@ class MealSyncService {
   }
 
   Future<void> syncAllMeals(String? query) async {
+    if (!_isActiveAccount) return;
     try {
       final res = await cloudRepo.getAllMeals(name: query);
       if (!res.valid || res.data == null) return;
@@ -161,6 +176,7 @@ class MealSyncService {
   }
 
   Future<void> _mergeIntoIsar(List<MealResponseDto> meals) async {
+    if (!_isActiveAccount) return;
     final isar = localRepo.isar;
     await isar.writeTxn(() async {
       for (final m in meals) {

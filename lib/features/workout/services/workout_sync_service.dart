@@ -8,9 +8,11 @@ import 'package:calorie_tracker/features/workout/models/workout_dto.dart';
 import 'package:calorie_tracker/features/workout/repo/local_workout_repo.dart';
 import 'package:calorie_tracker/features/workout/repo/workout_repo.dart';
 import 'package:calorie_tracker/core/services/local_data/local_data.dart';
+import 'package:calorie_tracker/core/providers/account_scope_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final workoutSyncServiceProvider = Provider((ref) {
+  ref.watch(accountScopeProvider);
   return WorkoutSyncService(
     localRepo: LocalWorkoutRepo(),
     cloudRepo: WorkoutCloudRepo(),
@@ -20,14 +22,23 @@ final workoutSyncServiceProvider = Provider((ref) {
 class WorkoutSyncService {
   final LocalWorkoutRepo localRepo;
   final WorkoutCloudRepo cloudRepo;
+  final String? accountId;
 
-  WorkoutSyncService({required this.localRepo, required this.cloudRepo});
+  WorkoutSyncService({required this.localRepo, required this.cloudRepo})
+    : accountId = LocalData.userId;
+
+  bool get _isActiveAccount =>
+      accountId != null &&
+      accountId == LocalData.userId &&
+      LocalData.token != null;
 
   // ----- Programs -----
 
   Future<void> syncPendingPrograms() async {
+    if (!_isActiveAccount) return;
     final pending = await localRepo.getPendingPrograms();
     for (final program in pending) {
+      if (!_isActiveAccount) return;
       try {
         if (program.syncStatus == SyncStatus.pendingCreate) {
           final dto = CreateProgramDto(
@@ -67,6 +78,7 @@ class WorkoutSyncService {
   }
 
   Future<void> syncAllPrograms() async {
+    if (!_isActiveAccount) return;
     try {
       final res = await cloudRepo.getPrograms();
       if (!res.valid || res.data == null) return;
@@ -108,6 +120,7 @@ class WorkoutSyncService {
   // ----- Exercises -----
 
   Future<void> syncPendingExercises() async {
+    if (!_isActiveAccount) return;
     final pending = await localRepo.getPendingExercises();
 
     // 1. Bulk Add from parent
@@ -141,6 +154,7 @@ class WorkoutSyncService {
 
     // 2. Individual Create/Update/Delete
     for (final exercise in pending) {
+      if (!_isActiveAccount) return;
       // Skip handled bulk adds
 
       try {
@@ -184,6 +198,7 @@ class WorkoutSyncService {
   }
 
   Future<void> localAddExercisesFromParent(List<String> exerciseIds) async {
+    if (!_isActiveAccount) return;
     await localRepo.isar.writeTxn(() async {
       for (final backendId in exerciseIds) {
         final existing = await localRepo.getExerciseByBackendId(backendId);
@@ -200,6 +215,7 @@ class WorkoutSyncService {
   }
 
   Future<void> syncExercises() async {
+    if (!_isActiveAccount) return;
     try {
       final res = await cloudRepo.getMyExercises();
       if (!res.valid || res.data == null) return;
@@ -241,6 +257,7 @@ class WorkoutSyncService {
     int page = 1,
     int limit = 100,
   }) async {
+    if (!_isActiveAccount) return false;
     bool hasMore = false;
     try {
       final res = await cloudRepo.getPaginatedExercises(
@@ -294,8 +311,10 @@ class WorkoutSyncService {
   // ----- Sets -----
 
   Future<void> syncPendingWorkoutSets() async {
+    if (!_isActiveAccount) return;
     final pending = await localRepo.getPendingWorkoutSets();
     for (final set in pending) {
+      if (!_isActiveAccount) return;
       try {
         if (set.syncStatus == SyncStatus.pendingCreate) {
           final dto = CreateWorkoutSetDto(
@@ -340,6 +359,7 @@ class WorkoutSyncService {
   }
 
   Future<void> syncWorkoutSets({String? exerciseId, int page = 1}) async {
+    if (!_isActiveAccount) return;
     try {
       final res = await cloudRepo.getSets(exerciseId: exerciseId, page: page);
       if (!res.valid || res.data == null || res.data!.data == null) return;

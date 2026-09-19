@@ -1,24 +1,20 @@
 import 'package:calorie_tracker/core/providers/theme_provider.dart';
 import 'package:calorie_tracker/core/services/local_data/local_data.dart';
+import 'package:calorie_tracker/core/providers/session_controller.dart';
 import 'package:calorie_tracker/features/home/presentation/home.dart';
-import 'package:calorie_tracker/features/auth/presentation/login_screen.dart';
-import 'package:calorie_tracker/features/meals/repo/meal_repo.dart';
-import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
-import 'package:calorie_tracker/features/meals/services/meal_sync_service.dart';
-import 'package:calorie_tracker/core/services/api_handler/upload_service.dart';
 import 'package:calorie_tracker/features/workout/presentation/widgets/workout_timer_overlay.dart';
 import 'package:calorie_tracker/packages/packages.dart';
+import 'package:calorie_tracker/core/services/notifications/notification_coordinator.dart';
+import 'package:calorie_tracker/features/medications/presentation/medications_home.dart';
+import 'package:calorie_tracker/features/onboarding/presentation/account_choice_screen.dart';
+import 'package:calorie_tracker/features/onboarding/presentation/intro_screen.dart';
+import 'package:calorie_tracker/features/onboarding/presentation/splash_screen.dart';
+import 'package:calorie_tracker/core/services/session/session_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalData.init();
-  if (LocalData.token != null) {
-    MealSyncService(
-      localRepo: LocalMealRepo(),
-      cloudRepo: MealCloudRepo(),
-      uploadService: UploadService(),
-    ).syncPendingMeals();
-  }
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -27,6 +23,21 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    NotificationCoordinator.instance.onPayload = (payload) {
+      if (payload.feature == 'medications') {
+        if (!payload.belongsTo(LocalData.userId)) return;
+        if (LocalData.token == null ||
+            NavigationService.navigatorKey.currentState == null) {
+          NotificationCoordinator.instance.deferPayload(payload);
+          return;
+        }
+        NavigationService.navigatorKey.currentState?.push(
+          CupertinoPageRoute(
+            builder: (_) => MedicationsHome(initialPayload: payload),
+          ),
+        );
+      }
+    };
     final themeMode = ref.watch(themeModeProvider);
     return GestureDetector(
       onTap: () {
@@ -50,11 +61,19 @@ class MyApp extends ConsumerWidget {
         child: MaterialApp(
           navigatorKey: NavigationService.navigatorKey,
           debugShowCheckedModeBanner: false,
-          builder: (context, child) {
-            return Stack(
-              children: [if (child != null) child, const WorkoutTimerOverlay()],
-            );
-          },
+          builder: (context, child) => Consumer(
+            builder: (context, ref, _) {
+              final isAuthenticated =
+                  ref.watch(sessionProvider).asData?.value.status ==
+                  SessionStatus.authenticated;
+              return Stack(
+                children: [
+                  if (child != null) child,
+                  if (isAuthenticated) const WorkoutTimerOverlay(),
+                ],
+              );
+            },
+          ),
           themeMode: themeMode,
           theme: ThemeData(
             useMaterial3: false,
@@ -288,21 +307,51 @@ class MyApp extends ConsumerWidget {
               ),
             ),
           ),
-          home: const TokenRouter(),
+          home: const SessionRouter(),
         ),
       ),
     );
   }
 }
 
-class TokenRouter extends StatelessWidget {
-  const TokenRouter({super.key});
+class SessionRouter extends ConsumerWidget {
+  const SessionRouter({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    if (LocalData.token == null) {
-      return const LoginScreen();
-    }
-    return const Home();
-  }
+  Widget build(BuildContext context, WidgetRef ref) => ref
+      .watch(sessionProvider)
+      .when(
+        loading: () => const SplashScreen(),
+        error: (error, _) => SplashScreen(
+          message: 'Unable to start QarrTrack: $error',
+          onRetry: () => ref.read(sessionProvider.notifier).retryBootstrap(),
+        ),
+        data: (session) {
+          switch (session.status) {
+            case SessionStatus.authenticated:
+              return const Home();
+            case SessionStatus.signedOut:
+              return session.onboardingComplete
+                  ? const AccountChoiceScreen()
+                  : const IntroScreen();
+            case SessionStatus.recoverableFailure:
+              return SplashScreen(
+                message: session.message,
+                onRetry: () =>
+                    ref.read(sessionProvider.notifier).retryBootstrap(),
+                recoveryAction: session.hasCachedAccount
+                    ? CupertinoButton(
+                        onPressed: () => ref
+                            .read(sessionProvider.notifier)
+                            .continueWithCachedAccount(),
+                        child: const Text(
+                          'Continue with offline data',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    : null,
+              );
+          }
+        },
+      );
 }

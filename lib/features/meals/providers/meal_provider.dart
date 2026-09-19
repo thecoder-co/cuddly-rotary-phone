@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'package:calorie_tracker/features/meals/repo/local_meal_repo.dart';
 import 'package:calorie_tracker/features/meals/services/meal_sync_service.dart';
+import 'package:calorie_tracker/core/providers/account_scope_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:calorie_tracker/features/meals/models/meal.dart';
 
 typedef MealQuery = ({String? date, String? query});
 
-final localMealRepoProvider = Provider((ref) => LocalMealRepo());
+final localMealRepoProvider = Provider((ref) {
+  ref.watch(accountScopeProvider);
+  return LocalMealRepo();
+});
 
 final mealByIdProvider = FutureProvider.family<Meal?, dynamic>((ref, id) async {
   return await ref.watch(localMealRepoProvider).getMeal(id);

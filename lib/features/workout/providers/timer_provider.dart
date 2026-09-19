@@ -6,9 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:live_activities/live_activities.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:calorie_tracker/core/services/notifications/notification_coordinator.dart';
 
 class TimerState extends Equatable {
   final bool isRunning;
@@ -62,7 +61,7 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
   Timer? _timer;
   final _liveActivities = LiveActivities();
   final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+      NotificationCoordinator.instance.plugin;
 
   static const _runningNotificationId = 8888;
   static const _completionNotificationId = 8889;
@@ -71,8 +70,9 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
 
   @override
   TimerState build() {
-    _initNativeServices();
-
+    if (Platform.isIOS) {
+      _liveActivities.init(appGroupId: 'group.com.qarrprojects.trackers');
+    }
     // Check persistence to see if there's a running timer
     final endTimeMillis = LocalData.prefs.getInt('workout_timer_end_time');
     final name =
@@ -99,62 +99,12 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
         // Clear expired timer data from prefs
         _clearPrefs();
         if (Platform.isIOS && liveActivityId != null) {
-           _liveActivities.endActivity(liveActivityId);
+          _liveActivities.endActivity(liveActivityId);
         }
       }
     }
 
     return const TimerState();
-  }
-
-  Future<void> _initNativeServices() async {
-    tz.initializeTimeZones();
-    try {
-      final tzInfo = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(tzInfo.identifier));
-    } catch (_) {
-      // Fallback if unavailable
-    }
-
-    // Android Initialization
-    if (Platform.isAndroid) {
-      const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
-
-      const DarwinInitializationSettings initializationSettingsDarwin =
-          DarwinInitializationSettings(
-            requestAlertPermission: false,
-            requestBadgePermission: false,
-            requestSoundPermission: false,
-          );
-
-      const InitializationSettings initializationSettings =
-          InitializationSettings(
-            android: initializationSettingsAndroid,
-            iOS: initializationSettingsDarwin,
-          );
-
-      await _localNotificationsPlugin.initialize(
-        settings: initializationSettings,
-      );
-    } else if (Platform.isIOS) {
-      const DarwinInitializationSettings initializationSettingsDarwin =
-          DarwinInitializationSettings(
-            requestAlertPermission: false,
-            requestBadgePermission: false,
-            requestSoundPermission: false,
-          );
-      const InitializationSettings initializationSettings =
-          InitializationSettings(
-            iOS: initializationSettingsDarwin,
-          );
-      await _localNotificationsPlugin.initialize(
-        settings: initializationSettings,
-      );
-      _liveActivities.init(
-        appGroupId: 'group.com.qarrprojects.trackers',
-      ); 
-    }
   }
 
   Future<void> startTimer({String exerciseName = 'Rest'}) async {
@@ -174,8 +124,10 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
     String? activityId;
 
     if (Platform.isAndroid) {
-      final androidPlugin = _localNotificationsPlugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin = _localNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       await androidPlugin?.requestNotificationsPermission();
       await androidPlugin?.requestExactAlarmsPermission();
       _showAndroidOngoingNotification(endTime, exerciseName);
@@ -188,7 +140,7 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
         );
       }
     }
-    
+
     await _scheduleCompletionNotification(endTime, exerciseName);
 
     state = TimerState(
@@ -261,7 +213,7 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
 
     _timer?.cancel();
     _localNotificationsPlugin.cancel(id: _completionNotificationId);
-    
+
     _scheduleCompletionNotification(newEndTime, state.exerciseName);
 
     if (Platform.isAndroid) {
@@ -320,7 +272,7 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
       when: endTime.millisecondsSinceEpoch,
       usesChronometer: true,
       chronometerCountDown: true,
-      ongoing: true, 
+      ongoing: true,
       autoCancel: false,
       color: const Color(0xFF34C759),
       icon: '@mipmap/ic_launcher',
@@ -334,17 +286,23 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
       ),
     );
   }
-  
+
   Future<void> _scheduleCompletionNotification(
     DateTime endTime,
     String exerciseName,
   ) async {
     if (Platform.isIOS) {
-       final iosPlugin = _localNotificationsPlugin.resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>();
-       await iosPlugin?.requestPermissions(alert: true, badge: true, sound: true);
+      final iosPlugin = _localNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      await iosPlugin?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
     }
-    
+
     final androidDetails = const AndroidNotificationDetails(
       'completion_channel',
       'Timer Completion',
@@ -355,13 +313,13 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
       icon: '@mipmap/ic_launcher',
       playSound: true,
     );
-    
+
     final iosDetails = const DarwinNotificationDetails(
       presentSound: true,
       presentAlert: true,
       interruptionLevel: InterruptionLevel.timeSensitive,
     );
-    
+
     await _localNotificationsPlugin.zonedSchedule(
       id: _completionNotificationId,
       title: 'Rest Complete!',
@@ -388,15 +346,11 @@ class WorkoutTimerNotifier extends Notifier<TimerState> {
     String exerciseName,
   ) async {
     try {
-      final activityId = await _liveActivities.createActivity(
-        'workout_rest_timer',
-        {
-          'exerciseName': exerciseName,
-          'endTime':
-              endTime.millisecondsSinceEpoch ~/
-              1000, 
-        },
-      );
+      final activityId = await _liveActivities
+          .createActivity('workout_rest_timer', {
+            'exerciseName': exerciseName,
+            'endTime': endTime.millisecondsSinceEpoch ~/ 1000,
+          });
       return activityId;
     } catch (e) {
       return null;

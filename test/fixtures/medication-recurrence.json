@@ -1,0 +1,282 @@
+[
+  {
+    "frequency": "DAILY",
+    "timezone": "Africa/Lagos",
+    "startDate": "2026-09-07",
+    "rule": {
+      "interval": 1
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-09-07T00:00:00Z",
+    "to": "2026-09-09T23:59:59Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "daily",
+    "expected": [
+      "2026-09-07T07:00:00.000Z",
+      "2026-09-08T07:00:00.000Z",
+      "2026-09-09T07:00:00.000Z"
+    ]
+  },
+  {
+    "frequency": "WEEKLY",
+    "timezone": "Africa/Lagos",
+    "startDate": "2026-09-07",
+    "rule": {
+      "interval": 1,
+      "weekdays": [
+        1,
+        3,
+        5
+      ]
+    },
+    "slots": [
+      "08:00",
+      "20:00"
+    ],
+    "from": "2026-09-07T00:00:00Z",
+    "to": "2026-09-13T23:59:59Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "weekly two slots",
+    "expected": [
+      "2026-09-07T07:00:00.000Z",
+      "2026-09-07T19:00:00.000Z",
+      "2026-09-09T07:00:00.000Z",
+      "2026-09-09T19:00:00.000Z",
+      "2026-09-11T07:00:00.000Z",
+      "2026-09-11T19:00:00.000Z"
+    ]
+  },
+  {
+    "frequency": "MONTHLY",
+    "timezone": "Africa/Lagos",
+    "startDate": "2026-01-31",
+    "rule": {
+      "monthDays": [
+        31
+      ]
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-02-01T00:00:00Z",
+    "to": "2026-03-01T00:00:00Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "monthly last valid",
+    "expected": [
+      "2026-02-28T07:00:00.000Z"
+    ]
+  },
+  {
+    "frequency": "MONTHLY",
+    "timezone": "Africa/Lagos",
+    "startDate": "2026-01-31",
+    "rule": {
+      "monthDays": [
+        31
+      ]
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-02-01T00:00:00Z",
+    "to": "2026-03-01T00:00:00Z",
+    "invalidDatePolicy": "SKIP",
+    "name": "monthly skip",
+    "expected": []
+  },
+  {
+    "frequency": "ANNUAL",
+    "timezone": "Africa/Lagos",
+    "startDate": "2024-02-29",
+    "rule": {
+      "annualDates": [
+        {
+          "month": 2,
+          "day": 29
+        }
+      ]
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-02-01T00:00:00Z",
+    "to": "2026-03-01T00:00:00Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "annual leap fallback",
+    "expected": [
+      "2026-02-28T07:00:00.000Z"
+    ]
+  },
+  {
+    "frequency": "ANNUAL",
+    "timezone": "Africa/Lagos",
+    "startDate": "2024-02-29",
+    "rule": {
+      "annualDates": [
+        {
+          "month": 2,
+          "day": 29
+        }
+      ]
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-02-01T00:00:00Z",
+    "to": "2026-03-01T00:00:00Z",
+    "invalidDatePolicy": "SKIP",
+    "name": "annual leap skip",
+    "expected": []
+  },
+  {
+    "frequency": "INTERVAL",
+    "timezone": "Africa/Lagos",
+    "startDate": "2026-09-07",
+    "rule": {
+      "interval": 8,
+      "intervalUnit": "HOURS"
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-09-07T00:00:00Z",
+    "to": "2026-09-08T06:59:59Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "interval elapsed hours",
+    "expected": [
+      "2026-09-07T07:00:00.000Z",
+      "2026-09-07T15:00:00.000Z",
+      "2026-09-07T23:00:00.000Z"
+    ]
+  },
+  {
+    "frequency": "CYCLICAL",
+    "timezone": "Africa/Lagos",
+    "startDate": "2026-09-07",
+    "rule": {
+      "cycleOnDays": 2,
+      "cycleOffDays": 1
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-09-07T00:00:00Z",
+    "to": "2026-09-09T23:59:59Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "cycle 2 on 1 off",
+    "expected": [
+      "2026-09-07T07:00:00.000Z",
+      "2026-09-08T07:00:00.000Z"
+    ]
+  },
+  {
+    "frequency": "PRN",
+    "timezone": "Africa/Lagos",
+    "startDate": "2026-09-07",
+    "rule": {
+      "interval": 1
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-09-07T00:00:00Z",
+    "to": "2026-09-09T23:59:59Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "PRN no expected doses",
+    "expected": []
+  },
+  {
+    "frequency": "DAILY",
+    "timezone": "Africa/Lagos",
+    "startDate": "2026-09-07",
+    "rule": {
+      "interval": 1
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-09-07T00:00:00Z",
+    "to": "2026-09-09T23:59:59Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "end date inclusive",
+    "endDate": "2026-09-08",
+    "expected": [
+      "2026-09-07T07:00:00.000Z",
+      "2026-09-08T07:00:00.000Z"
+    ]
+  },
+  {
+    "frequency": "DAILY",
+    "timezone": "Pacific/Auckland",
+    "startDate": "2026-09-01",
+    "rule": {
+      "interval": 1
+    },
+    "slots": [
+      "08:00"
+    ],
+    "from": "2026-09-07T19:00:00Z",
+    "to": "2026-09-07T21:00:00Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "positive timezone boundary",
+    "expected": [
+      "2026-09-07T20:00:00.000Z"
+    ]
+  },
+  {
+    "frequency": "DAILY",
+    "timezone": "America/New_York",
+    "startDate": "2026-09-01",
+    "rule": {
+      "interval": 1
+    },
+    "slots": [
+      "23:30"
+    ],
+    "from": "2026-09-07T02:00:00Z",
+    "to": "2026-09-07T05:00:00Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "negative timezone boundary",
+    "expected": [
+      "2026-09-07T03:30:00.000Z"
+    ]
+  },
+  {
+    "frequency": "DAILY",
+    "timezone": "America/New_York",
+    "startDate": "2026-03-08",
+    "rule": {
+      "interval": 1
+    },
+    "slots": [
+      "02:30"
+    ],
+    "from": "2026-03-08T00:00:00Z",
+    "to": "2026-03-08T23:59:59Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "DST spring gap",
+    "expected": [
+      "2026-03-08T07:30:00.000Z"
+    ]
+  },
+  {
+    "frequency": "DAILY",
+    "timezone": "America/New_York",
+    "startDate": "2026-11-01",
+    "rule": {
+      "interval": 1
+    },
+    "slots": [
+      "01:30"
+    ],
+    "from": "2026-11-01T00:00:00Z",
+    "to": "2026-11-01T23:59:59Z",
+    "invalidDatePolicy": "LAST_VALID_DAY",
+    "name": "DST autumn fold",
+    "expected": [
+      "2026-11-01T05:30:00.000Z"
+    ]
+  }
+]

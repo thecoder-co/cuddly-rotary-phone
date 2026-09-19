@@ -1,48 +1,47 @@
-# Calorie Tracker
+# QarrTrack
 
-**Simple, personalized, and efficient calorie and macro tracking.**
+QarrTrack is a local-first Flutter tracker for meals, workouts, and medications. Spending and Mood are visible only as **Coming soon** until those modules have a complete product and acceptance pass.
 
-## 🚀 Overview
+## Current feature set
 
-The Calorie Tracker is a mobile application designed to help you monitor your dietary intake with precision and ease. Unlike generic tracking apps, this app allows for granular customization of meal components, weights, and nutritional overrides, making it perfect for those tracking complex, homemade, or culturally specific meals. The goal is to make tracking a seamless part of your daily routine.
+- Meal templates and daily meal logging, including components, macros, images, and offline sync.
+- Workout programs, exercises, sets, history, and a rest timer.
+- Medication schedules, dose history, supply adjustments, recurrence, and local reminder actions.
+- Branded splash and introduction, email OTP sign-in, and an anonymous account option.
 
-## ✨ Key Features
+Guest accounts are real server-backed accounts. They persist on this device through their stored credentials; linking an email is required for recovery after reinstalling or on another device. A guest-to-email upgrade keeps the same account ID and data.
 
-### Home Screen (Daily Overview)
+## Local data and sync
 
-* **Daily Summary:** Quickly view your total calorie intake for the day right on the **Home** screen. (e.g., **787.30kcal**).
-* **Intuitive Date Selector:** Easily navigate between days using the calendar widget to check past or plan future entries.
-* **Personalized Greeting:** Start your day with a motivating and personalized welcome message.
-* **Today's Meals:** See a detailed list of all meals logged for the current day, including total weight and calorie count (e.g., **Jollof and Chicken**).
+Credentials are migrated from legacy preferences to platform-secure storage. Tracking data is opened in an account-scoped Isar database, and pending medication operations are durable and account-bound. Existing legacy meals or workout sets that have no demonstrable owner are intentionally retained for review rather than assigned to whichever account signs in first.
 
-### Meals Management
+Sync is triggered at module entry, on local changes, and on app resume. It does not claim to run after the operating system terminates the app.
 
-* **Custom Meal Database:** View and manage a personal list of recurring meals and their standard nutritional values (e.g., **Jollof** at **250.0kcal/100g**).
-* **Search Functionality:** Quickly find existing meals to log or edit using the **Search meals...** bar.
-* **Efficient Editing:** The simple dropdown icon on each meal allows for quick edits or viewing detailed information.
+## Setup
 
-### Detailed Meal Logging (Add Meal)
+```bash
+flutter pub get
+flutter run
+```
 
-* **Composite Meal Creation:** Combine multiple **Submeals** (like **Jollof** and **Chicken Thighs**) into one entry, making it easy to log complex dishes like a full plate.
-* **Weight & Unit Customization:** Enter the precise weight and unit (e.g., **234g**) for each submeal to calculate the exact calories consumed.
-* **Calorie Overrides:** **Override Calories per unit** or **Macros** (Protein, Carbs, Fats) to ensure accuracy when the default meal data doesn't match your specific preparation (e.g., lower fat chicken thighs).
-* **Flexible Data Entry:** Add custom protein and carb counts for highly accurate macro tracking.
+The development API defaults to `http://localhost:3000` on iOS and desktop and `http://10.0.2.2:3000` on an Android emulator. Configure a live build through `AppEndpoints` deliberately; TLS certificate validation is enabled.
 
-## 📸 Screenshots
-<img width="1320" height="2868" alt="Simulator Screenshot - iPhone 16 Pro Max - 2025-10-15 at 15 59 20" src="https://github.com/user-attachments/assets/bf4a5881-3f7f-4b06-8e42-c7379adc64df" /><img width="1320" height="2868" alt="Simulator Screenshot - iPhone 16 Pro Max - 2025-10-15 at 15 56 28" src="https://github.com/user-attachments/assets/3cbfe1a6-60a3-4355-91eb-0ba3bc0cc4f2" /><img width="1320" height="2868" alt="Simulator Screenshot - iPhone 16 Pro Max - 2025-10-15 at 15 59 26" src="https://github.com/user-attachments/assets/fa165ee8-b47e-4780-bbf0-2c70a6eea68d" />
+The paired API repository is `../qarr-tracker`. Run its build before changing authentication contracts:
 
-## ⚙️ Technology Stack
+```bash
+cd ../qarr-tracker
+npm run build
+```
 
-This project is built using the **Flutter** framework, providing a fast, natively-compiled experience across mobile platforms.
+## Verification
 
-* **Framework:** **Flutter (Dart)**
-* **State Management:** **Riverpod**
-* **Database:** **Isar**
+```bash
+flutter analyze
+flutter test test/features/medications test/widget_test.dart
+```
 
-## 🤝 Contributing
+These checks do not exercise real OTP delivery, a production database migration, or device notification delivery. Release work must also verify Android/iOS splash transitions, notification permissions/actions, account switching, offline recovery, signing, and the intended API environment.
 
-We welcome suggestions, bug reports, and contributions! If you have ideas for improving the interface, adding new tracking features, or enhancing data accuracy, please feel free to open an issue or pull request.
+## License
 
-## 📄 License
-
-This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) License](https://creativecommons.org/licenses/by-nc/4.0/).
+Licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).

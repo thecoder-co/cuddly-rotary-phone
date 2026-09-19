@@ -34,12 +34,14 @@ class BackendService {
   final bool jsonEncodeAllData;
   final bool shouldLog;
   final String? token;
+  final bool enableRetries;
 
   BackendService(
     this._dio, {
     this.otherBaseUrl,
     this.token,
     this.shouldLog = false,
+    this.enableRetries = true,
     this.jsonEncodeAllData = true,
   }) {
     initializeDio();
@@ -59,23 +61,24 @@ class BackendService {
 
     _dio.interceptors.addAll([
       // DefaultAPIInterceptor(dio: _dio),
-      RetryInterceptor(
-        dio: dio,
-        logPrint: talker.log,
-        retries: 3,
-        retryDelays: [
-          const Duration(seconds: 2),
-          const Duration(seconds: 4),
-          const Duration(seconds: 6),
-        ],
-      ),
+      if (enableRetries)
+        RetryInterceptor(
+          dio: dio,
+          logPrint: talker.log,
+          retries: 3,
+          retryDelays: [
+            const Duration(seconds: 2),
+            const Duration(seconds: 4),
+            const Duration(seconds: 6),
+          ],
+        ),
     ]);
     fixBadCertificate(dio: dio);
 
     dio.interceptors.add(
       InterceptorsWrapper(onRequest: authRequestInterceptors),
     );
-    if (kDebugMode) {
+    if (kDebugMode && shouldLog) {
       _dio.interceptors.add(TimeResponseInterceptor());
 
       _dio.interceptors.add(FormDataInterceptor());
@@ -83,9 +86,9 @@ class BackendService {
         TalkerDioLogger(
           talker: talker,
           settings: const TalkerDioLoggerSettings(
-            printRequestHeaders: true,
+            printRequestHeaders: false,
             printResponseHeaders: false,
-            printResponseData: true,
+            printResponseData: false,
             printResponseMessage: true,
           ),
         ),
@@ -163,6 +166,9 @@ class BackendService {
     RequestOptions options,
     RequestInterceptorHandler requestInterceptorHandler,
   ) {
+    if (options.extra[CustomExtras.tokenRequired] == false) {
+      return requestInterceptorHandler.next(options);
+    }
     final token = this.token ?? LocalData.token;
     if (token != null && !options.headers.containsKey('Authorization')) {
       options.headers.addAll({'Authorization': 'Bearer $token'});

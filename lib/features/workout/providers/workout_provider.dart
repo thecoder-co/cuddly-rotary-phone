@@ -5,9 +5,13 @@ import 'package:calorie_tracker/features/workout/models/exercise.dart';
 import 'package:calorie_tracker/features/workout/models/workout_set.dart';
 import 'package:calorie_tracker/features/workout/repo/local_workout_repo.dart';
 import 'package:calorie_tracker/features/workout/services/workout_sync_service.dart';
+import 'package:calorie_tracker/core/providers/account_scope_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final localWorkoutRepoProvider = Provider((ref) => LocalWorkoutRepo());
+final localWorkoutRepoProvider = Provider((ref) {
+  ref.watch(accountScopeProvider);
+  return LocalWorkoutRepo();
+});
 
 // ----- Stream Providers -----
 

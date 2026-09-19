@@ -1,25 +1,11 @@
-// coverage:ignore-file
-
-import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
-import 'package:flutter/foundation.dart';
 
-///This function used for those devices which doesnot support
-/// newer ssl certificate and disabled in web
+/// Leaves Dio on the platform's default TLS validation path.
+///
+/// The previous implementation accepted every certificate and made public
+/// authentication calls vulnerable to a network attacker. The parameter is
+/// retained so existing API-service construction stays source compatible.
 void fixBadCertificate({required Dio dio}) {
-  if (!kIsWeb) {
-    dio.httpClientAdapter = IOHttpClientAdapter(
-      createHttpClient: () {
-        // Don't trust any certificate just because their root cert is trusted.
-        final HttpClient client = HttpClient(
-          context: SecurityContext(withTrustedRoots: false),
-        );
-        // You can test the intermediate / root cert here. We just ignore it.
-        client.badCertificateCallback = (cert, host, port) => true;
-        return client;
-      },
-      validateCertificate: (cert, host, port) => true,
-    );
-  }
+  // Intentionally empty: Dio validates certificates using the platform trust
+  // store when no custom adapter is installed.
 }

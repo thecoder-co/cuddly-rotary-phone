@@ -4,7 +4,12 @@ import '../models/auth_dto.dart';
 
 class VerifyOtpScreen extends ConsumerStatefulWidget {
   final String email;
-  const VerifyOtpScreen({super.key, required this.email});
+  final bool isGuestUpgrade;
+  const VerifyOtpScreen({
+    super.key,
+    required this.email,
+    this.isGuestUpgrade = false,
+  });
 
   @override
   ConsumerState<VerifyOtpScreen> createState() => _VerifyOtpScreenState();
@@ -39,7 +44,9 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                 children: [
                   60.spacingH,
                   Text(
-                    'Verify It\'s You 🔐',
+                    widget.isGuestUpgrade
+                        ? 'Verify your new email 🔐'
+                        : 'Verify It\'s You 🔐',
                     style: CustomTextStyle.textextraBold24.w700,
                   ),
                   8.spacingH,
